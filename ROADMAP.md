@@ -28,6 +28,6 @@ Goal: Establish the base systems to a golf game, that things that make a golf ga
 
 Goal:
 
-* [ ] 
+* [✔] Adding movement to the ball over time.
 
 ---
