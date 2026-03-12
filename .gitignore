@@ -1,0 +1,78 @@
+# Dependencies
+
+node_modules/
+
+# Build output
+
+dist/
+build/
+out/
+
+# Logs
+
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+
+coverage/
+
+# Environment variables
+
+.env
+.env.local
+.env.*.local
+
+# Cache
+
+.cache/
+.parcel-cache/
+.vite/
+
+# TypeScript
+
+*.tsbuildinfo
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Testing
+
+jest-cache/
+*.lcov
+
+# Temporary files
+
+tmp/
+temp/
+
+# ThreeJS / assets builds (optional)
+
+public/build/
+
+# Misc
+
+*.tgz
+*.zip
