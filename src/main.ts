@@ -1,7 +1,8 @@
 import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
 
 const scene = new THREE.Scene();
-
+scene.background = new THREE.Color(150, 150, 150);
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -11,24 +12,112 @@ const camera = new THREE.PerspectiveCamera(
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const ground = new THREE.Mesh(new THREE.BoxGeometry(100, 1, 100), new THREE.MeshPhongMaterial({ color: 0x00f000 }));
+ground.receiveShadow = true;
+scene.add(ground);
 
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+const radius = 2;
+const area = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, radius), new THREE.MeshPhongMaterial({ color: 0x0000f0 }));
+area.receiveShadow = true;
+area.castShadow = true;
+area.position.set(0, 0, 10)
+scene.add(area);
 
-camera.position.z = 3;
+const ball = new THREE.Mesh(new THREE.SphereGeometry(), new THREE.MeshPhongMaterial({ color: 0xf00000 }));
+ball.position.set(0, 1.5, 0)
+ball.receiveShadow = true;
+ball.castShadow = true;
+scene.add(ball);
+
+camera.position.set(3, 3, 3);
+camera.lookAt(0, 0, 0);
+
+const light = new THREE.DirectionalLight();
+light.position.set(10, 10, 10);
+light.lookAt(-1, -1, -1);
+light.castShadow = true;
+light.shadow!.mapSize.set(2048, 2048);
+light.shadow!.bias = 0.0001;
+light.shadow!.normalBias = 0.01;
+
+const controls = new OrbitControls( camera, renderer.domElement );
+
+const directionalArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 10, new THREE.Color(0, 0, 255));
+scene.add( directionalArrow );
+
+scene.add(light)
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const direction = new THREE.Vector3();
+const plane = new THREE.Plane();
+let magnitude = 0;
+let maxMagnitude = 10;
+let strength = 10;
+let lastPress = 0;
 
 function animate() {
   requestAnimationFrame(animate);
-
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
 
   renderer.render(scene, camera);
 }
 
 animate();
+
+renderer.domElement.addEventListener("mousemove", (e) => {
+    updateArrowDirection(camera, directionalArrow, ball, direction, e);
+})
+
+renderer.domElement.addEventListener("mousedown", (e) => {
+    magnitude = 0;
+    lastPress = Date.now();
+})
+
+renderer.domElement.addEventListener("mouseup", (e) => {
+    let magnitude = millisecondsToUnits(Date.now() - lastPress) * strength;
+    magnitude = Math.min(magnitude, maxMagnitude);
+    updateBallPosition(ball, direction, magnitude);
+    updateArrowPosition(directionalArrow, ball)
+    checkCondition(ball, area, radius);
+})
+
+function updateBallPosition(ball: THREE.Mesh, direction: THREE.Vector3, magnitude: number = 1): void {
+    ball.position.addScaledVector(direction, magnitude);
+}
+
+function updateArrowDirection(camera: THREE.PerspectiveCamera, arrow: THREE.ArrowHelper, ball: THREE.Mesh, direction: THREE.Vector3, event: MouseEvent): void {
+    const rect = renderer.domElement.getBoundingClientRect();
+    
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    
+    raycaster.setFromCamera(mouse, camera);
+    
+    plane.set(new THREE.Vector3(0, 1, 0), -ball.position.y);
+    
+    const point = new THREE.Vector3();
+    
+    if (raycaster.ray.intersectPlane(plane, point)) {
+        const dir = new THREE.Vector3().subVectors(point, ball.position).normalize().multiplyScalar(-1);
+    
+        direction.set(...dir.toArray());
+        arrow.setDirection(dir);
+    }
+}
+
+function updateArrowPosition(arrow: THREE.ArrowHelper, ball: THREE.Mesh): void {
+    arrow.position.copy(ball.position);
+}
+
+function checkCondition(ball: THREE.Mesh, area: THREE.Mesh, distance: number): void {
+    if (ball.position.distanceTo(area.position) < distance) console.log("Inside area");
+}
+
+function millisecondsToUnits(ms: number): number {
+    return ms / 1000;
+}
