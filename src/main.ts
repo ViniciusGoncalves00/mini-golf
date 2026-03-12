@@ -56,13 +56,23 @@ const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 const direction = new THREE.Vector3();
 const plane = new THREE.Plane();
-let magnitude = 0;
-let maxMagnitude = 10;
-let strength = 10;
+let maxMagnitude = 100;
+let strength = 100;
 let lastPress = 0;
+
+const velocity = new THREE.Vector3();
+const timer = new THREE.Timer();
+
+const friction = 0.98;
+const stopThreshold = 0.01;
 
 function animate() {
   requestAnimationFrame(animate);
+
+    timer.update()
+  const delta = timer.getDelta()
+
+  updateBallMotion(delta);
 
   renderer.render(scene, camera);
 }
@@ -74,21 +84,18 @@ renderer.domElement.addEventListener("mousemove", (e) => {
 })
 
 renderer.domElement.addEventListener("mousedown", (e) => {
-    magnitude = 0;
     lastPress = Date.now();
 })
 
 renderer.domElement.addEventListener("mouseup", (e) => {
     let magnitude = millisecondsToUnits(Date.now() - lastPress) * strength;
     magnitude = Math.min(magnitude, maxMagnitude);
-    updateBallPosition(ball, direction, magnitude);
-    updateArrowPosition(directionalArrow, ball)
+
+    velocity.copy(direction).multiplyScalar(magnitude);
+    console.log(velocity)
+    
     checkCondition(ball, area, radius);
 })
-
-function updateBallPosition(ball: THREE.Mesh, direction: THREE.Vector3, magnitude: number = 1): void {
-    ball.position.addScaledVector(direction, magnitude);
-}
 
 function updateArrowDirection(camera: THREE.PerspectiveCamera, arrow: THREE.ArrowHelper, ball: THREE.Mesh, direction: THREE.Vector3, event: MouseEvent): void {
     const rect = renderer.domElement.getBoundingClientRect();
@@ -120,4 +127,18 @@ function checkCondition(ball: THREE.Mesh, area: THREE.Mesh, distance: number): v
 
 function millisecondsToUnits(ms: number): number {
     return ms / 1000;
+}
+
+function updateBallMotion(delta: number): void {
+  if (velocity.lengthSq() === 0) return;
+
+  ball.position.addScaledVector(velocity, delta);
+
+  velocity.multiplyScalar(friction);
+
+  if (velocity.length() < stopThreshold) {
+    velocity.set(0, 0, 0);
+  }
+
+  updateArrowPosition(directionalArrow, ball);
 }
