@@ -17,10 +17,10 @@ Therefore, the goal is to create a mini-golf game.
 
 Goal: Establish the base systems to a golf game, that things that make a golf game... a golf game.
 
-* [ ] To hit the ball with a club.
-* [ ] Choose the force to apply to the ball.
-* [ ] Choosing the direction of the shot.
-* [ ] Check if the ball is in a specific region.
+* [✔] To hit the ball with a club.
+* [✔] Choose the force to apply to the ball.
+* [✔] Choosing the direction of the shot.
+* [✔] Check if the ball is in a specific region.
 
 ---
 
