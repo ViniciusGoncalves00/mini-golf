@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "vite serve src",
+    "dev": "vite --open",
     "build": "vite build",
     "preview": "vite preview"
   },
