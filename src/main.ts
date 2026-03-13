@@ -1,5 +1,10 @@
+import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { PeerNetwork } from "./network/PeerNetwork";
+
+const network = new PeerNetwork();
+(window as any).network = network;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(150, 150, 150);
@@ -10,7 +15,8 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-const renderer = new THREE.WebGLRenderer();
+const canvas = document.getElementById("MyCanvas")!;
+const renderer = new THREE.WebGLRenderer({canvas: canvas});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -140,5 +146,21 @@ function updateBallMotion(delta: number): void {
     velocity.set(0, 0, 0);
   }
 
+  network.send({
+      type: "ball-position",
+      position: [...ball.position.toArray()]
+  })
+
   updateArrowPosition(directionalArrow, ball);
 }
+
+network.onReceive.push((data) => {
+    if (data.type === "ball-position") {
+        ball.position.set(data.position[0], data.position[1], data.position[2]);
+        updateArrowPosition(directionalArrow, ball);
+    }
+})
+
+const peerID = document.getElementById("PeerID")! as HTMLInputElement;
+const connect = document.getElementById("Connect")! as HTMLButtonElement;
+connect.onclick = () => network.joinRoom(peerID.value);

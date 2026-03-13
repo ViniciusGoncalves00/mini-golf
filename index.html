@@ -8,7 +8,19 @@
     <meta charset="UTF-8" />
     <title>Mini Golf</title>
 </head>
-<body>
+<body class="h-full w-full flex">
     <script type="module" src="src/main.ts"></script>
+    <div class="fixed flex flex-col">
+        <div class="flex">
+            <div>My ID: </div>
+            <div id="MyID">My ID</div>
+        </div>
+        <div class="flex">
+            <div>Enter Peer ID to connect</div>
+            <input id="PeerID" type="text" placeholder="Enter text">
+            <button id="Connect" class="cursor-pointer">Connect</button>
+        </div>
+    </div>
+    <canvas id="MyCanvas" class="h-full w-full"></canvas>
 </body>
 </html>
