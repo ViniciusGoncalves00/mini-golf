@@ -2,7 +2,13 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { PeerNetwork } from "./network/PeerNetwork";
+import { Tile } from "./tile";
+import { Builder } from "./builder";
+import { Board } from "./board";
+import { Ball } from "./ball";
+import { Club } from "./club";
 
+// config scene
 const network = new PeerNetwork();
 (window as any).network = network;
 
@@ -14,6 +20,8 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
+camera.position.set(3, 3, 3);
+camera.lookAt(0, 0, 0);
 
 const canvas = document.getElementById("MyCanvas")!;
 const renderer = new THREE.WebGLRenderer({canvas: canvas});
@@ -23,144 +31,63 @@ renderer.shadowMap.type = THREE.PCFShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
-const ground = new THREE.Mesh(new THREE.BoxGeometry(100, 1, 100), new THREE.MeshPhongMaterial({ color: 0x00f000 }));
-ground.receiveShadow = true;
-scene.add(ground);
+const timer = new THREE.Timer();
 
-const radius = 2;
-const area = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, radius), new THREE.MeshPhongMaterial({ color: 0x0000f0 }));
-area.receiveShadow = true;
-area.castShadow = true;
-area.position.set(0, 0, 10)
-scene.add(area);
+function animate() {
+    requestAnimationFrame(animate);
 
-const ball = new THREE.Mesh(new THREE.SphereGeometry(), new THREE.MeshPhongMaterial({ color: 0xf00000 }));
-ball.position.set(0, 1.5, 0)
-ball.receiveShadow = true;
-ball.castShadow = true;
-scene.add(ball);
+    timer.update();
+    const delta = timer.getDelta()
+    for (const monobehavior of Builder.monobehaviors) monobehavior.update(delta);
 
-camera.position.set(3, 3, 3);
-camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+}
+
+animate();
 
 const light = new THREE.DirectionalLight();
-light.position.set(10, 10, 10);
+light.position.set(100, 100, 100);
 light.lookAt(-1, -1, -1);
 light.castShadow = true;
 light.shadow!.mapSize.set(2048, 2048);
 light.shadow!.bias = 0.0001;
 light.shadow!.normalBias = 0.01;
-
-const controls = new OrbitControls( camera, renderer.domElement );
-
-const directionalArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 10, new THREE.Color(0, 0, 255));
-scene.add( directionalArrow );
-
 scene.add(light)
 
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-const direction = new THREE.Vector3();
-const plane = new THREE.Plane();
-let maxMagnitude = 100;
-let strength = 100;
-let lastPress = 0;
+const controls = new OrbitControls( camera, renderer.domElement );
+// config scene
 
-const velocity = new THREE.Vector3();
-const timer = new THREE.Timer();
+const board = new Board();
+const items = [
+    {coordinates: {x: 0, y: 0}, tile: Builder.tile(0x00aa00)},
+    {coordinates: {x: 1, y: 0}, tile: Builder.tile(0x00bb00)},
+    {coordinates: {x: 1, y: 1}, tile: Builder.tile(0x00cc00)},
+    {coordinates: {x: 0, y: 1}, tile: Builder.tile(0x00dd00)},
+]
 
-const friction = 0.98;
-const stopThreshold = 0.01;
+items.forEach(item => {
+    board.tryAddTile(item.coordinates, item.tile);
+    item.tile.mesh.position.set(item.tile.width * item.coordinates.x, 0, item.tile.length * item.coordinates.y);
+    scene.add(item.tile.mesh);
+})
 
-function animate() {
-  requestAnimationFrame(animate);
+const ball = Builder.ball();
+ball.mesh.position.set(0, 1, 0);
+scene.add(ball.mesh);
 
-    timer.update()
-  const delta = timer.getDelta()
-
-  updateBallMotion(delta);
-
-  renderer.render(scene, camera);
-}
-
-animate();
+const club = new Club();
+scene.add(club.arrow);
 
 renderer.domElement.addEventListener("mousemove", (e) => {
-    updateArrowDirection(camera, directionalArrow, ball, direction, e);
+    club.calculateDirection(camera, e, renderer.domElement.getBoundingClientRect(), ball)
 })
 
 renderer.domElement.addEventListener("mousedown", (e) => {
-    lastPress = Date.now();
+    club.startShot(ball);
 })
 
 renderer.domElement.addEventListener("mouseup", (e) => {
-    let magnitude = millisecondsToUnits(Date.now() - lastPress) * strength;
-    magnitude = Math.min(magnitude, maxMagnitude);
-
-    velocity.copy(direction).multiplyScalar(magnitude);
-    console.log(velocity)
+    club.freeShot();
     
-    checkCondition(ball, area, radius);
+    // checkCondition(ball, area, radius);
 })
-
-function updateArrowDirection(camera: THREE.PerspectiveCamera, arrow: THREE.ArrowHelper, ball: THREE.Mesh, direction: THREE.Vector3, event: MouseEvent): void {
-    const rect = renderer.domElement.getBoundingClientRect();
-    
-    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    
-    raycaster.setFromCamera(mouse, camera);
-    
-    plane.set(new THREE.Vector3(0, 1, 0), -ball.position.y);
-    
-    const point = new THREE.Vector3();
-    
-    if (raycaster.ray.intersectPlane(plane, point)) {
-        const dir = new THREE.Vector3().subVectors(point, ball.position).normalize().multiplyScalar(-1);
-    
-        direction.set(...dir.toArray());
-        arrow.setDirection(dir);
-    }
-}
-
-function updateArrowPosition(arrow: THREE.ArrowHelper, ball: THREE.Mesh): void {
-    arrow.position.copy(ball.position);
-}
-
-function checkCondition(ball: THREE.Mesh, area: THREE.Mesh, distance: number): void {
-    if (ball.position.distanceTo(area.position) < distance) console.log("Inside area");
-}
-
-function millisecondsToUnits(ms: number): number {
-    return ms / 1000;
-}
-
-function updateBallMotion(delta: number): void {
-  if (velocity.lengthSq() === 0) return;
-
-  ball.position.addScaledVector(velocity, delta);
-
-  velocity.multiplyScalar(friction);
-
-  if (velocity.length() < stopThreshold) {
-    velocity.set(0, 0, 0);
-  }
-
-  network.send({
-      type: "ball-position",
-      position: [...ball.position.toArray()]
-  })
-
-  updateArrowPosition(directionalArrow, ball);
-}
-
-network.onReceive.push((data) => {
-    if (data.type === "ball-position") {
-        ball.position.set(data.position[0], data.position[1], data.position[2]);
-        updateArrowPosition(directionalArrow, ball);
-    }
-})
-
-const peerID = document.getElementById("PeerID")! as HTMLInputElement;
-const connect = document.getElementById("Connect")! as HTMLButtonElement;
-connect.onclick = () => network.joinRoom(peerID.value);
