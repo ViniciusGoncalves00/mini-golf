@@ -33,5 +33,6 @@ Goal:
     * [ ] Shot strength.
 * [✔] Adding movement to the ball over time.
 * [ ] Allow multiplayer matches.
+* [ ] Add basic physics.
 
 ---
