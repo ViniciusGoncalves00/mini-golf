@@ -13,14 +13,14 @@ const network = new PeerNetwork();
 (window as any).network = network;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(150, 150, 150);
+scene.background = new THREE.Color(0.98, 0.98, 0.98);
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
   1000
 );
-camera.position.set(3, 3, 3);
+camera.position.set(0, 3, -3);
 camera.lookAt(0, 0, 0);
 
 const canvas = document.getElementById("MyCanvas")!;
@@ -30,20 +30,6 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 
 document.body.appendChild(renderer.domElement);
-
-const timer = new THREE.Timer();
-
-function animate() {
-    requestAnimationFrame(animate);
-
-    timer.update();
-    const delta = timer.getDelta()
-    for (const monobehavior of Builder.monobehaviors) monobehavior.update(delta);
-
-    renderer.render(scene, camera);
-}
-
-animate();
 
 const light = new THREE.DirectionalLight();
 light.position.set(100, 100, 100);
@@ -58,16 +44,26 @@ const controls = new OrbitControls( camera, renderer.domElement );
 // config scene
 
 const board = new Board();
-const items = [
-    {coordinates: {x: 0, y: 0}, tile: Builder.tile(0x00aa00)},
-    {coordinates: {x: 1, y: 0}, tile: Builder.tile(0x00bb00)},
-    {coordinates: {x: 1, y: 1}, tile: Builder.tile(0x00cc00)},
-    {coordinates: {x: 0, y: 1}, tile: Builder.tile(0x00dd00)},
-]
+const items = []
+const rows = 8;
+for (let index = 0; index < rows; index += 2) {
+    if (index > rows - 3) {
+        items.push({coordinates: {x: -1, y: index    }, tile: Builder.tile(0x00cc00)});
+        items.push({coordinates: {x:  0, y: index    }, tile: Builder.tile(0xaa0000)});
+        items.push({coordinates: {x:  1, y: index    }, tile: Builder.tile(0x00cc00)});
+    } else {
+        items.push({coordinates: {x: -1, y: index    }, tile: Builder.tile(0x00cc00)});
+        items.push({coordinates: {x:  0, y: index    }, tile: Builder.tile(0x00aa00)});
+        items.push({coordinates: {x:  1, y: index    }, tile: Builder.tile(0x00cc00)});
+    }
+    items.push({coordinates: {x: -1, y: index + 1}, tile: Builder.tile(0x00aa00)});
+    items.push({coordinates: {x:  0, y: index + 1}, tile: Builder.tile(0x00cc00)});
+    items.push({coordinates: {x:  1, y: index + 1}, tile: Builder.tile(0x00aa00)});
+}
 
 items.forEach(item => {
     board.tryAddTile(item.coordinates, item.tile);
-    item.tile.mesh.position.set(item.tile.width * item.coordinates.x, 0, item.tile.length * item.coordinates.y);
+    item.tile.mesh.position.set(item.tile.width * item.coordinates.x, 0, item.tile.depth * item.coordinates.y);
     scene.add(item.tile.mesh);
 })
 
@@ -91,3 +87,42 @@ renderer.domElement.addEventListener("mouseup", (e) => {
     
     // checkCondition(ball, area, radius);
 })
+
+console.log(board.bounds)
+const timer = new THREE.Timer();
+
+let lastCollision = Date.now();
+const collisionCheckInterval = 100;
+function animate() {
+    requestAnimationFrame(animate);
+
+    timer.update();
+    const delta = timer.getDelta()
+    for (const monobehavior of Builder.monobehaviors) monobehavior.update(delta);
+
+    renderer.render(scene, camera);
+
+    if ((Date.now() - lastCollision) < collisionCheckInterval) return;
+    if (!board.bounds.containsPoint(ball.mesh.position)) {
+        const normal = new THREE.Vector3();
+
+        if (ball.mesh.position.x < board.bounds.min.x) {
+            normal.set(1, 0, 0);
+        }
+        else if (ball.mesh.position.x > board.bounds.max.x) {
+            normal.set(-1, 0, 0);
+        }
+        else if (ball.mesh.position.z < board.bounds.min.z) {
+            normal.set(0, 0, 1);
+        }
+        else if (ball.mesh.position.z > board.bounds.max.z) {
+            normal.set(0, 0, -1);
+        }
+
+        ball.velocity.reflect(normal);
+
+        lastCollision = Date.now();
+    }
+}
+
+animate();

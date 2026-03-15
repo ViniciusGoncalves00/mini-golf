@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { Monobehavior } from "./monobehavior";
+import { Board } from "./board";
 
 export class Ball extends Monobehavior {
-    private velocity = new THREE.Vector3();
+    public velocity = new THREE.Vector3();
     public readonly mesh: THREE.Mesh;
 
     private stopThreshold = 1;
@@ -25,12 +26,16 @@ export class Ball extends Monobehavior {
         return this.velocity.length() > 0;
     }
 
+    public getDirection(): THREE.Vector3 {
+        return this.velocity.clone().normalize();
+    }
+
     private updateBallMotion(delta: number): void {
         if (this.velocity.lengthSq() === 0) return;
 
         this.mesh.position.addScaledVector(this.velocity, delta);
 
-        const friction = 0.98;
+        const friction = 0.992;
         this.velocity.multiplyScalar(friction);
         
         if (this.velocity.length() < this.stopThreshold) {

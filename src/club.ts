@@ -8,7 +8,7 @@ export class Club {
     private direction = new THREE.Vector3();
 
     private readonly maxMagnitude = 100;
-    private readonly strength = 100;
+    private readonly strength = 1000;
     private before = 0;
 
     private currentBall: Ball | null = null;

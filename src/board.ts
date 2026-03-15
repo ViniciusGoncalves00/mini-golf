@@ -3,6 +3,7 @@ import { Tile } from "./tile";
 import { Monobehavior } from "./monobehavior";
 
 export class Board extends Monobehavior {
+    public readonly bounds: THREE.Box3 = new THREE.Box3();
     private readonly tiles: Map<string, Tile> = new Map();
 
     public tryGetTile(coordinates: THREE.Vector2Like): Tile | undefined {
@@ -15,6 +16,11 @@ export class Board extends Monobehavior {
         if (this.tiles.has(index)) return this;
 
         this.tiles.set(index, tile);
+
+        const min = new THREE.Vector3(coordinates.x * tile.width - tile.width / 2,    0, coordinates.y * tile.depth - tile.depth / 2);
+        const max = new THREE.Vector3(coordinates.x * tile.width + tile.width / 2, 1000, coordinates.y * tile.depth + tile.depth / 2);
+        const box = new THREE.Box3(min, max);
+        this.bounds.union(box);
         return this;
     }
 
