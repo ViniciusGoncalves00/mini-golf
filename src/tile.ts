@@ -15,4 +15,8 @@ export class Tile extends Monobehavior {
         this.height = height;
         this.depth = depth;
     }
+
+    public setColor(color: THREE.ColorRepresentation): void {
+        this.mesh.material = new THREE.MeshPhongMaterial({color: color});
+    }
 }

@@ -1,36 +1,67 @@
 import * as THREE from "three";
 import { Ball } from "./ball";
+import { Monobehavior } from "./monobehavior";
 
-export class Club {
+export class Club extends Monobehavior {
     public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 10, new THREE.Color(0, 0, 255));
+
+    public readonly onStartShot: (() => void)[] = [];
+    public readonly onFreeShot: (() => void)[] = [];
     
+    private readonly maxStrength = 100;
+    private readonly timeToMaxStrengthInSeconds = 3;
+    private readonly strengthGainRate = this.maxStrength / this.timeToMaxStrengthInSeconds;
+    private strength = 0;
+    private isHolding = false;
+
     private normal = new THREE.Vector3(0, 1, 0);
     private direction = new THREE.Vector3();
+    private ball: Ball;
 
-    private readonly maxMagnitude = 100;
-    private readonly strength = 1000;
-    private before = 0;
+    public constructor(ball: Ball) {
+        super();
 
-    private currentBall: Ball | null = null;
+        this.ball = ball;
+    }
 
-    public startShot(ball: Ball): void {
-        if (ball.isMoving()) return;
+    public update(delta: number) {
+        if (this.isHolding) {
+            this.strength += delta * this.strengthGainRate;
+            this.strength = Math.min(this.strength, this.maxStrength);
+            this.arrow.scale.set(this.strength / 10, 1, this.strength / 10);
+        } else {
+            this.arrow.scale.set(1, 1, 1);
+        }
+    }
 
-        this.currentBall = ball;
-        this.before = Date.now();
+    public startShot(): void {
+        if (this.ball.isMoving()) return;
 
-        this.arrow.position.copy(ball.mesh.position);
-        this.arrow.visible = true;
+        this.strength = 0;
+        this.isHolding = true;
+
+        for (const callback of this.onStartShot) callback();
     }
 
     public freeShot(): void {
-        if (!this.currentBall) return;
+        if (this.ball.isMoving()) return;
 
-        const delta = (Date.now() - this.before) / 1000;
-        const magnitude = Math.min(delta * this.strength, this.maxMagnitude);
+        const force = new THREE.Vector3().copy(this.direction).multiplyScalar(this.strength);
+        this.ball.applyForce(force);
+        
+        this.strength = 0;
+        this.isHolding = false;
 
-        const force = new THREE.Vector3().copy(this.direction).multiplyScalar(magnitude);
-        this.currentBall.applyForce(force)
+        for (const callback of this.onFreeShot) callback();
+    }
+
+    public showArrow(): void {
+        this.arrow.position.copy(this.ball.mesh.position);
+        this.arrow.visible = true;
+    }
+
+    public hideArrow(): void {
+        this.arrow.visible = false;
     }
 
     public calculateDirection(camera: THREE.PerspectiveCamera, event: MouseEvent, rect: DOMRect, ball: Ball): void {
@@ -53,8 +84,5 @@ export class Club {
             this.direction.set(...dir.toArray());
             this.arrow.setDirection(dir);
         }
-
-        this.currentBall = null;
-        this.arrow.visible = false;
     }
 }

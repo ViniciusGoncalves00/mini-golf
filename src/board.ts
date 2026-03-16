@@ -4,6 +4,7 @@ import { Monobehavior } from "./monobehavior";
 
 export class Board extends Monobehavior {
     public readonly bounds: THREE.Box3 = new THREE.Box3();
+    
     private readonly tiles: Map<string, Tile> = new Map();
 
     public tryGetTile(coordinates: THREE.Vector2Like): Tile | undefined {

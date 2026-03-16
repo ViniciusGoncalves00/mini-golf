@@ -20,8 +20,8 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 3, -3);
-camera.lookAt(0, 0, 0);
+
+camera.position.set(0, 15, -15);
 
 const canvas = document.getElementById("MyCanvas")!;
 const renderer = new THREE.WebGLRenderer({canvas: canvas});
@@ -45,21 +45,36 @@ const controls = new OrbitControls( camera, renderer.domElement );
 
 const board = new Board();
 const items = []
-const rows = 8;
-for (let index = 0; index < rows; index += 2) {
-    if (index > rows - 3) {
-        items.push({coordinates: {x: -1, y: index    }, tile: Builder.tile(0x00cc00)});
-        items.push({coordinates: {x:  0, y: index    }, tile: Builder.tile(0xaa0000)});
-        items.push({coordinates: {x:  1, y: index    }, tile: Builder.tile(0x00cc00)});
-    } else {
-        items.push({coordinates: {x: -1, y: index    }, tile: Builder.tile(0x00cc00)});
-        items.push({coordinates: {x:  0, y: index    }, tile: Builder.tile(0x00aa00)});
-        items.push({coordinates: {x:  1, y: index    }, tile: Builder.tile(0x00cc00)});
+const rows = 9;
+const colums = 5;
+
+for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
+    for (let row = 0; row < rows; row++) {
+        const color = (colum + row) % 2 == 0 ?0x00aa00 : 0x00cc00;
+        items.push({coordinates: {x: colum, y: row}, tile: Builder.tile(color)});
     }
-    items.push({coordinates: {x: -1, y: index + 1}, tile: Builder.tile(0x00aa00)});
-    items.push({coordinates: {x:  0, y: index + 1}, tile: Builder.tile(0x00cc00)});
-    items.push({coordinates: {x:  1, y: index + 1}, tile: Builder.tile(0x00aa00)});
 }
+
+// for (let index = 0; index < rows; index += 2) {
+//     if (index > rows - 3) {
+//         items.push({coordinates: {x: -2, y: index    }, tile: Builder.tile(0x00aa00)});
+//         items.push({coordinates: {x: -1, y: index    }, tile: Builder.tile(0x00cc00)});
+//         items.push({coordinates: {x:  0, y: index    }, tile: Builder.tile(0xaa0000)});
+//         items.push({coordinates: {x:  1, y: index    }, tile: Builder.tile(0x00cc00)});
+//         items.push({coordinates: {x:  2, y: index    }, tile: Builder.tile(0x00aa00)});
+//     } else {
+//         items.push({coordinates: {x: -2, y: index    }, tile: Builder.tile(0x00aa00)});
+//         items.push({coordinates: {x: -1, y: index    }, tile: Builder.tile(0x00cc00)});
+//         items.push({coordinates: {x:  0, y: index    }, tile: Builder.tile(0x00aa00)});
+//         items.push({coordinates: {x:  1, y: index    }, tile: Builder.tile(0x00cc00)});
+//         items.push({coordinates: {x:  2, y: index    }, tile: Builder.tile(0x00aa00)});
+//     }
+//     items.push({coordinates: {x: -2, y: index + 1}, tile: Builder.tile(0x00cc00)});
+//     items.push({coordinates: {x: -1, y: index + 1}, tile: Builder.tile(0x00aa00)});
+//     items.push({coordinates: {x:  0, y: index + 1}, tile: Builder.tile(0x00cc00)});
+//     items.push({coordinates: {x:  1, y: index + 1}, tile: Builder.tile(0x00aa00)});
+//     items.push({coordinates: {x:  2, y: index + 1}, tile: Builder.tile(0x00cc00)});
+// }
 
 items.forEach(item => {
     board.tryAddTile(item.coordinates, item.tile);
@@ -69,9 +84,10 @@ items.forEach(item => {
 
 const ball = Builder.ball();
 ball.mesh.position.set(0, 1, 0);
+ball.mesh.add(camera);
 scene.add(ball.mesh);
 
-const club = new Club();
+const club = Builder.club(ball);
 scene.add(club.arrow);
 
 renderer.domElement.addEventListener("mousemove", (e) => {
@@ -79,16 +95,13 @@ renderer.domElement.addEventListener("mousemove", (e) => {
 })
 
 renderer.domElement.addEventListener("mousedown", (e) => {
-    club.startShot(ball);
+    club.startShot();
 })
 
 renderer.domElement.addEventListener("mouseup", (e) => {
     club.freeShot();
-    
-    // checkCondition(ball, area, radius);
 })
 
-console.log(board.bounds)
 const timer = new THREE.Timer();
 
 let lastCollision = Date.now();
@@ -98,10 +111,31 @@ function animate() {
 
     timer.update();
     const delta = timer.getDelta()
+    controls.update(delta);
     for (const monobehavior of Builder.monobehaviors) monobehavior.update(delta);
 
     renderer.render(scene, camera);
 
+    if (!ball.isMoving()) {
+        club.showArrow();
+        const tile = board.tryGetTile({x: 0, y: rows - 2});
+        if (tile) {
+            const box = new THREE.Box3(
+                new THREE.Vector3(-(tile.width / 2), 0          , ((rows - 2) * tile.depth) - (tile.depth / 2)),
+                new THREE.Vector3( (tile.width / 2), 10000000000, ((rows - 2) * tile.depth) + (tile.depth / 2)),
+            )
+
+            if (box.containsPoint(ball.mesh.position)) {
+                tile.setColor(0x0000aa);
+            } else {
+                tile.setColor(0xaa0000);
+            }
+        }
+    } else {
+        club.hideArrow();
+        controls.target.copy(ball.mesh.position);
+    }
+    
     if ((Date.now() - lastCollision) < collisionCheckInterval) return;
     if (!board.bounds.containsPoint(ball.mesh.position)) {
         const normal = new THREE.Vector3();

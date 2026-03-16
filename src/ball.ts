@@ -6,7 +6,10 @@ export class Ball extends Monobehavior {
     public velocity = new THREE.Vector3();
     public readonly mesh: THREE.Mesh;
 
-    private stopThreshold = 1;
+    public readonly onStartMove: (() => void)[] = [];
+    public readonly onStopMove: (() => void)[] = [];
+
+    private readonly stopThreshold = 0.1;
 
     public constructor(mesh: THREE.Mesh) {
         super();
@@ -15,10 +18,11 @@ export class Ball extends Monobehavior {
     }
 
     public update(delta: number): void {
-        this.updateBallMotion(delta)
+        this.updateMovement(delta);
     }
      
     public applyForce(force: THREE.Vector3): void {
+        if (!this.isMoving()) for (const callback of this.onStartMove) callback();
         this.velocity.add(force);
     }
 
@@ -30,16 +34,21 @@ export class Ball extends Monobehavior {
         return this.velocity.clone().normalize();
     }
 
-    private updateBallMotion(delta: number): void {
+    public stop(): void {
+        this.velocity.set(0, 0, 0);
+        for (const callback of this.onStopMove) callback();
+    }
+
+    private updateMovement(delta: number): void {
         if (this.velocity.lengthSq() === 0) return;
 
         this.mesh.position.addScaledVector(this.velocity, delta);
 
-        const friction = 0.992;
+        const friction = 0.99;
         this.velocity.multiplyScalar(friction);
         
         if (this.velocity.length() < this.stopThreshold) {
-            this.velocity.set(0, 0, 0);
+            this.stop();
         }
 
         // network.send({
