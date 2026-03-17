@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Tile } from "./tile";
 import { Monobehavior } from "./monobehavior";
 
-export class Board extends Monobehavior {
+export class Course extends Monobehavior {
     public readonly bounds: THREE.Box3 = new THREE.Box3();
     
     private readonly tiles: Map<string, Tile> = new Map();
@@ -12,7 +12,7 @@ export class Board extends Monobehavior {
         return this.tiles.get(index);
     }
 
-    public tryAddTile(coordinates: THREE.Vector2Like, tile: Tile): Board {
+    public tryAddTile(coordinates: THREE.Vector2Like, tile: Tile): Course {
         const index = this.coordinates2Index(coordinates);
         if (this.tiles.has(index)) return this;
 

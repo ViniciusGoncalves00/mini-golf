@@ -4,7 +4,7 @@ import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { PeerNetwork } from "./network/PeerNetwork";
 import { Tile } from "./tile";
 import { Builder } from "./builder";
-import { Board } from "./board";
+import { Course } from "./course";
 import { Ball } from "./ball";
 import { Club } from "./club";
 
@@ -41,12 +41,13 @@ light.shadow!.normalBias = 0.01;
 scene.add(light)
 
 const controls = new OrbitControls( camera, renderer.domElement );
+controls.enablePan = false;
 // config scene
 
-const board = new Board();
+const board = new Course();
 const items = []
 const rows = 9;
-const colums = 5;
+const colums = 3;
 
 for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
     for (let row = 0; row < rows; row++) {
@@ -84,7 +85,6 @@ items.forEach(item => {
 
 const ball = Builder.ball();
 ball.mesh.position.set(0, 1, 0);
-ball.mesh.add(camera);
 scene.add(ball.mesh);
 
 const club = Builder.club(ball);
@@ -111,8 +111,15 @@ function animate() {
 
     timer.update();
     const delta = timer.getDelta()
-    controls.update(delta);
+
     for (const monobehavior of Builder.monobehaviors) monobehavior.update(delta);
+
+    const direction = new THREE.Vector3().subVectors(camera.position, ball.mesh.position).normalize();
+    
+    const distance = 10;
+    camera.position.copy(direction.multiplyScalar(distance).add(ball.mesh.position));
+    controls.target.copy(ball.mesh.position);
+    controls.update();
 
     renderer.render(scene, camera);
 
@@ -133,7 +140,6 @@ function animate() {
         }
     } else {
         club.hideArrow();
-        controls.target.copy(ball.mesh.position);
     }
     
     if ((Date.now() - lastCollision) < collisionCheckInterval) return;
