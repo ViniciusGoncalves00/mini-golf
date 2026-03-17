@@ -28,14 +28,32 @@ Goal: Establish the base systems to a golf game, that things that make a golf ga
 
 Goal: Add basic behaviors that allow for an understanding of what is happening.
 
-* [ ] Add visualization and feedback to user.
+* [✔] Add visualization and feedback to user.
     * [✔] Shot direction.
     * [✔] Shot strength.
-    * [ ] The ball is in the area.
+    * [✔] The ball is in the area.
 * [✔] Adding movement to the ball over time.
 * [ ] Add basic physics.
     * [✔] The ball collide with board bounding box.
+    * [ ] The ball loses speed as it goes up and gains speed as it goes down.
+* [✔] Allow multiplayer matches.
+* [✔] Others.
+    * [✔] The camera follows the ball.
+
+---
+
+# Phase 3 — General Features
+
+Goal: Add most of the game's elements, such as user interface, sounds, improves the experience, etc.
+
+* [ ] Add more physics.
+    * [ ] The ball loses speed based on the terrain.
+    * [ ] The ball loses speed based on the collision.
     * [ ] The ball collide with other balls.
-* [ ] Allow multiplayer matches.
+* [ ] UI elements.
+    * [] Show the minimum shots.
+    * [] Show the total shots.
+    * [] Show the courses table.
+    * [] Show the current player (multiplayer).
 
 ---
