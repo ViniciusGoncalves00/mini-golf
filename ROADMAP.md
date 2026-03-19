@@ -13,32 +13,36 @@ Therefore, the goal is to create a mini-golf game.
 
 ---
 
-# Phase 1 — Minimum Playable Game
+# Phase 0 — Planning - [11/03/2026]
+
+Goal: Create a development plan.
+
+# Phase 1 — Minimum Playable Game - [12/03/2026]
 
 Goal: Establish the base systems to a golf game, that things that make a golf game... a golf game.
 
-* [✔] To hit the ball with a club.
-* [✔] Choose the force to apply to the ball.
-* [✔] Choosing the direction of the shot.
-* [✔] Check if the ball is in a specific region.
+* [✔] To hit the ball with a club. [12/03/2026]
+* [✔] Choose the force to apply to the ball. [12/03/2026]
+* [✔] Choosing the direction of the shot. [12/03/2026]
+* [✔] Check if the ball is in a specific region. [12/03/2026]
 
 ---
 
-# Phase 2 — Main Features
+# Phase 2 — Main Features - [12/03/2026 - 12/03/2026]
 
 Goal: Add basic behaviors that allow for an understanding of what is happening.
 
-* [✔] Add visualization and feedback to user.
-    * [✔] Shot direction.
-    * [✔] Shot strength.
-    * [✔] The ball is in the area.
-* [✔] Adding movement to the ball over time.
+* [✔] Add visualization and feedback to user. [16/03/2026]
+    * [✔] Shot direction. [12/03/2026]
+    * [✔] Shot strength. [16/03/2026]
+    * [✔] The ball is in the area. [16/03/2026]
+* [✔] Adding movement to the ball over time. [12/03/2026]
 * [ ] Add basic physics.
-    * [✔] The ball collide with board bounding box.
+    * [✔] The ball collide with board bounding box. [15/03/2026]
     * [ ] The ball loses speed as it goes up and gains speed as it goes down.
-* [✔] Allow multiplayer matches.
-* [✔] Others.
-    * [✔] The camera follows the ball.
+* [✔] Allow multiplayer matches. [13/03/2026]
+* [✔] Others. [17/03/2026]
+    * [✔] The camera follows the ball. [17/03/2026]
 
 ---
 
