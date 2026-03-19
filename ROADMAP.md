@@ -51,9 +51,18 @@ Goal: Add most of the game's elements, such as user interface, sounds, improves 
     * [ ] The ball loses speed based on the collision.
     * [ ] The ball collide with other balls.
 * [ ] UI elements.
-    * [] Show the minimum shots.
-    * [] Show the total shots.
-    * [] Show the courses table.
-    * [] Show the current player (multiplayer).
+    * [ ] Show the minimum shots.
+    * [ ] Show the total shots.
+    * [ ] Show the courses table.
+* [ ] Adapt the elements for multiplayer mode when necessary. (multiplayer)
+    * [ ] Show the current player.
+---
+
+# Ideas
+
+Goal: Add most of the game's elements, such as user interface, sounds, improves the experience, etc.
+
+* Map Editor
+* Ranking
 
 ---

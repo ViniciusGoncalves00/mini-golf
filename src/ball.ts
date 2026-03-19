@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { Monobehavior } from "./monobehavior";
-import { Course } from "./course";
 
 export class Ball extends Monobehavior {
     public velocity = new THREE.Vector3();

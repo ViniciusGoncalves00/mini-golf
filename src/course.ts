@@ -4,15 +4,32 @@ import { Monobehavior } from "./monobehavior";
 
 export class Course extends Monobehavior {
     public readonly bounds: THREE.Box3 = new THREE.Box3();
-    
-    private readonly tiles: Map<string, Tile> = new Map();
+    public readonly tiles: Map<string, Tile> = new Map();
 
-    public tryGetTile(coordinates: THREE.Vector2Like): Tile | undefined {
+    public constructor(tiles: Tile[]) {
+        super();
+
+        tiles?.forEach(tile => {
+            this.tryAddTile(tile.coordinates, tile);
+        })
+    }
+
+    public load(): void {
+        this.tiles.forEach(tile => {
+            tile.mesh.position.set(tile.width * tile.coordinates.x, 0, tile.depth * tile.coordinates.y);
+        })
+    }
+
+    public dispose(): void {
+
+    }
+
+    public tryGetTile(coordinates: THREE.Vector3Like): Tile | undefined {
         const index = this.coordinates2Index(coordinates);
         return this.tiles.get(index);
     }
 
-    public tryAddTile(coordinates: THREE.Vector2Like, tile: Tile): Course {
+    public tryAddTile(coordinates: THREE.Vector3Like, tile: Tile): Course {
         const index = this.coordinates2Index(coordinates);
         if (this.tiles.has(index)) return this;
 
@@ -35,7 +52,7 @@ export class Course extends Monobehavior {
             throw new Error("");
         }
     }
-    private coordinates2Index(coordinates: THREE.Vector2Like): string {
+    private coordinates2Index(coordinates: THREE.Vector3Like): string {
         return `${coordinates.x}:${coordinates.y}`;
     }
 }

@@ -7,14 +7,14 @@ import { Club } from "./club";
 export class Builder {
     public static readonly monobehaviors: Monobehavior[] = [];
 
-    public static tile(color: THREE.ColorRepresentation = 0x00f000, width = 10, height = 0.5, depth = 10): Tile {
+    public static tile(coordinates: THREE.Vector3Like, color: THREE.ColorRepresentation = 0x00f000, width = 10, height = 0.5, depth = 10): Tile {
         const geometry = new THREE.BoxGeometry(width, height, depth);
         const material = new THREE.MeshPhongMaterial({ color: color })
         const mesh = new THREE.Mesh(geometry, material);
         mesh.receiveShadow = true;
         mesh.castShadow = true;
 
-        const monobehavior = new Tile(mesh, width, height, depth);
+        const monobehavior = new Tile(coordinates, mesh, width, height, depth);
         this.monobehaviors.push(monobehavior);
         return monobehavior;
     }
