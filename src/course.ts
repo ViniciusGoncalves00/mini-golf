@@ -6,6 +6,8 @@ export class Course extends Monobehavior {
     public readonly bounds: THREE.Box3 = new THREE.Box3();
     public readonly tiles: Map<string, Tile> = new Map();
 
+    public readonly size: number = 10;
+
     public constructor(tiles: Tile[]) {
         super();
 
@@ -16,7 +18,7 @@ export class Course extends Monobehavior {
 
     public load(): void {
         this.tiles.forEach(tile => {
-            tile.mesh.position.set(tile.width * tile.coordinates.x, 0, tile.depth * tile.coordinates.y);
+            tile.mesh.position.set(tile.width * tile.coordinates.x, tile.height * tile.coordinates.y, tile.length * tile.coordinates.z);
         })
     }
 
@@ -35,24 +37,32 @@ export class Course extends Monobehavior {
 
         this.tiles.set(index, tile);
 
-        const min = new THREE.Vector3(coordinates.x * tile.width - tile.width / 2,    0, coordinates.y * tile.depth - tile.depth / 2);
-        const max = new THREE.Vector3(coordinates.x * tile.width + tile.width / 2, 1000, coordinates.y * tile.depth + tile.depth / 2);
+        const min = new THREE.Vector3(coordinates.x * tile.width - tile.width / 2,    0, coordinates.z * tile.length - tile.length / 2);
+        const max = new THREE.Vector3(coordinates.x * tile.width + tile.width / 2, 1000, coordinates.z * tile.length + tile.length / 2);
         const box = new THREE.Box3(min, max);
         this.bounds.union(box);
         return this;
     }
 
-    private index2Coordinates(index: string): THREE.Vector2 {
+    public world2coordinates(coordinates: THREE.Vector3Like): THREE.Vector3 {
+        const x = Math.round(coordinates.x / this.size);
+        const y = Math.round(coordinates.y / this.size);
+        const z = Math.round(coordinates.z / this.size);
+        return new THREE.Vector3(x, y, z);
+    }
+
+    private index2Coordinates(index: string): THREE.Vector3 {
         try {
             const coordinates = index.split(":");
             const x = Number(coordinates[0]);
             const y = Number(coordinates[1]);
-            return new THREE.Vector2(x, y)
+            const z = Number(coordinates[2]);
+            return new THREE.Vector3(x, y, z);
         } catch (error) {
             throw new Error("");
         }
     }
     private coordinates2Index(coordinates: THREE.Vector3Like): string {
-        return `${coordinates.x}:${coordinates.y}`;
+        return `${coordinates.x}:${coordinates.y}:${coordinates.z}`;
     }
 }

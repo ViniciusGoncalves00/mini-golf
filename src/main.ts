@@ -6,6 +6,7 @@ import { Builder } from "./builder";
 import { Course } from "./course";
 import { Match } from "./match";
 import { Tile } from "./tile";
+import { Global } from "./global";
 
 // config scene
 const network = new PeerNetwork();
@@ -49,7 +50,7 @@ const colums = 3;
 
 for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
     for (let row = 0; row < rows; row++) {
-        const color = (colum + row) % 2 == 0 ?0x00aa00 : 0x00cc00;
+        const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
         items.push(Builder.tile({x: colum, y: 0, z: row}, color));
     }
 }
@@ -61,39 +62,39 @@ const match = new Match(courses);
 match.nextCourse();
 
 const ball = Builder.ball();
-ball.mesh.position.set(0, 1, 0);
+ball.mesh.position.set(0, 10, 0);
 match.scene.add(ball.mesh);
 
 const club = Builder.club(ball);
 match.scene.add(club.arrow);
 
-// renderer.domElement.addEventListener("mousemove", (e) => {
-//     club.calculateDirection(camera, e, renderer.domElement.getBoundingClientRect(), ball)
-// })
+match.renderer.domElement.addEventListener("mousemove", (e) => {
+    club.calculateDirection(match.camera, e, match.renderer.domElement.getBoundingClientRect(), ball)
+})
 
-// renderer.domElement.addEventListener("mousedown", (e) => {
-//     club.startShot();
-// })
+match.renderer.domElement.addEventListener("mousedown", (e) => {
+    club.startShot();
+})
 
-// renderer.domElement.addEventListener("mouseup", (e) => {
-//     club.freeShot();
-// })
+match.renderer.domElement.addEventListener("mouseup", (e) => {
+    club.freeShot();
+})
 
 const timer = new THREE.Timer();
 
 let lastCollision = Date.now();
-const collisionCheckInterval = 100;
+const collisionCheckInterval = 20;
 function animate() {
     requestAnimationFrame(animate);
 
     timer.update();
-    const delta = timer.getDelta()
+    const delta = timer.getDelta() * Global.timeScale;
 
     for (const monobehavior of Builder.monobehaviors) monobehavior.update(delta);
 
     const direction = new THREE.Vector3().subVectors(match.camera.position, ball.mesh.position).normalize();
     
-    const distance = 10;
+    const distance = ball.mesh.position.distanceTo(match.camera.position);
     match.camera.position.copy(direction.multiplyScalar(distance).add(ball.mesh.position));
     match.orbitControls.target.copy(ball.mesh.position);
     match.orbitControls.update();
@@ -105,8 +106,8 @@ function animate() {
         const tile = course.tryGetTile({x: 0, y: 0, z: rows - 2});
         if (tile) {
             const box = new THREE.Box3(
-                new THREE.Vector3(-(tile.width / 2), 0          , ((rows - 2) * tile.depth) - (tile.depth / 2)),
-                new THREE.Vector3( (tile.width / 2), 10000000000, ((rows - 2) * tile.depth) + (tile.depth / 2)),
+                new THREE.Vector3(-(tile.width / 2), 0          , ((rows - 2) * tile.length) - (tile.length / 2)),
+                new THREE.Vector3( (tile.width / 2), 10000000000, ((rows - 2) * tile.length) + (tile.length / 2)),
             )
 
             if (box.containsPoint(ball.mesh.position)) {
@@ -136,9 +137,14 @@ function animate() {
             normal.set(0, 0, -1);
         }
 
-        ball.velocity.reflect(normal);
+        ball.reflect(normal);
 
         lastCollision = Date.now();
+    }
+    const index = course.world2coordinates(ball.mesh.position);
+    const tile = course.tryGetTile(index);
+    if (tile && tile.mesh.position.distanceTo(ball.mesh.position) < tile.height * 2) {
+        ball.reflect(tile.normal, tile.absorption);
     }
 }
 

@@ -1,60 +1,45 @@
 import * as THREE from "three";
 import { Monobehavior } from "./monobehavior";
+import { RigidBody } from "./physics/rigidBody";
 
 export class Ball extends Monobehavior {
-    public velocity = new THREE.Vector3();
     public readonly mesh: THREE.Mesh;
 
     public readonly onStartMove: (() => void)[] = [];
     public readonly onStopMove: (() => void)[] = [];
 
-    private readonly stopThreshold = 0.1;
+    private readonly rigidBody: RigidBody;
+    private readonly stopThreshold = 0.01;
 
     public constructor(mesh: THREE.Mesh) {
         super();
         
         this.mesh = mesh;
+        this.rigidBody = new RigidBody(mesh.position, mesh.quaternion);
     }
 
     public update(delta: number): void {
-        this.updateMovement(delta);
+        this.rigidBody.getSpeed() < this.stopThreshold ? this.stop() : this.rigidBody.update(delta);
     }
      
     public applyForce(force: THREE.Vector3): void {
-        if (!this.isMoving()) for (const callback of this.onStartMove) callback();
-        this.velocity.add(force);
+        if (!this.rigidBody.isMoving()) for (const callback of this.onStartMove) callback();
+        this.rigidBody.applyForce(force);
+    }
+
+    public reflect(normal: THREE.Vector3, magnitude: number = 1): void {
+        const velocity = this.rigidBody.getVelocity();
+        velocity.reflect(normal).multiplyScalar(magnitude);
+        this.stop();
+        this.applyForce(velocity);
     }
 
     public isMoving(): boolean {
-        return this.velocity.length() > 0;
-    }
-
-    public getDirection(): THREE.Vector3 {
-        return this.velocity.clone().normalize();
+        return this.rigidBody.isMoving();
     }
 
     public stop(): void {
-        this.velocity.set(0, 0, 0);
+        this.rigidBody.stop();
         for (const callback of this.onStopMove) callback();
-    }
-
-    private updateMovement(delta: number): void {
-        if (this.velocity.lengthSq() === 0) return;
-
-        this.mesh.position.addScaledVector(this.velocity, delta);
-
-        const friction = 0.99;
-        this.velocity.multiplyScalar(friction);
-        
-        if (this.velocity.length() < this.stopThreshold) {
-            this.stop();
-        }
-
-        // network.send({
-        //     type: "ball-position",
-        //     position: [...ball.position.toArray()]
-        // })
-
-        // updateArrowPosition(directionalArrow, ball);
     }
 }
