@@ -8,6 +8,7 @@ import { Match } from "./match";
 import { Tile } from "./tile";
 import { Global } from "./global";
 import { World } from "./physics/world";
+import { degToRad } from "three/src/math/MathUtils.js";
 
 // config scene
 const network = new PeerNetwork();
@@ -52,14 +53,27 @@ const colums = 3;
 for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
     for (let row = 0; row < rows; row++) {
         const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
-        tiles.push(Builder.planeTile({x: colum, y: colum * row - row, z: row}, color));
+        const y = row == Math.round(rows / 2) ? -1 : 0;
+        const tile = Builder.planeTile({x: colum, y: y, z: row}, color);
+        if (row == Math.round(rows / 2)) tile.mesh.rotateX(degToRad(-30))
+        tiles.push(tile);
     }
 }
 
 for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
     for (let row = 0; row < rows; row++) {
         const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
-        tiles.push(Builder.planeTile({x: colum, y: -20, z: row}, color));
+        const y = row == Math.round(rows / 2) ? -21 : -20;
+        const tile = Builder.planeTile({x: colum, y: y, z: row}, color);
+        if (row == Math.round(rows / 2)) tile.mesh.rotateX(degToRad(-30))
+        tiles.push(tile);
+    }
+}
+
+for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
+    for (let row = 0; row < rows; row++) {
+        const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
+        tiles.push(Builder.planeTile({x: colum, y: -40, z: row}, color));
     }
 }
 
@@ -160,21 +174,32 @@ function animate() {
     
     if (intersections.length === 0) return;
 
-    if (intersections[0].distance > ball.radius) {
+    const hit = intersections[0]
+
+    if (hit.distance > ball.radius) {
         ball.rigidBody.applyForce(World.gravity);
     } else {
-        const tile = tiles.find(t => t.mesh === intersections[0].object);
-        if (tile) {
-            const dot = ball.rigidBody.getDirection().dot(tile.normal);
-            if (ball.rigidBody.getSpeed() < 10) {
-                ball.rigidBody.stop();
-            } else if (dot >= -0.01 && dot <= 0.01) {
-                ball.rigidBody.applyDrag(tile.friction);
-            } else if (dot < -0.01) {
-                ball.rigidBody.reflect(tile.normal, 1 - tile.absorption);
-            }
+        const tile = tiles.find(t => t.mesh === hit.object);
+        if (!tile) return;
+
+        const normal = hit.face!.normal.clone();
+        normal.transformDirection(hit.object.matrixWorld).normalize();
+
+        const direction = ball.rigidBody.getDirection();
+        const dot = direction.dot(normal);
+
+        if (ball.rigidBody.getSpeed() < 1) {
+            ball.rigidBody.stop();
+        } 
+        else if (Math.abs(dot) < 0.01) {
+            ball.rigidBody.applyDrag(tile.friction);
+        } 
+        else if (dot < 0) {
+            ball.rigidBody.reflect(normal, 1 - tile.absorption);
         }
     }
+
+    ball.rigidBody.applyDrag(World.windDrag);
 }
 
 animate();

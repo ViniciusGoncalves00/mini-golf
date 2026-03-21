@@ -15,6 +15,7 @@ export class Match {
     public camera!: THREE.PerspectiveCamera;
     public orbitControls!: OrbitControls;
     public globalLight!: THREE.DirectionalLight;
+    public ambientLight!: THREE.AmbientLight;
 
     public constructor(courses: Course[]) {
         this.courses = courses;
@@ -60,7 +61,10 @@ export class Match {
         this.globalLight.shadow!.mapSize.set(2048, 2048);
         this.globalLight.shadow!.bias = 0.0001;
         this.globalLight.shadow!.normalBias = 0.01;
-        this.scene.add(this.globalLight)
+        this.scene.add(this.globalLight);
+
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+        this.scene.add(this.ambientLight);
 
         this.orbitControls = new OrbitControls( this.camera, this.renderer.domElement );
         this.orbitControls.enablePan = false;

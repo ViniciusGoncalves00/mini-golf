@@ -8,8 +8,8 @@ export class Club extends Monobehavior {
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: (() => void)[] = [];
     
-    private readonly maxStrength = 1000;
-    private readonly timeToMaxStrengthInSeconds = 1;
+    private readonly maxStrength = 100;
+    private readonly timeToMaxStrengthInSeconds = 3;
     private readonly strengthGainRate = this.maxStrength / this.timeToMaxStrengthInSeconds;
     private strength = 0;
     private isHolding = false;
