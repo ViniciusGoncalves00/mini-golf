@@ -7,6 +7,7 @@ import { Course } from "./course";
 import { Match } from "./match";
 import { Tile } from "./tile";
 import { Global } from "./global";
+import { World } from "./physics/world";
 
 // config scene
 const network = new PeerNetwork();
@@ -44,18 +45,25 @@ const network = new PeerNetwork();
 // controls.enablePan = false;
 // config scene
 
-const items: Tile[] = []
+const tiles: Tile[] = []
 const rows = 9;
 const colums = 3;
 
 for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
     for (let row = 0; row < rows; row++) {
         const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
-        items.push(Builder.tile({x: colum, y: 0, z: row}, color));
+        tiles.push(Builder.planeTile({x: colum, y: colum * row - row, z: row}, color));
     }
 }
 
-const course = new Course(items);
+for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
+    for (let row = 0; row < rows; row++) {
+        const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
+        tiles.push(Builder.planeTile({x: colum, y: -20, z: row}, color));
+    }
+}
+
+const course = new Course(tiles);
 
 const courses = [course];
 const match = new Match(courses);
@@ -64,6 +72,7 @@ match.nextCourse();
 const ball = Builder.ball();
 ball.mesh.position.set(0, 10, 0);
 match.scene.add(ball.mesh);
+match.scene.add(ball.arrow);
 
 const club = Builder.club(ball);
 match.scene.add(club.arrow);
@@ -83,7 +92,11 @@ match.renderer.domElement.addEventListener("mouseup", (e) => {
 const timer = new THREE.Timer();
 
 let lastCollision = Date.now();
-const collisionCheckInterval = 20;
+const collisionCheckInterval = 10;
+const raycaster = new THREE.Raycaster();
+raycaster.near = 0;
+raycaster.far = 100;
+
 function animate() {
     requestAnimationFrame(animate);
 
@@ -101,7 +114,7 @@ function animate() {
 
     match.renderer.render(match.scene, match.camera);
 
-    if (!ball.isMoving()) {
+    if (!ball.rigidBody.isMoving()) {
         club.showArrow();
         const tile = course.tryGetTile({x: 0, y: 0, z: rows - 2});
         if (tile) {
@@ -120,7 +133,7 @@ function animate() {
         club.hideArrow();
     }
     
-    if ((Date.now() - lastCollision) < collisionCheckInterval) return;
+    // if ((Date.now() - lastCollision) < collisionCheckInterval) return;
     if (!course.bounds.containsPoint(ball.mesh.position)) {
         const normal = new THREE.Vector3();
 
@@ -137,14 +150,30 @@ function animate() {
             normal.set(0, 0, -1);
         }
 
-        ball.reflect(normal);
+        ball.rigidBody.reflect(normal);
 
         lastCollision = Date.now();
     }
-    const index = course.world2coordinates(ball.mesh.position);
-    const tile = course.tryGetTile(index);
-    if (tile && tile.mesh.position.distanceTo(ball.mesh.position) < tile.height * 2) {
-        ball.reflect(tile.normal, tile.absorption);
+    
+    raycaster.set(ball.mesh.position, new THREE.Vector3(0, -1, 0));
+    const intersections = raycaster.intersectObjects(tiles.map(tile => tile.mesh));
+    
+    if (intersections.length === 0) return;
+
+    if (intersections[0].distance > ball.radius) {
+        ball.rigidBody.applyForce(World.gravity);
+    } else {
+        const tile = tiles.find(t => t.mesh === intersections[0].object);
+        if (tile) {
+            const dot = ball.rigidBody.getDirection().dot(tile.normal);
+            if (ball.rigidBody.getSpeed() < 10) {
+                ball.rigidBody.stop();
+            } else if (dot >= -0.01 && dot <= 0.01) {
+                ball.rigidBody.applyDrag(tile.friction);
+            } else if (dot < -0.01) {
+                ball.rigidBody.reflect(tile.normal, 1 - tile.absorption);
+            }
+        }
     }
 }
 

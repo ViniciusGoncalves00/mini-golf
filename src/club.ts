@@ -8,8 +8,8 @@ export class Club extends Monobehavior {
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: (() => void)[] = [];
     
-    private readonly maxStrength = 200;
-    private readonly timeToMaxStrengthInSeconds = 3;
+    private readonly maxStrength = 1000;
+    private readonly timeToMaxStrengthInSeconds = 1;
     private readonly strengthGainRate = this.maxStrength / this.timeToMaxStrengthInSeconds;
     private strength = 0;
     private isHolding = false;
@@ -26,7 +26,7 @@ export class Club extends Monobehavior {
 
     public update(delta: number) {
         if (this.isHolding) {
-            this.strength += delta * this.strengthGainRate;
+            this.strength += this.strengthGainRate * delta;
             this.strength = Math.min(this.strength, this.maxStrength);
             this.arrow.scale.set(this.strength / 10, 1, this.strength / 10);
         } else {
@@ -35,7 +35,7 @@ export class Club extends Monobehavior {
     }
 
     public startShot(): void {
-        if (this.ball.isMoving()) return;
+        if (this.ball.rigidBody.isMoving()) return;
 
         this.strength = 0;
         this.isHolding = true;
@@ -44,10 +44,10 @@ export class Club extends Monobehavior {
     }
 
     public freeShot(): void {
-        if (this.ball.isMoving()) return;
+        if (this.ball.rigidBody.isMoving()) return;
 
         const force = new THREE.Vector3().copy(this.direction).multiplyScalar(this.strength);
-        this.ball.applyForce(force);
+        this.ball.rigidBody.applyForce(force);
         
         this.strength = 0;
         this.isHolding = false;

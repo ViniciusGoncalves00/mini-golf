@@ -4,42 +4,28 @@ import { RigidBody } from "./physics/rigidBody";
 
 export class Ball extends Monobehavior {
     public readonly mesh: THREE.Mesh;
+    public readonly arrow: THREE.ArrowHelper;
+    public readonly collider: THREE.Sphere;
+    public readonly rigidBody: RigidBody;
 
-    public readonly onStartMove: (() => void)[] = [];
-    public readonly onStopMove: (() => void)[] = [];
+    public readonly radius: number;
 
-    private readonly rigidBody: RigidBody;
     private readonly stopThreshold = 0.01;
 
-    public constructor(mesh: THREE.Mesh) {
+    public constructor(mesh: THREE.Mesh, radius: number = 1) {
         super();
         
         this.mesh = mesh;
+        this.radius = radius;
+
+        this.collider = new THREE.Sphere(mesh.position, radius);
+        this.arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 10, new THREE.Color(255, 0, 255));
         this.rigidBody = new RigidBody(mesh.position, mesh.quaternion);
     }
 
     public update(delta: number): void {
-        this.rigidBody.getSpeed() < this.stopThreshold ? this.stop() : this.rigidBody.update(delta);
-    }
-     
-    public applyForce(force: THREE.Vector3): void {
-        if (!this.rigidBody.isMoving()) for (const callback of this.onStartMove) callback();
-        this.rigidBody.applyForce(force);
-    }
-
-    public reflect(normal: THREE.Vector3, magnitude: number = 1): void {
-        const velocity = this.rigidBody.getVelocity();
-        velocity.reflect(normal).multiplyScalar(magnitude);
-        this.stop();
-        this.applyForce(velocity);
-    }
-
-    public isMoving(): boolean {
-        return this.rigidBody.isMoving();
-    }
-
-    public stop(): void {
-        this.rigidBody.stop();
-        for (const callback of this.onStopMove) callback();
+        this.rigidBody.getSpeed() < this.stopThreshold ? this.rigidBody.stop() : this.rigidBody.update(delta);
+        this.arrow.position.copy(this.mesh.position);
+        this.arrow.setDirection(this.rigidBody.getDirection());
     }
 }
