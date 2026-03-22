@@ -14,38 +14,6 @@ import { degToRad } from "three/src/math/MathUtils.js";
 const network = new PeerNetwork();
 (window as any).network = network;
 
-// const scene = new THREE.Scene();
-// scene.background = new THREE.Color(0.98, 0.98, 0.98);
-// const camera = new THREE.PerspectiveCamera(
-//   75,
-//   window.innerWidth / window.innerHeight,
-//   0.1,
-//   1000
-// );
-
-// camera.position.set(0, 15, -15);
-
-// const canvas = document.getElementById("MyCanvas")!;
-// const renderer = new THREE.WebGLRenderer({canvas: canvas});
-// renderer.setSize(window.innerWidth, window.innerHeight);
-// renderer.shadowMap.enabled = true;
-// renderer.shadowMap.type = THREE.PCFShadowMap;
-
-// document.body.appendChild(renderer.domElement);
-
-// const light = new THREE.DirectionalLight();
-// light.position.set(100, 100, 100);
-// light.lookAt(-1, -1, -1);
-// light.castShadow = true;
-// light.shadow!.mapSize.set(2048, 2048);
-// light.shadow!.bias = 0.0001;
-// light.shadow!.normalBias = 0.01;
-// scene.add(light)
-
-// const controls = new OrbitControls( camera, renderer.domElement );
-// controls.enablePan = false;
-// config scene
-
 const tiles: Tile[] = []
 const rows = 9;
 const colums = 3;
@@ -111,6 +79,9 @@ const raycaster = new THREE.Raycaster();
 raycaster.near = 0;
 raycaster.far = 100;
 
+const down = new THREE.Vector3(0, -1, 0);
+const forward = new THREE.Vector3();
+
 function animate() {
     requestAnimationFrame(animate);
 
@@ -148,6 +119,17 @@ function animate() {
     }
     
     // if ((Date.now() - lastCollision) < collisionCheckInterval) return;
+
+    calculateWallCollision(delta);
+    // calculateGravity(delta);
+    // calculateColliision(delta);
+    physicsStep(delta);
+    // ball.rigidBody.applyDrag(World.windDrag * delta);
+}
+
+animate();
+
+function calculateWallCollision(delta: number) {
     if (!course.bounds.containsPoint(ball.mesh.position)) {
         const normal = new THREE.Vector3();
 
@@ -168,38 +150,111 @@ function animate() {
 
         lastCollision = Date.now();
     }
+}
+
+function calculateGravity(delta: number) {
+    raycaster.set(ball.mesh.position, down);
+    const intersections = raycaster.intersectObjects(tiles.map(tile => tile.mesh));
+
+    const hit = intersections[0].object.uuid === ball.mesh.uuid ? intersections[1] : intersections[0];
     
-    raycaster.set(ball.mesh.position, new THREE.Vector3(0, -1, 0));
+    if (!ball.rigidBody.isMoving() && hit?.distance < ball.radius + 0.1) {
+        ball.rigidBody.stop();
+        return;
+    }
+
+    ball.rigidBody.applyForce(World.gravity.clone().multiplyScalar(delta));
+}
+
+function calculateColliision(delta: number) {
+    if (!ball.rigidBody.isMoving()) return;
+    
+    forward.copy(ball.rigidBody.getDirection());
+    raycaster.set(ball.mesh.position, forward);
     const intersections = raycaster.intersectObjects(tiles.map(tile => tile.mesh));
     
     if (intersections.length === 0) return;
 
-    const hit = intersections[0]
+    const hit = intersections[0].object.uuid === ball.mesh.uuid ? intersections[1] : intersections[0];
 
-    if (hit.distance > ball.radius) {
-        ball.rigidBody.applyForce(World.gravity);
-    } else {
-        const tile = tiles.find(t => t.mesh === hit.object);
+    if (hit.distance < ball.radius + 0.01) {
+        const tile = tiles.find(tile => tile.mesh.uuid === hit.object.uuid);
         if (!tile) return;
 
         const normal = hit.face!.normal.clone();
         normal.transformDirection(hit.object.matrixWorld).normalize();
 
-        const direction = ball.rigidBody.getDirection();
-        const dot = direction.dot(normal);
+        const dot = forward.dot(normal);
 
-        if (ball.rigidBody.getSpeed() < 1) {
-            ball.rigidBody.stop();
-        } 
-        else if (Math.abs(dot) < 0.01) {
+        if (Math.abs(dot) < 0.01) {
             ball.rigidBody.applyDrag(tile.friction);
         } 
         else if (dot < 0) {
             ball.rigidBody.reflect(normal, 1 - tile.absorption);
         }
     }
-
-    ball.rigidBody.applyDrag(World.windDrag);
 }
 
-animate();
+function physicsStep(delta: number) {
+    const velocity = ball.rigidBody.getVelocity();
+
+    // 🔹 1. aplicar gravidade
+    ball.rigidBody.applyForce(World.gravity.clone().multiplyScalar(delta));
+
+    const newVelocity = ball.rigidBody.getVelocity();
+
+    // 🔹 2. prever movimento
+    const movement = newVelocity.clone().multiplyScalar(delta);
+    const distance = movement.length();
+
+    if (distance === 0) return;
+
+    const direction = movement.clone().normalize();
+
+    // 🔹 3. raycast (sweep simplificado)
+    raycaster.set(ball.mesh.position, direction);
+    raycaster.far = distance + ball.radius;
+
+    const intersections = raycaster.intersectObjects(tiles.map(t => t.mesh));
+    const hit = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
+
+    if (!hit) {
+        // ✅ sem colisão → move normalmente
+        ball.mesh.position.add(movement);
+        return;
+    }
+
+    // 🔹 4. colisão detectada
+
+    const tile = tiles.find(t => t.mesh.uuid === hit.object.uuid);
+    if (!tile) {
+        ball.mesh.position.add(movement);
+        return;
+    }
+
+    const normal = hit.face!.normal.clone()
+        .transformDirection(hit.object.matrixWorld)
+        .normalize();
+
+    // 🔥 refletir velocidade
+    const velocityBefore = newVelocity.clone();
+
+    let reflected = velocityBefore.reflect(normal);
+
+    // 🔹 absorção (perda de energia)
+    reflected.multiplyScalar(1 - tile.absorption);
+
+    // 🔹 atrito (quando quase paralelo)
+    const dot = reflected.dot(normal);
+    if (Math.abs(dot) < 0.01) {
+        reflected.multiplyScalar(1 - tile.friction);
+    }
+
+    ball.rigidBody.stop().applyForce(reflected);
+
+    // 🔥 posição corrigida (não entra na malha)
+    // const correctedPosition = hit.point.clone()
+    //     .addScaledVector(normal, ball.radius);
+
+    // ball.mesh.position.copy(correctedPosition);
+}

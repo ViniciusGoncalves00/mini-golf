@@ -72,6 +72,7 @@ export class Builder {
         const geometry = new THREE.BoxGeometry(width, height, length);
         const material = new THREE.MeshPhongMaterial({ color: color })
         const mesh = new THREE.Mesh(geometry, material);
+        mesh.name = "Plane Tile";
         mesh.receiveShadow = true;
         mesh.castShadow = true;
 
@@ -84,6 +85,7 @@ export class Builder {
         const geometry = new THREE.SphereGeometry();
         const material = new THREE.MeshPhongMaterial({ color: color });
         const mesh = new THREE.Mesh(geometry, material);
+        mesh.name = "Ball";
         mesh.receiveShadow = true;
         mesh.castShadow = true;
         

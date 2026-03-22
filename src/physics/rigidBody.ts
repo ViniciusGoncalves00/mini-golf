@@ -23,15 +23,16 @@ export class RigidBody extends Monobehavior {
         return this;
     }
 
-    public applyDrag(value: number) {
-        const inverseDirection = this.velocity.clone().normalize().multiplyScalar(-1);
-        this.velocity.addScaledVector(inverseDirection, value);
+    public applyDrag(factor: number): RigidBody {
+        this.velocity.multiplyScalar(1 - factor);
+        return this;
     }
     
-    public reflect(normal: THREE.Vector3, magnitude: number = 1): void {
+    public reflect(normal: THREE.Vector3, magnitude: number = 1): RigidBody {
         const velocity = this.getVelocity();
         velocity.reflect(normal).multiplyScalar(magnitude);
         this.velocity.copy(velocity);
+        return this;
     }
 
     public stop(): RigidBody {
@@ -40,7 +41,7 @@ export class RigidBody extends Monobehavior {
     }
 
     public isMoving(): boolean {
-        return this.velocity.length() > 0.1;
+        return this.velocity.length() > 1;
     }
 
     public getVelocity(): THREE.Vector3 {
