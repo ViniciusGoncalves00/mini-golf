@@ -28,7 +28,7 @@ Goal: Establish the base systems to a golf game, that things that make a golf ga
 
 ---
 
-# Phase 2 — Main Features - [12/03/2026 - 12/03/2026]
+# Phase 2 — Main Features - [12/03/2026 - 24/03/2026]
 
 Goal: Add basic behaviors that allow for an understanding of what is happening.
 
@@ -37,7 +37,7 @@ Goal: Add basic behaviors that allow for an understanding of what is happening.
     * [✔] Shot strength. [16/03/2026]
     * [✔] The ball is in the area. [16/03/2026]
 * [✔] Adding movement to the ball over time. [12/03/2026]
-* [✔] Add basic physics.
+* [✔] Add basic physics. [24/03/2026]
     * [✔] The ball collide with board bounding box. [15/03/2026]
     * [✔] The ball loses speed as it goes up and gains speed as it goes down. [24/03/2026]
 * [✔] Allow multiplayer matches. [13/03/2026]
