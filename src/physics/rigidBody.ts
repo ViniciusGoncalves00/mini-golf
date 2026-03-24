@@ -6,6 +6,7 @@ export class RigidBody extends Monobehavior {
     private readonly position: THREE.Vector3;
     private readonly quaternion: THREE.Quaternion;
     private readonly velocity: THREE.Vector3 = new THREE.Vector3();
+    private readonly mass: number = 1;
 
     public constructor(position: THREE.Vector3, quaternion: THREE.Quaternion) {
         super();
@@ -28,9 +29,9 @@ export class RigidBody extends Monobehavior {
         return this;
     }
     
-    public reflect(normal: THREE.Vector3, magnitude: number = 1): RigidBody {
+    public reflect(normal: THREE.Vector3, loss: number = 0): RigidBody {
         const velocity = this.getVelocity();
-        velocity.reflect(normal).multiplyScalar(magnitude);
+        velocity.reflect(normal).multiplyScalar(1 - loss);
         this.velocity.copy(velocity);
         return this;
     }
@@ -41,7 +42,7 @@ export class RigidBody extends Monobehavior {
     }
 
     public isMoving(): boolean {
-        return this.velocity.length() > 1;
+        return this.velocity.length() > 0.5;
     }
 
     public getVelocity(): THREE.Vector3 {

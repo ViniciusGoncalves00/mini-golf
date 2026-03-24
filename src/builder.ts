@@ -81,15 +81,15 @@ export class Builder {
         return monobehavior;
     }
 
-    public static ball(color: THREE.ColorRepresentation = 0xfefefe): Ball {
-        const geometry = new THREE.SphereGeometry();
+    public static ball(color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.5): Ball {
+        const geometry = new THREE.SphereGeometry(radius);
         const material = new THREE.MeshPhongMaterial({ color: color });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.name = "Ball";
         mesh.receiveShadow = true;
         mesh.castShadow = true;
         
-        const monobehavior = new Ball(mesh);
+        const monobehavior = new Ball(mesh, radius);
         this.monobehaviors.push(monobehavior);
         return monobehavior;
     }
