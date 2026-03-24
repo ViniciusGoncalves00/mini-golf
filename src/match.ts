@@ -55,10 +55,16 @@ export class Match {
         document.body.appendChild(this.renderer.domElement);
 
         this.globalLight = new THREE.DirectionalLight();
-        this.globalLight.position.set(100, 100, 100);
-        this.globalLight.lookAt(-1, -1, -1);
+        this.globalLight.position.set(100, 100, -100);
+        this.globalLight.shadow.camera.left = -50;
+this.globalLight.shadow.camera.right = 50;
+this.globalLight.shadow.camera.top = 50;
+this.globalLight.shadow.camera.bottom = -50;
+
+this.globalLight.shadow.camera.near = 0.1;
+this.globalLight.shadow.camera.far = 3000;
         this.globalLight.castShadow = true;
-        this.globalLight.shadow!.mapSize.set(2048, 2048);
+        this.globalLight.shadow!.mapSize.set(4096, 4096);
         this.globalLight.shadow!.bias = 0.0001;
         this.globalLight.shadow!.normalBias = 0.01;
         this.scene.add(this.globalLight);
