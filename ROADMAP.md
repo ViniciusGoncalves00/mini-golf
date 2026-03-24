@@ -64,8 +64,7 @@ Goal: Add most of the game's elements, such as user interface, sounds, improves 
 
 # Ideas
 
-Goal: Add most of the game's elements, such as user interface, sounds, improves the experience, etc.
-
+* Add support to mobile
 * Map Editor
 * Ranking
 
