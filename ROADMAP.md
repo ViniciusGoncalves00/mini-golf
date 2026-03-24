@@ -37,9 +37,9 @@ Goal: Add basic behaviors that allow for an understanding of what is happening.
     * [✔] Shot strength. [16/03/2026]
     * [✔] The ball is in the area. [16/03/2026]
 * [✔] Adding movement to the ball over time. [12/03/2026]
-* [ ] Add basic physics.
+* [✔] Add basic physics.
     * [✔] The ball collide with board bounding box. [15/03/2026]
-    * [ ] The ball loses speed as it goes up and gains speed as it goes down.
+    * [✔] The ball loses speed as it goes up and gains speed as it goes down. [24/03/2026]
 * [✔] Allow multiplayer matches. [13/03/2026]
 * [✔] Others. [17/03/2026]
     * [✔] The camera follows the ball. [17/03/2026]
@@ -51,8 +51,8 @@ Goal: Add basic behaviors that allow for an understanding of what is happening.
 Goal: Add most of the game's elements, such as user interface, sounds, improves the experience, etc.
 
 * [ ] Add more physics.
-    * [ ] The ball loses speed based on the terrain.
-    * [ ] The ball loses speed based on the collision.
+    * [✔] The ball loses speed based on the terrain. [24/03/2026]
+    * [✔] The ball loses speed based on the collision. [24/03/2026]
     * [ ] The ball collide with other balls.
 * [ ] UI elements.
     * [ ] Show the minimum shots.
