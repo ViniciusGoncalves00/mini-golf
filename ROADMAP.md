@@ -1,17 +1,10 @@
 # Roadmap
 
 This document describes the planned evolution of the project.
+
 The roadmap is organized by **phases**, representing major milestones.
 
----
-
-# Vision
-
-As a child with access to a computer in the early 21st century, I played many browser games on sites like Miniclip, Nitrome, and others.
-
-Therefore, the goal is to create a mini-golf game.
-
----
+The dates presented are not planned start or end dates for a task, but rather the date on which, to my understanding, the task was completed.
 
 # Phase 0 — Planning - [11/03/2026]
 
@@ -21,18 +14,16 @@ Therefore, the goal is to create a mini-golf game.
 
 # Phase 1 — Minimum Playable Game - [12/03/2026]
 
-Goal: Establish the base systems to a golf game, that things that make a golf game... a golf game.
+Establish the base systems to a golf game, that things that make a golf game... a golf game.
 
 - [✔] To hit the ball with a club. [12/03/2026]
 - [✔] Choose the force to apply to the ball. [12/03/2026]
 - [✔] Choosing the direction of the shot. [12/03/2026]
 - [✔] Check if the ball is in a specific region. [12/03/2026]
 
----
-
 # Phase 2 — Main Features - [12/03/2026 - 24/03/2026]
 
-Goal: Add basic behaviors that allow for an understanding of what is happening.
+Add basic behaviors that allow for an understanding of what is happening.
 
 - [✔] Add visualization and feedback to user. [16/03/2026]
     - [✔] Shot direction. [12/03/2026]
@@ -46,11 +37,9 @@ Goal: Add basic behaviors that allow for an understanding of what is happening.
 - [✔] Others. [17/03/2026]
     - [✔] The camera follows the ball. [17/03/2026]
 
----
-
 # Phase 3 — General Features
 
-Goal: Add most of the game's elements, such as user interface, sounds, improves the experience, etc.
+Add most of the game's elements, such as user interface, sounds, improves the experience, etc.
 
 * [ ] Add more physics.
     * [✔] The ball loses speed based on the terrain. [24/03/2026]
@@ -62,12 +51,9 @@ Goal: Add most of the game's elements, such as user interface, sounds, improves 
     * [ ] Show the courses table.
 * [ ] Adapt the elements for multiplayer mode when necessary. (multiplayer)
     * [ ] Show the current player.
----
 
 # Ideas
 
 * Add support to mobile
 * Map Editor
 * Ranking
-
----
