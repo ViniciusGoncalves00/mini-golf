@@ -14,7 +14,7 @@ const planeWall = storage.geometries.get("plane_wall")!;
 
 export const level1 = () => {
     const tiles: Tile[] = []
-    const rows = 7;
+    const rows = 13;
     const columns = 3;
 
     for (let column = 0; column < columns; column++) {

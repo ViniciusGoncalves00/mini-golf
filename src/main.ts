@@ -60,8 +60,12 @@ const down = new THREE.Vector3(0, -1, 0);
 const forward = new THREE.Vector3();
 let isGrounded = false;
 
+match.globalLight.target = ball.mesh;
+
 function animate() {
     requestAnimationFrame(animate);
+
+    match.globalLightHelper.update()
 
     timer.update();
     const delta = timer.getDelta() * Global.timeScale;
