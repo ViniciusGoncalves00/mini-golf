@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-const base = import.meta.url;
+const base = import.meta.env.BASE_URL;
 
 export class StorageManager {
     private static instance: StorageManager | null = null;
@@ -37,9 +37,10 @@ export class StorageManager {
         const loader = new STLLoader();
 
         for (const fileName of fileNames) {
-            const url = new URL(`../static/geometry/${fileName}.stl`, base);
+            const url = `${base}geometry/${fileName}.stl`;
+            console.log(url)
             const geometry = await loader.loadAsync(
-                url.href,
+                url,
                 function (xhr) {
                     console.log((xhr.loaded / xhr.total * 100) + '% loaded');
                 },
