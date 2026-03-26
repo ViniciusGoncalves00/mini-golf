@@ -7,6 +7,8 @@ node_modules/
 dist/
 build/
 out/
+references/
+skp/
 
 # Logs
 

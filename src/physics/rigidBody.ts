@@ -42,7 +42,7 @@ export class RigidBody extends Monobehavior {
     }
 
     public isMoving(): boolean {
-        return this.velocity.length() > 0.5;
+        return this.velocity.length() > 0.1;
     }
 
     public getVelocity(): THREE.Vector3 {

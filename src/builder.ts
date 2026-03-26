@@ -7,9 +7,7 @@ import { Club } from "./club";
 export class Builder {
     public static readonly monobehaviors: Monobehavior[] = [];
 
-    public static rampTile(coordinates: THREE.Vector3Like, color: THREE.ColorRepresentation = 0x00f000, width = 10, height = 10, length = 10): Tile {
-        const geometry = new THREE.BufferGeometry();
-
+    public static rampTile(coordinates: THREE.Vector3Like, geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation = 0x00f000, width = 10, height = 10, length = 10): Tile {
         const hw = width / 2;
         const hl = length / 2;
 
@@ -63,25 +61,24 @@ export class Builder {
         mesh.receiveShadow = true;
         mesh.castShadow = true;
 
-        const monobehavior = new Tile(coordinates, mesh, new THREE.Vector3(0, 1, 0), width, height, length);
+        const monobehavior = new Tile(coordinates, mesh, new THREE.Vector3(0, 1, 0));
         this.monobehaviors.push(monobehavior);
         return monobehavior;
     }
 
-    public static planeTile(coordinates: THREE.Vector3Like, color: THREE.ColorRepresentation = 0x00f000, width = 10, height = 1, length = 10): Tile {
-        const geometry = new THREE.BoxGeometry(width, height, length);
+    public static planeTile(coordinates: THREE.Vector3Like, geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation = 0x00f000): Tile {
         const material = new THREE.MeshPhongMaterial({ color: color })
         const mesh = new THREE.Mesh(geometry, material);
         mesh.name = "Plane Tile";
         mesh.receiveShadow = true;
         mesh.castShadow = true;
 
-        const monobehavior = new Tile(coordinates, mesh, new THREE.Vector3(0, 1, 0), width, height, length);
+        const monobehavior = new Tile(coordinates, mesh, new THREE.Vector3(0, 1, 0));
         this.monobehaviors.push(monobehavior);
         return monobehavior;
     }
 
-    public static ball(color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.5): Ball {
+    public static ball(color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.05): Ball {
         const geometry = new THREE.SphereGeometry(radius);
         const material = new THREE.MeshPhongMaterial({ color: color });
         const mesh = new THREE.Mesh(geometry, material);

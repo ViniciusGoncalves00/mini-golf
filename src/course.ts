@@ -18,7 +18,7 @@ export class Course extends Monobehavior {
 
     public load(): void {
         this.tiles.forEach(tile => {
-            tile.mesh.position.set(tile.width * tile.coordinates.x, tile.height * tile.coordinates.y, tile.length * tile.coordinates.z);
+            tile.mesh.position.set(tile.coordinates.x, tile.coordinates.y, tile.coordinates.z);
         })
     }
 
@@ -37,10 +37,10 @@ export class Course extends Monobehavior {
 
         this.tiles.set(index, tile);
 
-        const min = new THREE.Vector3(coordinates.x * tile.width - tile.width / 2,    0, coordinates.z * tile.length - tile.length / 2);
-        const max = new THREE.Vector3(coordinates.x * tile.width + tile.width / 2, 1000, coordinates.z * tile.length + tile.length / 2);
-        const box = new THREE.Box3(min, max);
-        this.bounds.union(box);
+        // const min = new THREE.Vector3(coordinates.x * tile.width - tile.width / 2,    0, coordinates.z * tile.length - tile.length / 2);
+        // const max = new THREE.Vector3(coordinates.x * tile.width + tile.width / 2, 1000, coordinates.z * tile.length + tile.length / 2);
+        // const box = new THREE.Box3(min, max);
+        // this.bounds.union(box);
         return this;
     }
 

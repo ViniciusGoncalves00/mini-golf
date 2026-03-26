@@ -9,6 +9,7 @@ import { Tile } from "./tile";
 import { Global } from "./global";
 import { World } from "./physics/world";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
+import { StorageManager } from "./storageManager";
 
 // config scene
 const network = new PeerNetwork();
@@ -19,14 +20,17 @@ const connect = document.getElementById("Connect")! as HTMLButtonElement;
 connect.onclick = () => network.joinRoom(peerID.value);
 
 const tiles: Tile[] = []
-const rows = 9;
-const colums = 9;
+const rows = 2;
+const colums = 3;
+
+const storage = await StorageManager.init();
+const geometry = storage.geometries.get("plane_u")!;
 
 for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
     for (let row = 0; row < rows; row++) {
         const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
         const y = row == Math.round(rows / 2) ? -1 : 0;
-        const tile = Builder.planeTile({x: colum, y: y, z: row}, color);
+        const tile = Builder.planeTile({x: colum, y: y, z: row}, geometry, color);
         if (row == Math.round(rows / 2)) tile.mesh.rotateX(degToRad(-30))
         tiles.push(tile);
     }
@@ -36,7 +40,7 @@ for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); 
     for (let row = 0; row < rows; row++) {
         const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
         const y = row == Math.round(rows / 2) ? -21 : -20;
-        const tile = Builder.planeTile({x: colum, y: y, z: row}, color);
+        const tile = Builder.planeTile({x: colum, y: y, z: row}, geometry, color);
         if (row == Math.round(rows / 2)) tile.mesh.rotateX(degToRad(-30))
         tiles.push(tile);
     }
@@ -45,7 +49,7 @@ for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); 
 for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
     for (let row = 0; row < rows; row++) {
         const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
-        tiles.push(Builder.planeTile({x: colum, y: -40, z: row}, color));
+        tiles.push(Builder.planeTile({x: colum, y: -40, z: row}, geometry, color));
     }
 }
 
@@ -56,14 +60,14 @@ const match = new Match(courses);
 match.nextCourse();
 
 const ball = Builder.ball();
-ball.mesh.position.set(0, 10, 0);
+ball.mesh.position.set(0, 1, 0);
 match.scene.add(ball.mesh);
 match.scene.add(ball.arrow);
 
 const club = Builder.club(ball);
 match.scene.add(club.arrow);
 
-const colliderDebug = new THREE.Mesh(new THREE.SphereGeometry(0.1));
+const colliderDebug = new THREE.Mesh(new THREE.SphereGeometry(0.01));
 match.scene.add(colliderDebug);
 
 match.renderer.domElement.addEventListener("mousemove", (e) => {
@@ -111,16 +115,16 @@ function animate() {
         club.showArrow();
         const tile = course.tryGetTile({x: 0, y: 0, z: rows - 2});
         if (tile) {
-            const box = new THREE.Box3(
-                new THREE.Vector3(-(tile.width / 2), 0          , ((rows - 2) * tile.length) - (tile.length / 2)),
-                new THREE.Vector3( (tile.width / 2), 10000000000, ((rows - 2) * tile.length) + (tile.length / 2)),
-            )
+            // const box = new THREE.Box3(
+            //     new THREE.Vector3(-(tile.width / 2), 0          , ((rows - 2) * tile.length) - (tile.length / 2)),
+            //     new THREE.Vector3( (tile.width / 2), 10000000000, ((rows - 2) * tile.length) + (tile.length / 2)),
+            // )
 
-            if (box.containsPoint(ball.mesh.position)) {
-                tile.setColor(0x0000aa);
-            } else {
-                tile.setColor(0xaa0000);
-            }
+            // if (box.containsPoint(ball.mesh.position)) {
+            //     tile.setColor(0x0000aa);
+            // } else {
+            //     tile.setColor(0xaa0000);
+            // }
         }
     } else {
         club.hideArrow();
@@ -128,7 +132,7 @@ function animate() {
     
     if ((Date.now() - lastCollision) < collisionCheckInterval) return;
 
-    calculateWallCollision(delta);
+    // calculateWallCollision(delta);
     applyGravity(delta);
     calculateCollision(delta);
     ball.rigidBody.applyDrag(ball.rigidBody.getSpeed() * World.windDrag * delta);

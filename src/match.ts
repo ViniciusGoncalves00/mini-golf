@@ -44,7 +44,7 @@ export class Match {
           1000
         );
 
-        this.camera.position.set(0, 15, -15);
+        this.camera.position.set(1, 1, -1);
 
         const canvas = document.getElementById("MyCanvas")!;
         this.renderer = new THREE.WebGLRenderer({canvas: canvas});
@@ -62,7 +62,7 @@ this.globalLight.shadow.camera.top = 50;
 this.globalLight.shadow.camera.bottom = -50;
 
 this.globalLight.shadow.camera.near = 0.1;
-this.globalLight.shadow.camera.far = 3000;
+this.globalLight.shadow.camera.far = 100;
         this.globalLight.castShadow = true;
         this.globalLight.shadow!.mapSize.set(4096, 4096);
         this.globalLight.shadow!.bias = 0.0001;
