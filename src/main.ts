@@ -10,6 +10,7 @@ import { Global } from "./global";
 import { World } from "./physics/world";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { StorageManager } from "./storageManager";
+import { level1 } from "./course/courses";
 
 // config scene
 const network = new PeerNetwork();
@@ -19,42 +20,7 @@ const peerID = document.getElementById("PeerID")! as HTMLInputElement;
 const connect = document.getElementById("Connect")! as HTMLButtonElement;
 connect.onclick = () => network.joinRoom(peerID.value);
 
-const tiles: Tile[] = []
-const rows = 2;
-const colums = 3;
-
-const storage = await StorageManager.init();
-const geometry = storage.geometries.get("plane_u")!;
-
-for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
-    for (let row = 0; row < rows; row++) {
-        const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
-        const y = row == Math.round(rows / 2) ? -1 : 0;
-        const tile = Builder.planeTile({x: colum, y: y, z: row}, geometry, color);
-        if (row == Math.round(rows / 2)) tile.mesh.rotateX(degToRad(-30))
-        tiles.push(tile);
-    }
-}
-
-for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
-    for (let row = 0; row < rows; row++) {
-        const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
-        const y = row == Math.round(rows / 2) ? -21 : -20;
-        const tile = Builder.planeTile({x: colum, y: y, z: row}, geometry, color);
-        if (row == Math.round(rows / 2)) tile.mesh.rotateX(degToRad(-30))
-        tiles.push(tile);
-    }
-}
-
-for (let colum = -Math.round((colums - 1) / 2); colum < Math.round(colums / 2); colum++) {
-    for (let row = 0; row < rows; row++) {
-        const color = (colum + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
-        tiles.push(Builder.planeTile({x: colum, y: -40, z: row}, geometry, color));
-    }
-}
-
-const course = new Course(tiles);
-
+const course = level1();
 const courses = [course];
 const match = new Match(courses);
 match.nextCourse();
@@ -113,19 +79,19 @@ function animate() {
 
     if (!ball.rigidBody.isMoving() && isGrounded) {
         club.showArrow();
-        const tile = course.tryGetTile({x: 0, y: 0, z: rows - 2});
-        if (tile) {
-            // const box = new THREE.Box3(
-            //     new THREE.Vector3(-(tile.width / 2), 0          , ((rows - 2) * tile.length) - (tile.length / 2)),
-            //     new THREE.Vector3( (tile.width / 2), 10000000000, ((rows - 2) * tile.length) + (tile.length / 2)),
-            // )
+        // const tile = course.tryGetTile({x: 0, y: 0, z: rows - 2});
+        // if (tile) {
+        //     const box = new THREE.Box3(
+        //         new THREE.Vector3(-(tile.width / 2), 0          , ((rows - 2) * tile.length) - (tile.length / 2)),
+        //         new THREE.Vector3( (tile.width / 2), 10000000000, ((rows - 2) * tile.length) + (tile.length / 2)),
+        //     )
 
-            // if (box.containsPoint(ball.mesh.position)) {
-            //     tile.setColor(0x0000aa);
-            // } else {
-            //     tile.setColor(0xaa0000);
-            // }
-        }
+        //     if (box.containsPoint(ball.mesh.position)) {
+        //         tile.setColor(0x0000aa);
+        //     } else {
+        //         tile.setColor(0xaa0000);
+        //     }
+        // }
     } else {
         club.hideArrow();
     }
@@ -179,7 +145,7 @@ function applyGravity(delta: number) {
     raycaster.set(ball.mesh.position, down);
     raycaster.far = ball.radius;
 
-    const intersections = raycaster.intersectObjects(tiles.map(t => t.mesh));
+    const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
     const hit = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
 
     const distance = World.gravity.length() + ball.radius;
@@ -204,11 +170,11 @@ function calculateCollision(delta: number) {
 
     if (isGrounded) {
         raycaster.set(ball.mesh.position, new THREE.Vector3(0, -1, 0));
-        const intersections = raycaster.intersectObjects(tiles.map(t => t.mesh));
+        const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
         const hit2 = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
         if (!hit2) return;
 
-        const tile2 = tiles.find(tile => tile.mesh.uuid === hit2.object.uuid);
+        const tile2 = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit2.object.uuid);
         if (!tile2) return;
 
         ball.rigidBody.applyDrag(tile2.friction * delta);
@@ -216,7 +182,7 @@ function calculateCollision(delta: number) {
     
     forward.copy(ball.rigidBody.getDirection());
     raycaster.set(ball.mesh.position, forward);
-    const intersections = raycaster.intersectObjects(tiles.map(t => t.mesh));
+    const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
 
     if (intersections.length === 0) return;
 
@@ -229,7 +195,7 @@ function calculateCollision(delta: number) {
     colliderDebug.position.copy(hit.point)
 
     if (isColliding(forward, hit, ball.radius)) {
-        const tile = tiles.find(tile => tile.mesh.uuid === hit.object.uuid);
+        const tile = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit.object.uuid);
         if (!tile) return;
 
         const normal = hit.face!.normal.clone();
