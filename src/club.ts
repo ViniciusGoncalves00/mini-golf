@@ -3,7 +3,7 @@ import { Ball } from "./ball";
 import { Monobehavior } from "./monobehavior";
 
 export class Club extends Monobehavior {
-    public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 10, new THREE.Color(0, 0, 255));
+    public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(0, 0, 255));
 
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: (() => void)[] = [];
@@ -28,7 +28,7 @@ export class Club extends Monobehavior {
         if (this.isHolding) {
             this.strength += this.strengthGainRate * delta;
             this.strength = Math.min(this.strength, this.maxStrength);
-            this.arrow.scale.set(this.strength / 10, 1, this.strength / 10);
+            this.arrow.scale.set(this.strength / 5, this.strength / 5, this.strength / 5);
         } else {
             this.arrow.scale.set(1, 1, 1);
         }

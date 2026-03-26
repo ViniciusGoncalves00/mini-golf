@@ -19,7 +19,7 @@ export class Ball extends Monobehavior {
         this.radius = radius;
 
         this.collider = new THREE.Sphere(mesh.position, radius);
-        this.arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 5, new THREE.Color(255, 0, 255));
+        this.arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(255, 0, 255));
         this.rigidBody = new RigidBody(mesh.position, mesh.quaternion);
     }
 
