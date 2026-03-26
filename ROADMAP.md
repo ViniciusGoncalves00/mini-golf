@@ -51,9 +51,15 @@ Add most of the game's elements, such as user interface, sounds, improves the ex
     * [ ] Show the courses table.
 * [ ] Adapt the elements for multiplayer mode when necessary. (multiplayer)
     * [ ] Show the current player.
+* [ ] FX
+    * [ ] On collision ("dust")
+    * [ ] Ball tail
+* [ ] SFX
+    * [ ] On collision
+    * [ ] On shot
 
 # Ideas
 
-* Add support to mobile
+* Add support to cross-platform (tauri)
 * Map Editor
 * Ranking
