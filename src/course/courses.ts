@@ -3,14 +3,15 @@ import { Builder } from "../builder";
 import { Course } from "../course";
 import { StorageManager } from "../storageManager";
 import { Tile } from "../tile";
+import { Tiles } from "../enums";
 
 const storage = await StorageManager.init();
-const plane = storage.geometries.get("plane")!;
-const planeCorner = storage.geometries.get("plane_corner")!;
-const planeHole = storage.geometries.get("plane_hole")!;
-const planeParallel = storage.geometries.get("plane_parallel")!;
-const planeU = storage.geometries.get("plane_u")!;
-const planeWall = storage.geometries.get("plane_wall")!;
+const plane = storage.geometries.get(Tiles.PLANE)!;
+const planeCorner = storage.geometries.get(Tiles.CORNER)!;
+const planeHole = storage.geometries.get(Tiles.HOLE)!;
+const planeParallel = storage.geometries.get(Tiles.PARALLEL)!;
+const planeU = storage.geometries.get(Tiles.U)!;
+const planeWall = storage.geometries.get(Tiles.WALL)!;
 
 export const level1 = () => {
     const tiles: Tile[] = []
@@ -61,5 +62,34 @@ export const level1 = () => {
         }
     }
     
+    return new Course(tiles);
+}
+
+export const level2 = () => {
+    const tiles: Tile[] = []
+    const rows = 13;
+    const columns = 1;
+
+    let y = 0;
+    for (let x = 0; x < columns; x++) {
+        for (let z = 0; z < rows; z++) {
+            let geometry;
+            if (z === 0) {
+                geometry = planeU.clone();
+            } else if (z === rows - 1) {
+                geometry = planeU.clone();
+                geometry.rotateY(Math.PI);
+            } else if (z === rows - 2) {
+                geometry = planeHole.clone();
+            } else {
+                geometry = planeParallel.clone();
+            }
+
+            const color = (x + z) % 2 == 0 ? 0x00aa00 : 0x00cc00;
+
+            const tile = Builder.planeTile({x: x, y: y--, z: z}, geometry, color);
+            tiles.push(tile);
+        }
+    }
     return new Course(tiles);
 }

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+import { Tiles } from "./enums";
 const base = import.meta.env.BASE_URL;
 
 export class StorageManager {
@@ -25,20 +26,12 @@ export class StorageManager {
     }
 
     private async loadGeometries() {
-        const fileNames = [
-            "plane_corner",
-            "plane_hole",
-            "plane_parallel",
-            "plane_u",
-            "plane_wall",
-            "plane",
-        ];
-
+        const fileNames = Object.values(Tiles);
         const loader = new STLLoader();
+        
 
         for (const fileName of fileNames) {
             const url = `${base}geometry/${fileName}.stl`;
-            console.log(url)
             const geometry = await loader.loadAsync(
                 url,
                 function (xhr) {

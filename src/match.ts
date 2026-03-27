@@ -82,7 +82,7 @@ export class Match {
         this.globalLightHelper = new THREE.DirectionalLightHelper(this.globalLight, 10, 0xff0000);
         this.scene.add(this.globalLightHelper)
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         this.scene.add(this.ambientLight);
 
         this.orbitControls = new OrbitControls( this.camera, this.renderer.domElement );

@@ -10,7 +10,7 @@ import { Global } from "./global";
 import { World } from "./physics/world";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { StorageManager } from "./storageManager";
-import { level1 } from "./course/courses";
+import { level1, level2 } from "./course/courses";
 
 // config scene
 const network = new PeerNetwork();
