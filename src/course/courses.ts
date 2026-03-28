@@ -3,9 +3,11 @@ import { Builder } from "../builder";
 import { Course } from "../course";
 import { StorageManager } from "../storageManager";
 import { Tile } from "../tile";
-import { Tiles } from "../enums";
+import { Colors, Tiles } from "../common/enums";
 
-const storage = await StorageManager.init();
+const storage = StorageManager.getInstance();
+await storage.loadSTL();
+const plane45 = storage.geometries.get(Tiles.PLANE_45)!;
 const plane = storage.geometries.get(Tiles.PLANE)!;
 const planeCorner = storage.geometries.get(Tiles.CORNER)!;
 const planeHole = storage.geometries.get(Tiles.HOLE)!;
@@ -52,10 +54,10 @@ export const level1 = () => {
                 geometry = planeHole.clone();
             }
              else {
-                geometry = plane;
+                geometry = plane45;
             }
 
-            const color = (column + row) % 2 == 0 ? 0x00aa00 : 0x00cc00;
+            const color = (column + row) % 2 == 0 ? Colors.DARK_GREEN : Colors.LIGHT_GREEN;
 
             const tile = Builder.planeTile({x: column, y: 0, z: row}, geometry, color);
             tiles.push(tile);

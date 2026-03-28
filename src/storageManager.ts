@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-import { Tiles } from "./enums";
+import { Tiles } from "./common/enums";
 const base = import.meta.env.BASE_URL;
 
 export class StorageManager {
@@ -17,19 +17,10 @@ export class StorageManager {
         return this.instance;
     }
 
-    public static async init(): Promise<StorageManager> {
-        if (!this.instance) {
-            this.instance = new StorageManager();
-            await this.instance.loadGeometries();
-        }
-        return this.instance;
-    }
-
-    private async loadGeometries() {
+    public async loadSTL(): Promise<void> {
         const fileNames = Object.values(Tiles);
         const loader = new STLLoader();
         
-
         for (const fileName of fileNames) {
             const url = `${base}geometry/${fileName}.stl`;
             const geometry = await loader.loadAsync(
@@ -44,5 +35,14 @@ export class StorageManager {
             geometry.computeVertexNormals();
             this.geometries.set(fileName, geometry);
         }
+    }
+
+    public load(key: string): string | null {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+    }
+
+    public save(key: string, data: any): void {
+        localStorage.setItem(key, JSON.stringify(data));
     }
 }

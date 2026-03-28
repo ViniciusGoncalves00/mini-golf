@@ -1,10 +1,8 @@
 import * as THREE from "three";
 import { Course } from "./course";
-import { Player } from "./player";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 
 export class Match {
-    public readonly players: Player[] = [];
     public readonly courses: Course[];
     
     private currentCourse: Course | null = null;
@@ -47,7 +45,7 @@ export class Match {
 
         this.camera.position.set(0, 1, -2);
 
-        const canvas = document.getElementById("MyCanvas")!;
+        const canvas = document.getElementById("game")!;
         this.renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.shadowMap.enabled = true;
@@ -82,7 +80,7 @@ export class Match {
         this.globalLightHelper = new THREE.DirectionalLightHelper(this.globalLight, 10, 0xff0000);
         this.scene.add(this.globalLightHelper)
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
         this.scene.add(this.ambientLight);
 
         this.orbitControls = new OrbitControls( this.camera, this.renderer.domElement );

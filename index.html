@@ -1,26 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <style>
-        body { margin: 0; }
-        canvas { display: block; }
-    </style>
-    <meta charset="UTF-8" />
-    <title>Mini Golf</title>
-</head>
-<body class="h-full w-full flex">
-    <script type="module" src="src/main.ts"></script>
-    <div class="fixed flex flex-col">
-        <div class="flex">
-            <div>My ID: </div>
-            <div id="MyID">My ID</div>
+    <head>
+        <style>
+            body { margin: 0; }
+            canvas { display: block; }
+        </style>
+        <meta charset="UTF-8" />
+        <title>Mini Golf</title>
+        <script type="module" src="src/main.ts"></script>
+    </head>
+    <body x-data class="h-screen w-full flex">
+        <div id="overlay" class="h-full w-full bg-grid">
+            <div id="home" class="h-full w-full flex flex-col items-center justify-center gap-2">
+                <button type="button" @click="$store.ui.setContext('singleplayer')" class="cursor-pointer bg-white rounded-full py-2 px-4">SinglePlayer</button>
+                <button type="button" @click="$store.ui.setContext('multiplayer')" class="cursor-pointer bg-white rounded-full py-2 px-4">MultiPlayer</button>
+            </div>
+            <div id="singleplayer" class="h-full w-full flex flex-col items-center justify-center gap-2" hidden>
+                <button type="button" @click="$store.ui.start()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
+                <button type="button" @click="$store.ui.back()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
+            </div>
+            <div id="multiplayer" class="h-full w-full flex flex-col items-center justify-center gap-2" hidden>
+                <div class="flex bg-white rounded-full py-2 px-4">
+                    <div>My ID: </div>
+                    <div id="MyID">My ID</div>
+                </div>
+                <div class="flex bg-white rounded-full py-2 px-4">
+                    <div>Enter Peer ID to connect</div>
+                    <input id="PeerID" type="text" placeholder="Enter text">
+                    <button id="Connect" class="cursor-pointer">Connect</button>
+                </div>
+                <button type="button" @click="$store.ui.back()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
+            </div>
         </div>
-        <div class="flex">
-            <div>Enter Peer ID to connect</div>
-            <input id="PeerID" type="text" placeholder="Enter text">
-            <button id="Connect" class="cursor-pointer">Connect</button>
-        </div>
-    </div>
-    <canvas id="MyCanvas" class="h-full w-full"></canvas>
-</body>
+        <canvas id="game" class="h-full w-full" hidden></canvas>
+    </body>
 </html>

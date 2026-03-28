@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+.bg-grid {
+  --size: 128px;
+  --color-a: #00cc00;
+  --color-b: #00aa00;
+
+  background-image: conic-gradient(
+    var(--color-a) 0% 25%,
+    var(--color-b) 25% 50%,
+    var(--color-a) 50% 75%,
+    var(--color-b) 75% 100%
+  );
+
+  background-size: var(--size) var(--size);
+}
