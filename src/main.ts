@@ -81,7 +81,7 @@ function animate() {
 
     match.renderer.render(match.scene, match.camera);
 
-    if (!ball.rigidBody.isMoving() && isGrounded) {
+    if (ball.rigidBody.canInteract() && isGrounded) {
         club.showArrow();
         // const tile = course.tryGetTile({x: 0, y: 0, z: rows - 2});
         // if (tile) {
@@ -105,7 +105,8 @@ function animate() {
     // calculateWallCollision(delta);
     applyGravity(delta);
     calculateCollision(delta);
-    ball.rigidBody.applyDrag(ball.rigidBody.getSpeed() * World.windDrag * delta);
+    ball.rigidBody.applyDrag(World.airDrag * delta);
+    // ball.rigidBody.applyForce(World.windDirection.clone().multiplyScalar(World.windSpeed * delta))
 }
 
 animate();
@@ -160,7 +161,7 @@ function applyGravity(delta: number) {
         isGrounded = false;
     }
 
-    if (isGrounded && !ball.rigidBody.isMoving()) {
+    if (isGrounded && ball.rigidBody.getSpeed() < 0.1) {
         ball.rigidBody.stop();
     }
 

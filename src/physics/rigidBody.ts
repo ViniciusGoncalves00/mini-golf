@@ -8,6 +8,8 @@ export class RigidBody extends Monobehavior {
     private readonly velocity: THREE.Vector3 = new THREE.Vector3();
     private readonly mass: number = 1;
 
+    private wasStopped: boolean = false;
+
     public constructor(position: THREE.Vector3, quaternion: THREE.Quaternion) {
         super();
 
@@ -21,28 +23,32 @@ export class RigidBody extends Monobehavior {
 
     public applyForce(force: THREE.Vector3): RigidBody {
         this.velocity.add(force);
+        this.wasStopped = false;
         return this;
     }
 
     public applyDrag(factor: number): RigidBody {
-        this.velocity.multiplyScalar(1 - factor);
+        this.velocity.multiplyScalar(1 - (factor * this.getSpeed()));
         return this;
     }
     
-    public reflect(normal: THREE.Vector3, loss: number = 0): RigidBody {
-        const velocity = this.getVelocity();
-        velocity.reflect(normal).multiplyScalar(1 - loss);
-        this.velocity.copy(velocity);
+    public reflect(normal: THREE.Vector3, factor: number = 0): RigidBody {
+        this.velocity.reflect(normal).multiplyScalar(1 - factor);
         return this;
     }
 
     public stop(): RigidBody {
         this.velocity.set(0, 0, 0);
+        this.wasStopped = true;
         return this;
     }
 
+    public canInteract(): boolean {
+        return this.wasStopped;
+    }
+
     public isMoving(): boolean {
-        return this.velocity.length() > 0.1;
+        return this.velocity.length() > 0;
     }
 
     public getVelocity(): THREE.Vector3 {
