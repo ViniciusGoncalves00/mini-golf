@@ -2,14 +2,18 @@ import Alpine from 'alpinejs';
 
 import "./style.css";
 import { Session } from "./session";
-import { UI } from "./pages/ui";
 
 export class Main {
+    private static initialized: boolean = false;
+
     public static async init(): Promise<void> {
-        new Session();
+        if (this.initialized) return;
+        this.initialized = true;
+
+        const session = new Session();
         
         document.addEventListener('alpine:init', () => {
-            Alpine.store("ui", new UI());
+            Alpine.store("ui", session.page);
         });
 
         (window as any).Alpine = Alpine;

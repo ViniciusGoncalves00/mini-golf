@@ -1,6 +1,7 @@
 import { StorageManager } from "./storageManager";
 
 export class User {
+    public readonly id: string = crypto.randomUUID();
     public name: string;
 
     private constructor(name: string) {
@@ -13,6 +14,6 @@ export class User {
     }
 
     public static fromJSON(data: any): User {
-        return new User(data.name ?? "Guest");
+        return new User(data?.name ?? "Guest");
     }
 }

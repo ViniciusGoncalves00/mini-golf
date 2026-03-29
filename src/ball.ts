@@ -9,6 +9,7 @@ export class Ball extends Monobehavior {
     public readonly rigidBody: RigidBody;
 
     public readonly radius: number;
+    public readonly isLoaded: boolean = false;
 
     private readonly stopThreshold = 0.01;
 

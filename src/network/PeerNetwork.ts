@@ -1,69 +1,124 @@
 import Peer, { DataConnection } from "peerjs";
+import { NetworkMessage } from "./networkMessage";
 
 export class PeerNetwork {
+    public readonly peer: Peer;
+    private connections = new Map<string, DataConnection>();
 
-  private peer: Peer;
-  private connections: DataConnection[] = [];
+    public onReceive: ((peerId: string, data: NetworkMessage) => void)[] = [];
+    public onJoin: ((peerId: string) => void)[] = [];
+    public onLeave: ((peerId: string) => void)[] = [];
 
-  public onReceive: ((data: any) => void)[] = [];
+    private isReady = false;
 
-  constructor() {
+    constructor() {
+        this.peer = new Peer();
 
-    this.peer = new Peer();
+        this.peer.on("open", (id) => {
+            console.log("Peer ID:", id);
+            this.isReady = true;
 
-    this.peer.on("open", (id) => {
-      console.log("Room ID:", id);
-      const MyID = document.getElementById("MyID")!;
-      MyID.innerText = id;
-    });
+            const el = document.getElementById("MyID");
+            if (el) el.innerText = id;
+        });
 
-    this.peer.on("connection", (conn) => {
-      console.log("Player joined:", conn.peer);
+        this.peer.on("connection", (conn) => {
+            this.registerConnection(conn);
+        });
 
-      this.connections.push(conn);
-
-      this.setupConnection(conn);
-    });
-  }
-
-  private setupConnection(conn: DataConnection) {
-
-    conn.on("data", (data) => {
-      console.log("Received:", data);
-      this.onReceive.forEach((callback) => callback(data));
-    });
-
-    conn.on("close", () => {
-      console.log("Player disconnected");
-      this.connections = this.connections.filter(c => c !== conn);
-    });
-
-  }
-
-  joinRoom(roomId: string) {
-
-    const connection = this.peer.connect(roomId);
-
-    connection.on("open", () => {
-      console.log("Connected to room:", roomId);
-      this.connections.push(connection);
-    });
-
-    this.setupConnection(connection);
-  }
-
-  send(data: any) {
-
-    for (const conn of this.connections) {
-      if (conn.open) conn.send(data);
+        this.peer.on("error", (err) => {
+            console.error("Peer error:", err);
+        });
     }
 
-  }
+    // 🔥 importante: só conecta se pronto
+    public joinRoom(roomId: string) {
+        if (!this.isReady) {
+            console.warn("Peer ainda não está pronto");
+            return;
+        }
 
+        if (roomId === this.peer.id) {
+            console.warn("Tentativa de conectar em si mesmo");
+            return;
+        }
 
+        if (this.connections.has(roomId)) {
+            console.warn("Já conectado a esse peer");
+            return;
+        }
 
-  getRoomId() {
-    return this.peer.id;
-  }
+        console.log("Trying to join room:", roomId);
 
+        const connection = this.peer.connect(roomId, {
+            reliable: true
+        });
+
+        connection.on("open", () => {
+            console.log("Connected to room:", roomId);
+            this.registerConnection(connection);
+
+            // handshake
+            connection.send({ type: "connected" });
+        });
+
+        connection.on("error", (err) => {
+            console.error("Connection error:", err);
+        });
+    }
+
+    public send(data: NetworkMessage) {
+        for (const conn of this.connections.values()) {
+            if (conn.open) conn.send(data);
+        }
+    }
+
+    public sendTo(peerId: string, data: NetworkMessage) {
+        const conn = this.connections.get(peerId);
+        if (conn?.open) conn.send(data);
+    }
+
+    public getRoomId() {
+        return this.peer.id;
+    }
+
+    public getPeers(): string[] {
+        return Array.from(this.connections.values().map(connection => connection.peer));
+    }
+
+    private registerConnection(connection: DataConnection) {
+        const peerId = connection.peer;
+
+        if (this.connections.has(peerId)) return;
+
+        console.log("Player connected:", peerId);
+
+        this.connections.set(peerId, connection);
+
+        this.setupConnection(connection);
+
+        this.onJoin.forEach(cb => cb(peerId));
+    }
+
+    private setupConnection(connection: DataConnection) {
+        const peerId = connection.peer;
+
+        connection.on("data", (data: any) => {
+            console.log("Received:", data);
+
+            this.onReceive.forEach(cb => cb(peerId, data));
+        });
+
+        connection.on("close", () => {
+            console.log("Disconnected:", peerId);
+
+            this.connections.delete(peerId);
+            
+            this.onLeave.forEach(cb => cb(peerId));
+        });
+
+        connection.on("error", (err) => {
+            console.error("Connection error:", err);
+        });
+    }
 }

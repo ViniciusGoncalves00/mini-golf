@@ -54,7 +54,7 @@ export const level1 = () => {
                 geometry = planeHole.clone();
             }
              else {
-                geometry = plane45;
+                geometry = plane;
             }
 
             const color = (column + row) % 2 == 0 ? Colors.DARK_GREEN : Colors.LIGHT_GREEN;
