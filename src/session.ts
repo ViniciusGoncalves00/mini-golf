@@ -1,4 +1,5 @@
 import Peer from "peerjs";
+import * as THREE from "three";
 import { level1 } from "./course/courses";
 import { Match } from "./match";
 import { Server } from "./network/server";
@@ -12,7 +13,8 @@ export class Session {
     public readonly user: User;
     public readonly page: Page;
 
-    public network: PeerNetwork;
+    private network: PeerNetwork;
+    private match: Match | null = null;
     
     public constructor() {
         const user = StorageManager.getInstance().load("user");
@@ -35,7 +37,18 @@ export class Session {
 
         const course = level1();
         const courses = [course];
-        const match = new Match([this.user], courses);
+        this.match = new Match([this.user], courses);
+
+        this.match.players.forEach(player => {
+            player.club.onFreeShot.push((force) => {
+                this.network.send({
+                    type: "shot",
+                    payload: {
+                        vector: [force.x, force.y, force.z],
+                    }
+                });
+            }
+        )});
     }
 
     public createRoom(): void {
@@ -87,6 +100,14 @@ export class Session {
                 
                     this.page.updatePlayerList(peers)
                     break;
+                case "shot":
+                    if (!this.match) return;
+                    this.network.send({
+                        type: "shot",
+                        payload: {
+                            vector: data.payload.vector,
+                        }
+                    })
                 default:
                     break;
             }
@@ -101,6 +122,9 @@ export class Session {
                     break;
                 case "playersList":
                     this.page.updatePlayerList(data.payload.players);
+                    break;
+                case "shot":
+                    this.match?.players[0].ball.rigidBody.applyForce(new THREE.Vector3(...data.payload.vector));
                     break;
                 default:
                     break;

@@ -6,7 +6,8 @@ export class Club extends Monobehavior {
     public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(0, 0, 255));
 
     public readonly onStartShot: (() => void)[] = [];
-    public readonly onFreeShot: (() => void)[] = [];
+    public readonly onFreeShot: ((force: THREE.Vector3) => void)[] = [];
+    public isPlayerTurn = false;
     
     private readonly maxStrength = 10;
     private readonly timeToMaxStrengthInSeconds = 3;
@@ -35,6 +36,7 @@ export class Club extends Monobehavior {
     }
 
     public startShot(): void {
+        if (!this.isPlayerTurn) return;
         if (!this.ball.rigidBody.canInteract()) return;
 
         this.strength = 0;
@@ -47,12 +49,12 @@ export class Club extends Monobehavior {
         if (!this.ball.rigidBody.canInteract()) return;
 
         const force = new THREE.Vector3().copy(this.direction).multiplyScalar(this.strength);
-        this.ball.rigidBody.applyForce(force);
+        // this.ball.rigidBody.applyForce(force);
         
         this.strength = 0;
         this.isHolding = false;
 
-        for (const callback of this.onFreeShot) callback();
+        for (const callback of this.onFreeShot) callback(force);
     }
 
     public showArrow(): void {

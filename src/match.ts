@@ -5,6 +5,9 @@ import { User } from "./user";
 import { Player } from "./player";
 import { Global } from "./global";
 import { Builder } from "./builder";
+import { Ball } from "./ball";
+import { World } from "./physics/world";
+import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 
 export class Match {
     public readonly players: Player[];
@@ -31,6 +34,11 @@ export class Match {
 
         this.players = users.map((user) => new Player(user, this.renderer.domElement));
         this.courses = courses;
+
+        this.players.forEach(player => {
+            this.scene.add(player.camera);
+            player.camera.position.set(0, 1, -2);
+        });
 
         this.nextCourse();
 
@@ -147,8 +155,7 @@ export class Match {
     
         for (const monobehavior of Builder.monobehaviors) monobehavior.update(delta);
 
-        const player = this.currentPlayer;
-        if (!player) return;
+        for (const player of this.players) {
     
         const direction = new THREE.Vector3().subVectors(player.camera.position, player.ball.mesh.position).normalize();
         
@@ -156,8 +163,8 @@ export class Match {
         this.camera.position.copy(direction.multiplyScalar(distance).add(player.ball.mesh.position));
         this.orbitControls.target.copy(player.ball.mesh.position);
         this.orbitControls.update();
-    
-        this.renderer.render(this.scene, this.camera);
+        
+        this.renderer.render(this.scene, player.camera);
     
         if (player.ball.rigidBody.canInteract()) {
             player.club.showArrow();
@@ -181,9 +188,96 @@ export class Match {
         // if ((Date.now() - lastCollision) < collisionCheckInterval) return;
     
         // calculateWallCollision(delta);
-        // applyGravity(delta);
-        // calculateCollision(delta);
+        const isGrounded = false;
+        applyGravity(delta, player.ball, this.currentCourse!, isGrounded);
+        calculateCollision(delta, player.ball, this.currentCourse!, isGrounded);
         // ball.rigidBody.applyDrag(World.airDrag * delta);
         // ball.rigidBody.applyForce(World.windDirection.clone().multiplyScalar(World.windSpeed * delta))
+        }
     }
+}
+
+function applyGravity(delta: number, ball: Ball, course: Course, isGrounded: boolean) {
+    const raycaster = new THREE.Raycaster();
+    const down = new THREE.Vector3(0, -1, 0);
+
+    raycaster.set(ball.mesh.position, down);
+    raycaster.far = ball.radius;
+
+    const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
+    const hit = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
+
+    const distance = World.gravity.length() + ball.radius;
+    
+    if (hit && hit.distance < ball.radius * 1.1) {
+        isGrounded = true;
+    } else {
+        isGrounded = false;
+    }
+
+    if (isGrounded && ball.rigidBody.getSpeed() < 0.1) {
+        ball.rigidBody.stop();
+    }
+
+    if (!hit || hit.distance > ball.radius * 1.1) {
+        ball.rigidBody.applyForce(World.gravity.clone().multiplyScalar(delta));
+    }
+}
+
+function calculateCollision(delta: number, ball: Ball, course: Course, isGrounded: boolean) {
+    if (!ball.rigidBody.isMoving()) return;
+
+    const raycaster = new THREE.Raycaster();
+    const forward = new THREE.Vector3();
+
+
+    if (isGrounded) {
+        raycaster.set(ball.mesh.position, new THREE.Vector3(0, -1, 0));
+        const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
+        const hit2 = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
+        if (!hit2) return;
+
+        const tile2 = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit2.object.uuid);
+        if (!tile2) return;
+
+        ball.rigidBody.applyDrag(tile2.friction * delta);
+    }
+    
+    forward.copy(ball.rigidBody.getDirection());
+    raycaster.set(ball.mesh.position, forward);
+    const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
+
+    if (intersections.length === 0) return;
+    
+    const hit = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
+    if (!hit) return;
+
+    // colliderDebug.position.copy(hit.point)
+
+    if (isColliding(forward, hit, ball.radius)) {
+        const tile = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit.object.uuid);
+        if (!tile) return;
+
+        const normal = hit.face!.normal.clone();
+        normal.transformDirection(hit.object.matrixWorld).normalize();
+
+        const dot = forward.dot(normal);
+        const impactStrength = Math.abs(dot) * tile.absorption;
+        ball.rigidBody.reflect(normal, impactStrength);
+    }
+}
+
+function isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 1) {
+    const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
+    const angle = radToDeg(inverseNormal.angleTo(direction));
+
+    const opositeAngle = 90 - angle;
+    const cossine = Math.cos(degToRad(opositeAngle));
+    const hypotenuse = hit.distance;
+
+    const adjacentSide = cossine * hypotenuse;
+    const distance = Math.abs(adjacentSide - radius);
+
+    const isColliding = distance < threshold;
+    return isColliding;
 }

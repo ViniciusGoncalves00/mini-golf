@@ -20,3 +20,9 @@ export type NetworkMessage =
             vector: [number, number, number];
         };
     }
+  | {
+        type: "shotResult";
+        payload: {
+            vector: [number, number, number];
+        };
+    }
