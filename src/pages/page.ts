@@ -38,9 +38,17 @@ export class Page {
 
     public start(): void {
         this.setPage("game");
-        document.getElementById("interface")!.setAttribute("hidden", "");
+        this.hideInterface();
 
         this.onStart();
+    }
+
+    public hideInterface(): void {
+        document.getElementById("interface")!.setAttribute("hidden", "");
+    }
+
+    public showInterface(): void {
+        document.getElementById("interface")!.removeAttribute("hidden");
     }
 
     public tryConnect(): void {

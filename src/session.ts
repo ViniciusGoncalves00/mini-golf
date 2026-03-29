@@ -21,7 +21,7 @@ export class Session {
         this.page = new Page();
         this.network = new PeerNetwork();
 
-        // this.page.onStart = () => this.network.send({ type: "start" });
+        this.page.onStart = () => this.network.send({ type: "start" });
         this.page.onCreateRoom = () => this.createRoom();
         this.page.onCloseRoom = () => this.closeRoom();
         this.page.onConnect = (roomID) => this.joinRoom(roomID);
@@ -31,6 +31,7 @@ export class Session {
         const course = level1();
         const courses = [course];
         const match = new Match([this.user], courses);
+        this.page.hideInterface();
     }
 
     public createRoom(): void {
@@ -66,11 +67,8 @@ export class Session {
                 
             this.page.updatePlayerList(peers)
         });
-        this.network?.onReceive.push((peerId, data) => {
+        this.network.onReceive.push((peerId, data) => {
             switch (data.type) {
-                case "start":
-                    this.startMatch();
-                    break;
                 case "connected":
                 case "disconnected":
                     const peers = this.network.getPeers();
@@ -92,7 +90,7 @@ export class Session {
     }
 
     public setupClientConnection(): void {
-        this.network?.onReceive.push((peerId, data) => {
+        this.network.onReceive.push((peerId, data) => {
             switch (data.type) {
                 case "start":
                     this.startMatch();

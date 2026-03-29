@@ -1,15 +1,12 @@
 export type NetworkMessage =
   | {
         type: "connected";
-        payload: {};
     }
   | {
         type: "disconnected";
-        payload: {};
     }
   | {
         type: "start";
-        payload: {};
     }
   | {
         type: "playersList";
