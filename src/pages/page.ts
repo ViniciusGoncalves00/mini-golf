@@ -36,8 +36,12 @@ export class Page {
         this.setPage("joinRoom");
     }
 
-    public start(): void {
+    public setGamePage(): void {
         this.setPage("game");
+    }
+
+    public start(): void {
+        this.setGamePage();
         this.hideInterface();
 
         this.onStart();

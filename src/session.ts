@@ -21,17 +21,21 @@ export class Session {
         this.page = new Page();
         this.network = new PeerNetwork();
 
-        this.page.onStart = () => this.network.send({ type: "start" });
+        this.page.onStart = () => this.start();
         this.page.onCreateRoom = () => this.createRoom();
         this.page.onCloseRoom = () => this.closeRoom();
         this.page.onConnect = (roomID) => this.joinRoom(roomID);
     }
 
-    public startMatch(): void {
+    public start(): void {
+        this.network.send({ type: "start" })
+
+        this.page.setGamePage();
+        this.page.hideInterface();
+
         const course = level1();
         const courses = [course];
         const match = new Match([this.user], courses);
-        this.page.hideInterface();
     }
 
     public createRoom(): void {
@@ -93,7 +97,7 @@ export class Session {
         this.network.onReceive.push((peerId, data) => {
             switch (data.type) {
                 case "start":
-                    this.startMatch();
+                    this.start();
                     break;
                 case "playersList":
                     this.page.updatePlayerList(data.payload.players);

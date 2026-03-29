@@ -139,8 +139,8 @@ export class Match {
 
     private animate = () => {
         requestAnimationFrame(this.animate);
-    
-        this.globalLightHelper.update()
+
+        this.globalLightHelper.update();
     
         this.timer.update();
         const delta = this.timer.getDelta() * Global.timeScale;
