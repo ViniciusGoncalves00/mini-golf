@@ -322,13 +322,13 @@ export class Match2 {
 
         this.globalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 
-        this.globalLight.position.set(100, 75, 100);
+        this.globalLight.position.set(120, 75, 100);
         this.globalLight.castShadow = true;
 
         this.globalLight.target.position.set(0, 0, 0);
         this.scene.add(this.globalLight.target);
 
-        this.globalLight.shadow.mapSize.set(16_384, 16_384);
+        this.globalLight.shadow.mapSize.set(4_096, 4_096);
 
         this.globalLight.shadow.camera.left = -10;
         this.globalLight.shadow.camera.right = 10;
