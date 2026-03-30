@@ -1,19 +1,16 @@
 import { StorageManager } from "./storageManager";
 
 export class User {
-    public readonly id: string = crypto.randomUUID();
+    public readonly id: string;
     public name: string;
 
-    private constructor(name: string) {
+    public constructor(id: string, name: string) {
+        this.id = id;
         this.name = name;
     }
 
     public setName(name: string): void {
         this.name = name;
         StorageManager.getInstance().save("user", this);
-    }
-
-    public static fromJSON(data: any): User {
-        return new User(data?.name ?? "Guest");
     }
 }

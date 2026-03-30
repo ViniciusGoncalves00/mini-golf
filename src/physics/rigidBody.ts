@@ -3,8 +3,8 @@ import { Monobehavior } from "../monobehavior";
 import { World } from "./world";
 
 export class RigidBody extends Monobehavior {
-    private readonly position: THREE.Vector3;
-    private readonly quaternion: THREE.Quaternion;
+    public readonly position: THREE.Vector3;
+    public readonly quaternion: THREE.Quaternion;
     private readonly velocity: THREE.Vector3 = new THREE.Vector3();
     private readonly mass: number = 1;
 

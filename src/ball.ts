@@ -9,7 +9,7 @@ export class Ball extends Monobehavior {
     public readonly rigidBody: RigidBody;
 
     public readonly radius: number;
-    public readonly isLoaded: boolean = false;
+    public isLoaded: boolean = false;
 
     private readonly stopThreshold = 0.01;
 
@@ -25,7 +25,11 @@ export class Ball extends Monobehavior {
     }
 
     public update(delta: number): void {
+        this.mesh.position.copy(this.rigidBody.position);
+        this.mesh.quaternion.copy(this.rigidBody.quaternion);
+
         this.rigidBody.getSpeed() < this.stopThreshold ? this.rigidBody.stop() : this.rigidBody.update(delta);
+        
         this.arrow.position.copy(this.mesh.position);
         this.arrow.setDirection(this.rigidBody.getDirection());
     }

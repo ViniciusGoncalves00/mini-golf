@@ -3,11 +3,11 @@ import { Ball } from "./ball";
 import { Monobehavior } from "./monobehavior";
 
 export class Club extends Monobehavior {
+    public enabled: boolean = false;
     public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(0, 0, 255));
 
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: ((force: THREE.Vector3) => void)[] = [];
-    public isPlayerTurn = false;
     
     private readonly maxStrength = 10;
     private readonly timeToMaxStrengthInSeconds = 3;
@@ -36,7 +36,7 @@ export class Club extends Monobehavior {
     }
 
     public startShot(): void {
-        if (!this.isPlayerTurn) return;
+        if (!this.enabled) return;
         if (!this.ball.rigidBody.canInteract()) return;
 
         this.strength = 0;

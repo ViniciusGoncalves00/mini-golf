@@ -37,7 +37,7 @@ export class StorageManager {
         }
     }
 
-    public load(key: string): string | null {
+    public load(key: string): any {
         const item = localStorage.getItem(key);
         return item ? JSON.parse(item) : null;
     }

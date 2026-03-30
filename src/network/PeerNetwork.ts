@@ -82,7 +82,7 @@ export class PeerNetwork {
         return this.peer.id;
     }
 
-    public getPeers(): string[] {
+    public getPeersList(): string[] {
         return Array.from(this.connections.values().map(connection => connection.peer));
     }
 

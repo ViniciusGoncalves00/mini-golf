@@ -1,43 +1,66 @@
 import Peer from "peerjs";
 import * as THREE from "three";
 import { level1 } from "./course/courses";
-import { Match } from "./match";
+import { Match2 } from "./match";
 import { Server } from "./network/server";
 import { WebRTCTransport, WebSocketTransport } from "./network/transports";
 import { Page } from "./pages/page";
 import { StorageManager } from "./storageManager";
 import { User } from "./user";
 import { PeerNetwork } from "./network/PeerNetwork";
+import { Player } from "./player";
 
 export class Session {
     public readonly user: User;
     public readonly page: Page;
 
     private network: PeerNetwork;
-    private match: Match | null = null;
+    private match: Match2 | null = null;
     
     public constructor() {
+        this.network = new PeerNetwork();
+
         const user = StorageManager.getInstance().load("user");
-        this.user = User.fromJSON(user);
+        this.user = new User(this.network.peer.id, user?.name ?? "Guest");
 
         this.page = new Page();
-        this.network = new PeerNetwork();
 
         this.page.onStart = () => this.start();
         this.page.onCreateRoom = () => this.createRoom();
         this.page.onCloseRoom = () => this.closeRoom();
         this.page.onConnect = (roomID) => this.joinRoom(roomID);
     }
-
+    
     public start(): void {
+        if (this.network.getPeersList().length > 0) {
+            this.startMultiplayerMatch();
+        } else {
+            this.startSinglePlayerMatch();
+        }
+    }
+
+    public startSinglePlayerMatch(): void {
+        this.page.setGamePage();
+        this.page.hideInterface();
+        const player = new Player(this.user);
+        const course = level1();
+        const courses = [course];
+        this.match = new Match2(player, [player], courses);
+    }
+
+    public startMultiplayerMatch(): void {
         this.network.send({ type: "start" })
 
         this.page.setGamePage();
         this.page.hideInterface();
 
+        const localPlayer: Player = new Player(this.user);
+        const allPlayers: Player[] = this.network.getPeersList().map(peerId => new Player(new User(peerId, "Player " + peerId.substring(0, 5))));
+        allPlayers.push(localPlayer);
+
         const course = level1();
         const courses = [course];
-        this.match = new Match([this.user], courses);
+        this.match = new Match2(localPlayer, allPlayers, courses);
 
         this.match.players.forEach(player => {
             player.club.onFreeShot.push((force) => {
@@ -72,7 +95,7 @@ export class Session {
 
     public setupHostConnection(): void {
         this.network.onLeave.push((peerId) => {
-            const peers = this.network.getPeers();
+            const peers = this.network.getPeersList();
             peers.push(this.network.peer.id);
                     
             this.network.send({
@@ -88,7 +111,7 @@ export class Session {
             switch (data.type) {
                 case "connected":
                 case "disconnected":
-                    const peers = this.network.getPeers();
+                    const peers = this.network.getPeersList();
                     peers.push(this.network.peer.id);
                     
                     this.network.send({
@@ -118,7 +141,7 @@ export class Session {
         this.network.onReceive.push((peerId, data) => {
             switch (data.type) {
                 case "start":
-                    this.start();
+                    this.startMultiplayerMatch();
                     break;
                 case "playersList":
                     this.page.updatePlayerList(data.payload.players);
