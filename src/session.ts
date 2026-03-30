@@ -43,9 +43,13 @@ export class Session {
         this.page.setGamePage();
         this.page.hideInterface();
         const player = new Player(this.user);
-        const course = level1();
-        const courses = [course];
+        const courses = [level1()];
         this.match = new Match2(player, [player], courses);
+
+        player.club.onFreeShot.push((force) => {
+            console.log("Shot force:", force);
+            player.ball.rigidBody.applyForce(force);
+        })
     }
 
     public startMultiplayerMatch(): void {
@@ -58,8 +62,7 @@ export class Session {
         const allPlayers: Player[] = this.network.getPeersList().map(peerId => new Player(new User(peerId, "Player " + peerId.substring(0, 5))));
         allPlayers.push(localPlayer);
 
-        const course = level1();
-        const courses = [course];
+        const courses = [level1()];
         this.match = new Match2(localPlayer, allPlayers, courses);
 
         this.match.players.forEach(player => {
@@ -125,12 +128,18 @@ export class Session {
                     break;
                 case "shot":
                     if (!this.match) return;
+                    
                     this.network.send({
                         type: "shot",
                         payload: {
                             vector: data.payload.vector,
                         }
                     })
+
+                    const player = this.match.players.find(player => player.user.id === peerId);
+                    if (!player) return;
+                    
+                    player.ball.rigidBody.applyForce(new THREE.Vector3(...data.payload.vector));
                 default:
                     break;
             }
@@ -147,7 +156,12 @@ export class Session {
                     this.page.updatePlayerList(data.payload.players);
                     break;
                 case "shot":
-                    this.match?.players[0].ball.rigidBody.applyForce(new THREE.Vector3(...data.payload.vector));
+                    if (!this.match) return;
+                    
+                    const player = this.match.players.find(player => player.user.id === peerId);
+                    if (!player) return;
+
+                    player.ball.rigidBody.applyForce(new THREE.Vector3(...data.payload.vector));
                     break;
                 default:
                     break;

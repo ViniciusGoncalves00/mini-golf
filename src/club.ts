@@ -3,7 +3,7 @@ import { Ball } from "./ball";
 import { Monobehavior } from "./monobehavior";
 
 export class Club extends Monobehavior {
-    public enabled: boolean = false;
+    public enabled: boolean = true;
     public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(0, 0, 255));
 
     public readonly onStartShot: (() => void)[] = [];
@@ -37,7 +37,7 @@ export class Club extends Monobehavior {
 
     public startShot(): void {
         if (!this.enabled) return;
-        if (!this.ball.rigidBody.canInteract()) return;
+        // if (!this.ball.rigidBody.canInteract()) return;
 
         this.strength = 0;
         this.isHolding = true;
@@ -46,7 +46,9 @@ export class Club extends Monobehavior {
     }
 
     public freeShot(): void {
-        if (!this.ball.rigidBody.canInteract()) return;
+        console.log("Trying to free shot...");
+        // if (!this.ball.rigidBody.canInteract()) return;
+        console.log("After chekding");
 
         const force = new THREE.Vector3().copy(this.direction).multiplyScalar(this.strength);
         // this.ball.rigidBody.applyForce(force);

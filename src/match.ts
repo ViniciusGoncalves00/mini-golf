@@ -264,7 +264,7 @@ function calculateCollision(delta: number, ball: Ball, course: Course, isGrounde
     }
 }
 
-function isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.01) {
+function isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.005) {
     const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
     const angle = radToDeg(inverseNormal.angleTo(direction));
 
@@ -272,7 +272,7 @@ function isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: 
     const hypotenuse = hit.distance;
 
     const adjacentSide = cossine * hypotenuse;
-    const distance = Math.abs(adjacentSide - radius);
+    const distance = adjacentSide - radius;
 
     const isColliding = distance < threshold;
     return isColliding;
@@ -396,11 +396,11 @@ export class Match2 {
                 this.currentPlayer?.club.calculateDirection(this.camera, e, this.renderer.domElement.getBoundingClientRect(), this.currentPlayer?.ball)
             })
 
-            this.renderer.domElement.addEventListener("mousemove", (e) => {
+            this.renderer.domElement.addEventListener("mousedown", (e) => {
                 this.currentPlayer?.club.startShot();
             })
 
-            this.renderer.domElement.addEventListener("mousemove", (e) => {
+            this.renderer.domElement.addEventListener("mouseup", (e) => {
                 this.currentPlayer?.club.freeShot();
             })
         }
