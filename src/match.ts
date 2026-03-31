@@ -192,62 +192,6 @@ import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 //     }
 // }
 
-function calculateCollision(delta: number, ball: Ball, course: Course, isGrounded: boolean) {
-    if (!ball.rigidBody.isMoving()) return;
-
-    const raycaster = new THREE.Raycaster();
-    const forward = new THREE.Vector3();
-
-    if (isGrounded) {
-        raycaster.set(ball.mesh.position, new THREE.Vector3(0, -1, 0));
-        const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
-        const hit2 = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
-        if (!hit2) return;
-
-        const tile2 = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit2.object.uuid);
-        if (!tile2) return;
-
-        ball.rigidBody.applyDrag(tile2.friction * delta);
-    }
-    
-    forward.copy(ball.rigidBody.getDirection());
-    raycaster.set(ball.mesh.position, forward);
-    const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
-
-    if (intersections.length === 0) return;
-    
-    const hit = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
-    if (!hit) return;
-
-    // colliderDebug.position.copy(hit.point)
-
-    if (isColliding(forward, hit, ball.radius)) {
-        const tile = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit.object.uuid);
-        if (!tile) return;
-
-        const normal = hit.face!.normal.clone();
-        normal.transformDirection(hit.object.matrixWorld).normalize();
-
-        const dot = forward.dot(normal);
-        const impactStrength = Math.abs(dot) * tile.absorption;
-        ball.rigidBody.reflect(normal, impactStrength);
-    }
-}
-
-function isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.005) {
-    const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
-    const angle = radToDeg(inverseNormal.angleTo(direction));
-
-    const cossine = Math.cos(degToRad(angle));
-    const hypotenuse = hit.distance;
-
-    const adjacentSide = cossine * hypotenuse;
-    const distance = adjacentSide - radius;
-
-    const isColliding = distance < threshold;
-    return isColliding;
-}
-
 export class Match2 {
     public readonly player: Player;
     public readonly players: Player[] = [];
@@ -415,9 +359,10 @@ export class Match2 {
         for (const player of this.players) {
             const ball = player.ball;
 
-            calculateCollision(delta, ball, this.currentCourse, ball.isCollidingGround);
+            this.calculateCollision(delta, ball, this.currentCourse, ball.isCollidingGround);
             this.gravity(delta, ball, this.currentCourse);
             this.mustStop(ball);
+            this.rollback(ball, -1);
         }
     }
 
@@ -432,14 +377,80 @@ export class Match2 {
 
         ball.isCollidingGround = hit && hit.distance <= ball.radius + threshold;
 
+        if (ball.isCollidingGround) {
+            ball.lastGroundPosition.copy(ball.mesh.position);
+        }
+
         if (!ball.isCollidingGround) {
             ball.rigidBody.applyForce(World.gravity.clone().multiplyScalar(delta));
         }
     }
 
+    private calculateCollision(delta: number, ball: Ball, course: Course, isGrounded: boolean) {
+        if (!ball.rigidBody.isMoving()) return;
+
+        const raycaster = new THREE.Raycaster();
+        const forward = new THREE.Vector3();
+
+        if (isGrounded) {
+            raycaster.set(ball.mesh.position, new THREE.Vector3(0, -1, 0));
+            const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
+            const hit2 = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
+            if (!hit2) return;
+
+            const tile2 = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit2.object.uuid);
+            if (!tile2) return;
+
+            ball.rigidBody.applyDrag(tile2.friction * delta);
+        }
+
+        forward.copy(ball.rigidBody.getDirection());
+        raycaster.set(ball.mesh.position, forward);
+        const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
+
+        if (intersections.length === 0) return;
+
+        const hit = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
+        if (!hit) return;
+
+        // colliderDebug.position.copy(hit.point)
+
+        if (this.isColliding(forward, hit, ball.radius)) {
+            const tile = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit.object.uuid);
+            if (!tile) return;
+
+            const normal = hit.face!.normal.clone();
+            normal.transformDirection(hit.object.matrixWorld).normalize();
+
+            const dot = forward.dot(normal);
+            const impactStrength = Math.abs(dot) * tile.absorption;
+            ball.rigidBody.reflect(normal, impactStrength);
+        }
+    }
+
+    private isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.005) {
+        const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
+        const angle = radToDeg(inverseNormal.angleTo(direction));
+
+        const cossine = Math.cos(degToRad(angle));
+        const hypotenuse = hit.distance;
+
+        const adjacentSide = cossine * hypotenuse;
+        const distance = adjacentSide - radius;
+
+        const isColliding = distance < threshold;
+        return isColliding;
+    }
+
     private mustStop(ball: Ball, threshold: number = 0.01): void {
         if (!ball.isCollidingGround || ball.rigidBody.getSpeed() > threshold) return;
         
+        ball.rigidBody.stop();
+    }
+
+    private rollback(ball: Ball, height: number): void {
+        if (ball.mesh.position.y > height) return;
+        ball.mesh.position.copy(ball.lastGroundPosition);
         ball.rigidBody.stop();
     }
 }
