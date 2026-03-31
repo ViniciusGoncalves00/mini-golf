@@ -5,7 +5,7 @@ import { World } from "./world";
 export class RigidBody extends Monobehavior {
     public readonly position: THREE.Vector3;
     public readonly quaternion: THREE.Quaternion;
-    private readonly velocity: THREE.Vector3 = new THREE.Vector3();
+    public velocity: THREE.Vector3 = new THREE.Vector3();
     private readonly mass: number = 1;
 
     private wasStopped: boolean = false;

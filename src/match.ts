@@ -192,36 +192,6 @@ import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 //     }
 // }
 
-function applyGravity(delta: number, ball: Ball, course: Course): boolean {
-    const raycaster = new THREE.Raycaster();
-    const down = new THREE.Vector3(0, -1, 0);
-
-    raycaster.set(ball.mesh.position, down);
-    raycaster.far = ball.radius;
-
-    const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
-    const hit = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
-
-    const distance = World.gravity.length() + ball.radius;
-    
-    let isGrounded = false;
-    if (hit && hit.distance < ball.radius * 1.1) {
-        isGrounded = true;
-    } else {
-        isGrounded = false;
-    }
-
-    if (isGrounded && ball.rigidBody.getSpeed() < 0.1) {
-        ball.rigidBody.stop();
-    }
-
-    if (!hit || hit.distance > ball.radius * 1.1) {
-        ball.rigidBody.applyForce(World.gravity.clone().multiplyScalar(delta));
-    }
-
-    return isGrounded;
-}
-
 function calculateCollision(delta: number, ball: Ball, course: Course, isGrounded: boolean) {
     if (!ball.rigidBody.isMoving()) return;
 
@@ -300,6 +270,9 @@ export class Match2 {
     public canSimulate: boolean = true;
 
     private timer: THREE.Timer = new THREE.Timer();
+    private raycaster = new THREE.Raycaster();
+
+    private down = new THREE.Vector3(0, -1, 0);
     
     public constructor(player: Player, players: Player[], courses: Course[]) {
         this.player = player;
@@ -442,8 +415,31 @@ export class Match2 {
         for (const player of this.players) {
             const ball = player.ball;
 
-            const isGrounded = applyGravity(delta, ball, this.currentCourse);
-            calculateCollision(delta, ball, this.currentCourse, isGrounded);
+            calculateCollision(delta, ball, this.currentCourse, ball.isCollidingGround);
+            this.gravity(delta, ball, this.currentCourse);
+            this.mustStop(ball);
         }
+    }
+
+    private gravity(delta: number, ball: Ball, course: Course, threshold: number = 0.01): void {
+        this.raycaster.set(ball.mesh.position, this.down);
+        this.raycaster.far = Infinity;
+
+        const intersections = this.raycaster.intersectObjects(
+            course.tiles.values().toArray().map(t => t.mesh)
+        );
+        const hit = intersections[0];
+
+        ball.isCollidingGround = hit && hit.distance <= ball.radius + threshold;
+
+        if (!ball.isCollidingGround) {
+            ball.rigidBody.applyForce(World.gravity.clone().multiplyScalar(delta));
+        }
+    }
+
+    private mustStop(ball: Ball, threshold: number = 0.01): void {
+        if (!ball.isCollidingGround || ball.rigidBody.getSpeed() > threshold) return;
+        
+        ball.rigidBody.stop();
     }
 }
