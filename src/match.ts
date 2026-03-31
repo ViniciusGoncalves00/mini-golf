@@ -290,6 +290,7 @@ export class Match2 {
         this.players.forEach(player => {
             this.scene.remove(player.ball.mesh);
             this.scene.remove(player.ball.arrow);
+            this.scene.remove(player.ball.colliderDebug);
             this.scene.remove(player.club.arrow);
         })
         this.nextPlayer();
@@ -305,6 +306,7 @@ export class Match2 {
 
             this.scene.add(this.currentPlayer.ball.mesh);
             this.scene.add(this.currentPlayer.ball.arrow);
+            this.scene.add(this.currentPlayer.ball.colliderDebug);
             this.scene.add(this.currentPlayer.club.arrow);
 
             this.currentPlayer.ball.mesh.position.set(0, 1, 0);
@@ -413,11 +415,13 @@ export class Match2 {
         const hit = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
         if (!hit) return;
 
-        // colliderDebug.position.copy(hit.point)
 
         if (this.isColliding(forward, hit, ball.radius)) {
             const tile = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit.object.uuid);
             if (!tile) return;
+
+            const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
+            ball.colliderDebug.position.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
 
             const normal = hit.face!.normal.clone();
             normal.transformDirection(hit.object.matrixWorld).normalize();
