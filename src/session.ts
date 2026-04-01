@@ -1,6 +1,6 @@
 import Peer from "peerjs";
 import * as THREE from "three";
-import { level1 } from "./course/courses";
+import { level1, level3 } from "./course/courses";
 import { Match2 } from "./match";
 import { Server } from "./network/server";
 import { WebRTCTransport, WebSocketTransport } from "./network/transports";
@@ -43,7 +43,7 @@ export class Session {
         this.page.setGamePage();
         this.page.hideInterface();
         const player = new Player(this.user);
-        const courses = [level1()];
+        const courses = [level3()];
         this.match = new Match2(player, [player], courses);
 
         player.club.onFreeShot.push((force) => {

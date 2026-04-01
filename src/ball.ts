@@ -38,5 +38,6 @@ export class Ball extends Monobehavior {
         
         this.arrow.position.copy(this.mesh.position);
         this.arrow.setDirection(this.rigidBody.getDirection());
+        this.arrow.visible = false;
     }
 }

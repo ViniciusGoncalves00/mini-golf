@@ -4,6 +4,8 @@ import { Course } from "../course";
 import { StorageManager } from "../storageManager";
 import { Tile } from "../tile";
 import { Colors, Tiles } from "../common/enums";
+import { GeometryBuilder } from "../geometry/geometryBuilder";
+import * as THREE from "three";
 
 const storage = StorageManager.getInstance();
 await storage.loadSTL();
@@ -14,6 +16,10 @@ const planeHole = storage.geometries.get(Tiles.HOLE)!;
 const planeParallel = storage.geometries.get(Tiles.PARALLEL)!;
 const planeU = storage.geometries.get(Tiles.U)!;
 const planeWall = storage.geometries.get(Tiles.WALL)!;
+const ramp15NoWalls = storage.geometries.get(Tiles.RAMP_15_NO_WALLS)!.rotateY(Math.PI);
+const ramp15WallLeft = storage.geometries.get(Tiles.RAMP_15_WALL_LEFT)!.rotateY(Math.PI);
+const ramp15WallRight = storage.geometries.get(Tiles.RAMP_15_WALL_RIGHT)!.rotateY(Math.PI);
+const ramp15TwoWalls = storage.geometries.get(Tiles.RAMP_15_TWO_WALLS)!.rotateY(Math.PI);
 
 export const level1 = () => {
     const tiles: Tile[] = []
@@ -95,3 +101,67 @@ export const level2 = () => {
     }
     return new Course(tiles);
 }
+
+export const level3 = () => {
+    const tiles: Tile[] = [];
+    const rows = 7;
+    const columns = 3;
+    const middleRow = Math.round(rows / 2);
+
+    type GridTile = {
+        x: number;
+        z: number;
+        geometry: THREE.BufferGeometry;
+        rotationY?: number;
+        translateY?: number;
+    };
+
+    const tileDefinitions: GridTile[] = [
+        // Comeco
+        { x: 0, z: 0, geometry: planeCorner },
+        { x: 1, z: 0, geometry: planeWall, rotationY: -Math.PI / 2 },
+        { x: 2, z: 0, geometry: planeCorner, rotationY: -Math.PI / 2 },
+
+        // Meio (rampas)
+        { x: 0, z: 2, geometry: ramp15WallRight },
+        { x: 1, z: 2, geometry: ramp15NoWalls },
+        { x: 2, z: 2, geometry: ramp15WallLeft },
+
+        { x: 0, z: rows - 3, geometry: ramp15WallLeft, rotationY: Math.PI },
+        { x: 1, z: rows - 3, geometry: ramp15NoWalls, rotationY: Math.PI },
+        { x: 2, z: rows - 3, geometry: ramp15WallRight, rotationY: Math.PI },
+
+        // Parede central
+        { x: 0, z: 3, geometry: planeWall, translateY: 0.267949 },
+        { x: 1, z: 3, geometry: plane, translateY: 0.267949 },
+        { x: 2, z: 3, geometry: planeWall, rotationY: Math.PI, translateY: 0.267949 },
+
+        // Fim
+        { x: 0, z: rows - 1, geometry: planeCorner, rotationY: Math.PI / 2 },
+        { x: 1, z: rows - 1, geometry: planeWall, rotationY: Math.PI / 2 },
+        { x: 2, z: rows - 1, geometry: planeCorner, rotationY: Math.PI },
+    ];
+
+    // Laterais contínuas (excluindo cantos)
+    for (let z = 1; z < rows - 1; z++) {
+        if (z !== middleRow - 1 && z !== middleRow) {
+            tileDefinitions.push({ x: 0, z, geometry: planeWall });
+            tileDefinitions.push({ x: columns - 1, z, geometry: planeWall, rotationY: Math.PI });
+        }
+    }
+
+    for (let x = 0; x < columns; x++) {
+        for (let z = 0; z < rows; z++) {
+            const found = tileDefinitions.find((t) => t.x === x && t.z === z);
+
+            let geometry = found?.geometry.clone() ?? plane.clone();
+            if (found?.rotationY) geometry.rotateY(found.rotationY);
+            if (found?.translateY) geometry.translate(0, found.translateY, 0);
+
+            const color = (x + z) % 2 === 0 ? Colors.DARK_GREEN : Colors.LIGHT_GREEN;
+            tiles.push(Builder.planeTile({ x, y: 0, z }, geometry, color));
+        }
+    }
+
+    return new Course(tiles);
+};
