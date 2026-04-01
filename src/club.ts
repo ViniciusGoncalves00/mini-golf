@@ -9,7 +9,7 @@ export class Club extends Monobehavior {
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: ((force: THREE.Vector3) => void)[] = [];
     
-    private readonly maxStrength = 10;
+    private readonly maxStrength = 5;
     private readonly timeToMaxStrengthInSeconds = 3;
     private readonly strengthGainRate = this.maxStrength / this.timeToMaxStrengthInSeconds;
     private strength = 0;

@@ -262,6 +262,7 @@ export class Match2 {
         this.scene.add(this.globalLight);
 
         this.globalLightHelper = new THREE.DirectionalLightHelper(this.globalLight, 10, 0xff0000);
+        this.globalLightHelper.visible = false;
         this.scene.add(this.globalLightHelper)
 
         this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
@@ -316,11 +317,11 @@ export class Match2 {
             })
 
             this.renderer.domElement.addEventListener("mousedown", (e) => {
-                this.currentPlayer?.club.startShot();
+                if (e.button == 2) this.currentPlayer?.club.startShot();
             })
 
             this.renderer.domElement.addEventListener("mouseup", (e) => {
-                this.currentPlayer?.club.freeShot();
+                if (e.button == 2) this.currentPlayer?.club.freeShot();
             })
         }
     }
@@ -341,7 +342,7 @@ export class Match2 {
 
         this.camera.position.copy(position);
 
-        // this.orbitControls.target.copy(this.player.ball.mesh.position);
+        this.orbitControls.target.copy(this.player.ball.mesh.position);
         this.orbitControls.update();
         
         this.renderer.render(this.scene, this.camera);

@@ -104,8 +104,8 @@ export const level2 = () => {
 
 export const level3 = () => {
     const tiles: Tile[] = [];
-    const rows = 7;
-    const columns = 3;
+    const rows = 8;
+    const columns = 4;
     const middleRow = Math.round(rows / 2);
 
     type GridTile = {
@@ -120,26 +120,36 @@ export const level3 = () => {
         // Comeco
         { x: 0, z: 0, geometry: planeCorner },
         { x: 1, z: 0, geometry: planeWall, rotationY: -Math.PI / 2 },
-        { x: 2, z: 0, geometry: planeCorner, rotationY: -Math.PI / 2 },
+        { x: 2, z: 0, geometry: planeWall, rotationY: -Math.PI / 2 },
+        { x: 3, z: 0, geometry: planeCorner, rotationY: -Math.PI / 2 },
 
         // Meio (rampas)
         { x: 0, z: 2, geometry: ramp15WallRight },
         { x: 1, z: 2, geometry: ramp15NoWalls },
-        { x: 2, z: 2, geometry: ramp15WallLeft },
+        { x: 2, z: 2, geometry: ramp15NoWalls },
+        { x: 3, z: 2, geometry: ramp15WallLeft },
 
         { x: 0, z: rows - 3, geometry: ramp15WallLeft, rotationY: Math.PI },
         { x: 1, z: rows - 3, geometry: ramp15NoWalls, rotationY: Math.PI },
-        { x: 2, z: rows - 3, geometry: ramp15WallRight, rotationY: Math.PI },
+        { x: 2, z: rows - 3, geometry: ramp15NoWalls, rotationY: Math.PI },
+        { x: 3, z: rows - 3, geometry: ramp15WallRight, rotationY: Math.PI },
 
         // Parede central
         { x: 0, z: 3, geometry: planeWall, translateY: 0.267949 },
         { x: 1, z: 3, geometry: plane, translateY: 0.267949 },
-        { x: 2, z: 3, geometry: planeWall, rotationY: Math.PI, translateY: 0.267949 },
+        { x: 2, z: 3, geometry: plane, translateY: 0.267949 },
+        { x: 3, z: 3, geometry: planeWall, rotationY: Math.PI, translateY: 0.267949 },
+
+        { x: 0, z: 4, geometry: planeWall, translateY: 0.267949 },
+        { x: 1, z: 4, geometry: plane, translateY: 0.267949 },
+        { x: 2, z: 4, geometry: plane, translateY: 0.267949 },
+        { x: 3, z: 4, geometry: planeWall, rotationY: Math.PI, translateY: 0.267949 },
 
         // Fim
         { x: 0, z: rows - 1, geometry: planeCorner, rotationY: Math.PI / 2 },
         { x: 1, z: rows - 1, geometry: planeWall, rotationY: Math.PI / 2 },
-        { x: 2, z: rows - 1, geometry: planeCorner, rotationY: Math.PI },
+        { x: 2, z: rows - 1, geometry: planeWall, rotationY: Math.PI / 2 },
+        { x: 3, z: rows - 1, geometry: planeCorner, rotationY: Math.PI },
     ];
 
     // Laterais contínuas (excluindo cantos)
