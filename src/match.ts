@@ -362,14 +362,15 @@ export class Match2 {
         for (const player of this.players) {
             const ball = player.ball;
 
-            this.calculateCollision(delta, ball, this.currentCourse, ball.isCollidingGround);
+            this.calculateCollision(delta, ball, this.currentCourse);
             this.gravity(delta, ball, this.currentCourse);
+            this.applyDrag(delta, ball, this.currentCourse);
             this.mustStop(ball);
             this.rollback(ball, -1);
         }
     }
 
-    private gravity(delta: number, ball: Ball, course: Course, threshold: number = 0.01): void {
+    private gravity(delta: number, ball: Ball, course: Course, threshold: number = 0.0001): void {
         this.raycaster.set(ball.mesh.position, this.down);
         this.raycaster.far = Infinity;
 
@@ -379,9 +380,14 @@ export class Match2 {
         const hit = intersections[0];
 
         ball.isCollidingGround = hit && hit.distance <= ball.radius + threshold;
+        ball.isPenetrating = hit && hit.distance <= ball.radius;
 
         if (ball.isCollidingGround) {
             ball.lastGroundPosition.copy(ball.mesh.position);
+        }
+
+        if (ball.isPenetrating) {
+            ball.mesh.position.y += ball.radius - hit.distance;
         }
 
         if (!ball.isCollidingGround) {
@@ -389,23 +395,11 @@ export class Match2 {
         }
     }
 
-    private calculateCollision(delta: number, ball: Ball, course: Course, isGrounded: boolean) {
+    private calculateCollision(delta: number, ball: Ball, course: Course) {
         if (!ball.rigidBody.isMoving()) return;
 
         const raycaster = new THREE.Raycaster();
         const forward = new THREE.Vector3();
-
-        if (isGrounded) {
-            raycaster.set(ball.mesh.position, new THREE.Vector3(0, -1, 0));
-            const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
-            const hit2 = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
-            if (!hit2) return;
-
-            const tile2 = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit2.object.uuid);
-            if (!tile2) return;
-
-            ball.rigidBody.applyDrag(tile2.friction * delta);
-        }
 
         forward.copy(ball.rigidBody.getDirection());
         raycaster.set(ball.mesh.position, forward);
@@ -431,6 +425,24 @@ export class Match2 {
             const impactStrength = Math.abs(dot) * tile.absorption;
             ball.rigidBody.reflect(normal, impactStrength);
         }
+    }
+
+    private applyDrag(delta: number, ball: Ball, course: Course): void {
+        
+        if (ball.isCollidingGround) {
+            const raycaster = new THREE.Raycaster();
+            raycaster.set(ball.mesh.position, new THREE.Vector3(0, -1, 0));
+            const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
+            const hit2 = intersections.find(i => i.object.uuid !== ball.mesh.uuid);
+            if (!hit2) return;
+
+            const tile2 = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit2.object.uuid);
+            if (!tile2) return;
+
+            ball.rigidBody.applyDrag(tile2.friction * delta);
+        }
+
+        ball.rigidBody.applyDrag(World.airDrag);
     }
 
     private isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.005) {

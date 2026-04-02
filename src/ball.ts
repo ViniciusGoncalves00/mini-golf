@@ -15,6 +15,7 @@ export class Ball extends Monobehavior {
     
     public readonly radius: number;
     public isCollidingGround: boolean = false;
+    public isPenetrating: boolean = false;
     public lastGroundPosition: THREE.Vector3 = new THREE.Vector3();
     public isLoaded: boolean = false;
 
