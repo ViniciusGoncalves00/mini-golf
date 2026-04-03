@@ -442,7 +442,7 @@ export class Match2 {
             ball.rigidBody.applyDrag(tile2.friction * delta);
         }
 
-        ball.rigidBody.applyDrag(World.airDrag);
+        ball.rigidBody.applyDrag(World.airDrag * delta);
     }
 
     private isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.005) {
