@@ -12,7 +12,8 @@ export class PeerNetwork {
     private isReady = false;
 
     constructor() {
-        this.peer = new Peer();
+        const id = Math.round(Math.random() * 1000);
+        this.peer = new Peer(id.toString());
 
         this.peer.on("open", (id) => {
             console.log("Peer ID:", id);

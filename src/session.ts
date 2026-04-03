@@ -25,18 +25,11 @@ export class Session {
 
         this.page = new Page();
 
-        this.page.onStart = () => this.start();
+        this.page.onStartSingleplayer = () => this.startSinglePlayerMatch();
+        this.page.onStartMultiplayer = () => this.startMultiplayerMatch();
         this.page.onCreateRoom = () => this.createRoom();
         this.page.onCloseRoom = () => this.closeRoom();
         this.page.onConnect = (roomID) => this.joinRoom(roomID);
-    }
-    
-    public start(): void {
-        if (this.network.getPeersList().length > 0) {
-            this.startMultiplayerMatch();
-        } else {
-            this.startSinglePlayerMatch();
-        }
     }
 
     public startSinglePlayerMatch(): void {

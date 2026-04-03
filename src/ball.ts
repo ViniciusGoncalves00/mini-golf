@@ -9,16 +9,21 @@ export class Ball extends Monobehavior {
 
     //#region [gizmos]
     public readonly arrow: THREE.ArrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(255, 0, 255));
-    public readonly groundDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16), new THREE.MeshBasicMaterial({color: 0xff0000}));
-    public readonly colliderDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16));
+    public readonly groundDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16));
+    public readonly colliderDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16), new THREE.MeshBasicMaterial({color: 0xff0000}));
     //#endregion
      
-    public readonly radius: number;
-    public isCollidingGround: boolean = false;
-    public isPenetrating: boolean = false;
+    //#region
     public lastCollisionPosition: THREE.Vector3 = new THREE.Vector3();
     public lastGroundPosition: THREE.Vector3 = new THREE.Vector3();
+
+    public readonly radius: number;
+    public readonly diameter: number;
+
+    public isCollidingGround: boolean = false;
+    public isPenetrating: boolean = false;
     public isLoaded: boolean = false;
+    //#endregion
 
     private readonly stopThreshold = 0.01;
 
@@ -27,6 +32,7 @@ export class Ball extends Monobehavior {
         
         this.mesh = mesh;
         this.radius = radius;
+        this.diameter = radius * 2;
 
         this.collider = new THREE.Sphere(mesh.position, radius);
         this.rigidBody = new RigidBody(mesh.position, mesh.quaternion);

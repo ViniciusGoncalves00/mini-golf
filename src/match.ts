@@ -28,7 +28,7 @@ export class Match {
     private raycaster = new THREE.Raycaster();
     private up = new THREE.Vector3(0, 1, 0);
     private down = new THREE.Vector3(0, -1, 0);
-    private interpolation: number = 1;
+    private interpolation: number = 0.5;
     private rollbackHeight: number = -1;
 
     private readonly sceneWrapper: SceneWrapper;
@@ -139,7 +139,7 @@ export class Match {
 
             const speed = ball.rigidBody.getSpeed();
             const distance = speed * delta;
-            const maxMovePerStep = ball.radius * this.interpolation;
+            const maxMovePerStep = ball.diameter * this.interpolation;
                     
             const steps = Math.max(1, Math.ceil(distance / maxMovePerStep));
             const stepDelta = delta / steps;
@@ -171,10 +171,12 @@ export class Match {
         const hit = intersections[0];
 
         ball.isCollidingGround = hit && hit.distance <= ball.radius + threshold;
-        ball.isPenetrating = hit && hit.distance <= ball.radius;
+        ball.isPenetrating = hit && hit.distance < ball.radius;
 
         if (ball.isCollidingGround) {
             ball.lastGroundPosition.copy(hit.point.add(this.up.multiplyScalar(ball.radius)));
+            const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
+            ball.lastCollisionPosition.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
         }
 
         if (ball.isPenetrating) {

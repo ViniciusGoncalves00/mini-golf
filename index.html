@@ -13,10 +13,10 @@
         <div id="interface" class="h-full w-full bg-grid flex items-center justify-center">
             <div id="home" class="bg-cyan-800/25 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-white">
                 <button type="button" @click="$store.ui.setSinglePlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">SinglePlayer</button>
-                <!-- <button type="button" @click="$store.ui.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">MultiPlayer</button> -->
+                <button type="button" @click="$store.ui.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">MultiPlayer</button>
             </div>
             <div id="singleplayer" class="bg-cyan-800/25 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-white" hidden>
-                <button type="button" @click="$store.ui.start()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
+                <button type="button" @click="$store.ui.startSingleplayer()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
                 <button type="button" @click="$store.ui.setHomePage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
             </div>
             <div id="multiplayer" class="bg-cyan-800/25 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-white" hidden>
@@ -35,7 +35,7 @@
                     <div id="MyID">My ID</div>
                 </div>
                 <div id="playersList" class="flex flex-col gap-2"></div>
-                <button type="button" @click="$store.ui.start()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
+                <button type="button" @click="$store.ui.startMultiplayer()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
                 <button type="button" @click="$store.ui.closeRoom()" class="cursor-pointer bg-white rounded-full py-2 px-4">Close Room</button>
                 <button type="button" @click="$store.ui.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
             </div>

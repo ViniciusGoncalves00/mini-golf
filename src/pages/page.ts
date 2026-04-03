@@ -2,7 +2,8 @@ export class Page {
     public currentID: string = "home";
     public previousID: string = "home";
 
-    public onStart = () => {};
+    public onStartSingleplayer = () => {};
+    public onStartMultiplayer = () => {};
     public onConnect = (value: string) => {};
     public onCreateRoom = () => {};
     public onCloseRoom = () => {};
@@ -40,11 +41,18 @@ export class Page {
         this.setPage("game");
     }
 
-    public start(): void {
+    public startSingleplayer(): void {
         this.setGamePage();
         this.hideInterface();
 
-        this.onStart();
+        this.onStartSingleplayer();
+    }
+
+    public startMultiplayer(): void {
+        this.setGamePage();
+        this.hideInterface();
+
+        this.onStartMultiplayer();
     }
 
     public hideInterface(): void {

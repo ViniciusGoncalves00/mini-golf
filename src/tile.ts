@@ -4,10 +4,7 @@ import { Monobehavior } from "./monobehavior";
 export class Tile extends Monobehavior {
     public readonly mesh: THREE.Mesh;
     public readonly coordinates: THREE.Vector3Like;
-
-    public readonly normal: THREE.Vector3;
-    // public readonly collider: THREE.Box3;
-    
+    public readonly normal: THREE.Vector3;    
     public readonly friction: number;
     public readonly absorption: number;
 
@@ -19,11 +16,6 @@ export class Tile extends Monobehavior {
         this.normal = normal;
         this.friction = friction;
         this.absorption = absorption;
-
-        // this.collider = new THREE.Box3(
-        //     new THREE.Vector3(width * coordinates.x - width / 2, height * coordinates.y - height / 2, length * coordinates.z - length / 2),
-        //     new THREE.Vector3(width * coordinates.x + width / 2, height * coordinates.y + height / 2, length * coordinates.z + length / 2),
-        // )
     }
 
     public setColor(color: THREE.ColorRepresentation): void {
