@@ -44,7 +44,7 @@ export class Session {
         this.page.hideInterface();
         const player = new Player(this.user);
         const courses = [level3()];
-        this.match = new Match(player, [player], courses);
+        this.match = new Match(document.getElementById("game")!, player, [player], courses);
 
         player.club.onFreeShot.push((force) => {
             console.log("Shot force:", force);
@@ -63,7 +63,7 @@ export class Session {
         allPlayers.push(localPlayer);
 
         const courses = [level1()];
-        this.match = new Match(localPlayer, allPlayers, courses);
+        this.match = new Match(document.getElementById("game")!, localPlayer, allPlayers, courses);
 
         this.match.players.forEach(player => {
             player.club.onFreeShot.push((force) => {

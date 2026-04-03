@@ -1,15 +1,17 @@
 import * as THREE from "three";
 import { Course } from "./course";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
-import { User } from "./user";
 import { Player } from "./player";
 import { Global } from "./global";
-import { Builder } from "./builder";
 import { Ball } from "./ball";
 import { World } from "./physics/world";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
+import { CameraWrapper } from "./wrappers/camera-wrapper";
+import { SceneWrapper } from "./wrappers/scene-wrapper";
+import { Monobehavior } from "./monobehavior";
 
 export class Match {
+    public readonly monobehaviors: Monobehavior[] = [];
+    
     public readonly player: Player;
     public readonly players: Player[] = [];
     public readonly courses: Course[] = [];
@@ -20,74 +22,38 @@ export class Match {
     private currentCourse: Course | null = null;
     private currentCourseIndex: number = -1;
 
-    public renderer: THREE.WebGLRenderer;
-    public scene: THREE.Scene;
-    public camera: THREE.PerspectiveCamera;
-    public orbitControls: OrbitControls;
-    public globalLight: THREE.DirectionalLight;
-    public globalLightHelper: THREE.DirectionalLightHelper;
-    public ambientLight: THREE.AmbientLight;
-
-    public canSimulate: boolean = true;
+    public simulateEnabled: boolean = true;
 
     private timer: THREE.Timer = new THREE.Timer();
     private raycaster = new THREE.Raycaster();
-
     private down = new THREE.Vector3(0, -1, 0);
+
+    private readonly sceneWrapper: SceneWrapper;
+    private readonly cameraWrapper: CameraWrapper;
     
-    public constructor(player: Player, players: Player[], courses: Course[]) {
+    public constructor(canvas: HTMLElement, player: Player, players: Player[], courses: Course[]) {
         this.player = player;
         this.players = players;
         this.courses = courses;
 
-        this.scene = new THREE.Scene();
+        this.monobehaviors.push(this.player.ball);
+        this.monobehaviors.push(this.player.club);
 
-        this.scene.background = new THREE.Color(0.98, 0.98, 0.98);
-        this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.camera.position.set(0, 1, -2);
+        for (const player of players) {
+            this.monobehaviors.push(player.ball);
+            this.monobehaviors.push(player.club);
+        }
 
-        const canvas = document.getElementById("game")!;
-        this.renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFShadowMap;
+        for (const course of courses) {
+            this.monobehaviors.push(...course.tiles.values().toArray());
+        }
 
-        document.body.appendChild(this.renderer.domElement);
+        this.cameraWrapper = new CameraWrapper(canvas, this.player.ball);
+        this.monobehaviors.push(this.cameraWrapper);
 
-        this.globalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-
-        this.globalLight.position.set(120, 75, 100);
-        this.globalLight.castShadow = true;
-
-        this.globalLight.target.position.set(0, 0, 0);
-        this.scene.add(this.globalLight.target);
-
-        this.globalLight.shadow.mapSize.set(4_096, 4_096);
-
-        this.globalLight.shadow.camera.left = -10;
-        this.globalLight.shadow.camera.right = 10;
-        this.globalLight.shadow.camera.top = 10;
-        this.globalLight.shadow.camera.bottom = -10;
-
-        this.globalLight.shadow.camera.near = 0.01;
-        this.globalLight.shadow.camera.far = 2000;
-
-        this.globalLight.shadow.bias = 0.00000001;
-        this.globalLight.shadow.normalBias = 0.0001;
-        this.globalLight.shadow.radius = 1;
-
-        this.scene.add(this.globalLight);
-
-        this.globalLightHelper = new THREE.DirectionalLightHelper(this.globalLight, 10, 0xff0000);
-        this.globalLightHelper.visible = false;
-        this.scene.add(this.globalLightHelper)
-
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-        this.scene.add(this.ambientLight);
-
-        this.orbitControls = new OrbitControls( this.camera, this.renderer.domElement );
-        // this.orbitControls.enablePan = false;
-
+        this.sceneWrapper = new SceneWrapper(canvas, this.cameraWrapper.camera);
+        this.monobehaviors.push(this.sceneWrapper);
+        
         this.nextCourse();
 
         this.animate();
@@ -100,16 +66,16 @@ export class Match {
         this.currentCourse = this.courses[this.currentCourseIndex];
         this.currentCourse.load();
         this.currentCourse.tiles.values().forEach((tile) => {
-            this.scene.add(tile.mesh);
+            this.sceneWrapper.scene.add(tile.mesh);
         })
 
         this.currentPlayer = null;
         this.turnIndex = -1;
         this.players.forEach(player => {
-            this.scene.remove(player.ball.mesh);
-            this.scene.remove(player.ball.arrow);
-            this.scene.remove(player.ball.colliderDebug);
-            this.scene.remove(player.club.arrow);
+            this.sceneWrapper.scene.remove(player.ball.mesh);
+            this.sceneWrapper.scene.remove(player.ball.arrow);
+            this.sceneWrapper.scene.remove(player.ball.colliderDebug);
+            this.sceneWrapper.scene.remove(player.club.arrow);
         })
         this.nextPlayer();
     }
@@ -122,22 +88,22 @@ export class Match {
         if (!this.currentPlayer.ball.isLoaded) {
             this.currentPlayer.ball.isLoaded = true;
 
-            this.scene.add(this.currentPlayer.ball.mesh);
-            this.scene.add(this.currentPlayer.ball.arrow);
-            this.scene.add(this.currentPlayer.ball.colliderDebug);
-            this.scene.add(this.currentPlayer.club.arrow);
+            this.sceneWrapper.scene.add(this.currentPlayer.ball.mesh);
+            this.sceneWrapper.scene.add(this.currentPlayer.ball.arrow);
+            this.sceneWrapper.scene.add(this.currentPlayer.ball.colliderDebug);
+            this.sceneWrapper.scene.add(this.currentPlayer.club.arrow);
 
             this.currentPlayer.ball.mesh.position.set(0, 1, 0);
 
-            this.renderer.domElement.addEventListener("mousemove", (e) => {
-                this.currentPlayer?.club.calculateDirection(this.camera, e, this.renderer.domElement.getBoundingClientRect(), this.currentPlayer?.ball)
+            this.sceneWrapper.renderer.domElement.addEventListener("mousemove", (e) => {
+                this.currentPlayer?.club.calculateDirection(this.cameraWrapper.camera, e, this.sceneWrapper.renderer.domElement.getBoundingClientRect(), this.currentPlayer?.ball)
             })
 
-            this.renderer.domElement.addEventListener("mousedown", (e) => {
+            this.sceneWrapper.renderer.domElement.addEventListener("mousedown", (e) => {
                 if (e.button == 2) this.currentPlayer?.club.startShot();
             })
 
-            this.renderer.domElement.addEventListener("mouseup", (e) => {
+            this.sceneWrapper.renderer.domElement.addEventListener("mouseup", (e) => {
                 if (e.button == 2) this.currentPlayer?.club.freeShot();
             })
         }
@@ -146,31 +112,17 @@ export class Match {
     private animate = () => {
         requestAnimationFrame(this.animate);
 
-        this.globalLightHelper.update();
-    
         this.timer.update();
         const delta = this.timer.getDelta() * Global.timeScale;
     
-        for (const monobehavior of Builder.monobehaviors) monobehavior.update(delta);
-
-        const direction = new THREE.Vector3().subVectors(this.camera.position, this.player.ball.mesh.position).normalize();
-        // const distance = Math.abs(this.player.ball.mesh.position.distanceTo(this.camera.position));
-        const position = new THREE.Vector3().copy(direction).multiplyScalar(2).add(this.player.ball.mesh.position)
-
-        this.camera.position.copy(position);
-
-        this.orbitControls.target.copy(this.player.ball.mesh.position);
-        this.orbitControls.update();
+        for (const monobehavior of this.monobehaviors) monobehavior.update(delta);
+        if (this.simulateEnabled) this.simulate(delta);
         
-        this.renderer.render(this.scene, this.camera);
+        const ball = this.player.ball;
+        const club = this.player.club;
+        
+        ball.rigidBody.canInteract() ? club.showArrow() : club.hideArrow();
 
-        if (this.player.ball.rigidBody.canInteract()) {
-            this.player.club.showArrow();
-        } else {
-            this.player.club.hideArrow();
-        }
-
-        if (this.canSimulate) this.simulate(delta);
     }
 
     private simulate(delta: number): void {
@@ -179,12 +131,28 @@ export class Match {
         for (const player of this.players) {
             const ball = player.ball;
 
-            this.calculateCollision(delta, ball, this.currentCourse);
-            this.gravity(delta, ball, this.currentCourse);
-            this.applyDrag(delta, ball, this.currentCourse);
-            this.mustStop(ball);
+            const speed = ball.rigidBody.getSpeed();
+            const distance = speed * delta;
+            const maxMovePerStep = ball.radius * 1;
+                    
+            const steps = Math.max(1, Math.ceil(distance / maxMovePerStep));
+            const stepDelta = delta / steps;
+                    
+            for (let i = 0; i < steps; i++) {
+                this.simulateStep(stepDelta, ball, this.currentCourse);
+            }
+
             this.rollback(ball, -1);
         }
+    }
+
+
+    private simulateStep(delta: number, ball: Ball, course: Course): void {
+        this.gravity(delta, ball, course);
+        this.applyDrag(delta, ball, course);
+        this.calculateCollision(delta, ball, course);
+        ball.rigidBody.update(delta);
+        this.mustStop(ball);
     }
 
     private gravity(delta: number, ball: Ball, course: Course, threshold: number = 0.0001): void {
@@ -262,7 +230,7 @@ export class Match {
         ball.rigidBody.applyDrag(World.airDrag * delta);
     }
 
-    private isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.005) {
+    private isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.0001) {
         const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
         const angle = radToDeg(inverseNormal.angleTo(direction));
 

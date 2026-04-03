@@ -34,8 +34,6 @@ export class Ball extends Monobehavior {
     public update(delta: number): void {
         this.mesh.position.copy(this.rigidBody.position);
         this.mesh.quaternion.copy(this.rigidBody.quaternion);
-
-        this.rigidBody.getSpeed() < this.stopThreshold ? this.rigidBody.stop() : this.rigidBody.update(delta);
         
         this.arrow.position.copy(this.mesh.position);
         this.arrow.setDirection(this.rigidBody.getDirection());

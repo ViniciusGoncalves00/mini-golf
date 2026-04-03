@@ -9,8 +9,8 @@ export class Club extends Monobehavior {
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: ((force: THREE.Vector3) => void)[] = [];
     
-    private readonly maxStrength = 5;
-    private readonly timeToMaxStrengthInSeconds = 3;
+    private readonly maxStrength = 10;
+    private readonly timeToMaxStrengthInSeconds = 5;
     private readonly strengthGainRate = this.maxStrength / this.timeToMaxStrengthInSeconds;
     private strength = 0;
     private isHolding = false;
@@ -18,6 +18,8 @@ export class Club extends Monobehavior {
     private normal = new THREE.Vector3(0, 1, 0);
     private direction = new THREE.Vector3();
     private ball: Ball;
+
+    private date: number = 0;
 
     public constructor(ball: Ball) {
         super();
