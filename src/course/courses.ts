@@ -66,7 +66,7 @@ export const level1 = () => {
 
             const color = (column + row) % 2 == 0 ? Colors.DARK_GREEN : Colors.LIGHT_GREEN;
 
-            const tile = Builder.planeTile({x: column, y: 0, z: row}, geometry, color);
+            const tile = Builder.tile({x: column, y: 0, z: row}, geometry, color);
             tiles.push(tile);
         }
     }
@@ -96,7 +96,7 @@ export const level2 = () => {
 
             const color = (x + z) % 2 == 0 ? 0x00aa00 : 0x00cc00;
 
-            const tile = Builder.planeTile({x: x, y: y--, z: z}, geometry, color);
+            const tile = Builder.tile({x: x, y: y--, z: z}, geometry, color);
             tiles.push(tile);
         }
     }
@@ -172,7 +172,7 @@ export const level3 = () => {
             if (found?.translateY) geometry.translate(0, found.translateY, 0);
 
             const color = (x + z) % 2 === 0 ? Colors.DARK_GREEN : Colors.LIGHT_GREEN;
-            tiles.push(Builder.planeTile({ x, y: 0, z }, geometry, color, found?.friction, found?.absorption));
+            tiles.push(Builder.tile({ x, y: 0, z }, geometry, color, found?.friction, found?.absorption));
         }
     }
 

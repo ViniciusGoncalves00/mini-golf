@@ -19,8 +19,6 @@ export class Club extends Monobehavior {
     private direction = new THREE.Vector3();
     private ball: Ball;
 
-    private date: number = 0;
-
     public constructor(ball: Ball) {
         super();
 
@@ -48,12 +46,9 @@ export class Club extends Monobehavior {
     }
 
     public freeShot(): void {
-        console.log("Trying to free shot...");
         // if (!this.ball.rigidBody.canInteract()) return;
-        console.log("After chekding");
 
         const force = new THREE.Vector3().copy(this.direction).multiplyScalar(this.strength);
-        // this.ball.rigidBody.applyForce(force);
         
         this.strength = 0;
         this.isHolding = false;

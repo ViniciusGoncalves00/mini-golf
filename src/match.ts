@@ -22,11 +22,14 @@ export class Match {
     private currentCourse: Course | null = null;
     private currentCourseIndex: number = -1;
 
-    public simulateEnabled: boolean = true;
+    public physicSimulationEnabled: boolean = true;
 
     private timer: THREE.Timer = new THREE.Timer();
     private raycaster = new THREE.Raycaster();
+    private up = new THREE.Vector3(0, 1, 0);
     private down = new THREE.Vector3(0, -1, 0);
+    private interpolation: number = 1;
+    private rollbackHeight: number = -1;
 
     private readonly sceneWrapper: SceneWrapper;
     private readonly cameraWrapper: CameraWrapper;
@@ -74,6 +77,7 @@ export class Match {
         this.players.forEach(player => {
             this.sceneWrapper.scene.remove(player.ball.mesh);
             this.sceneWrapper.scene.remove(player.ball.arrow);
+            this.sceneWrapper.scene.remove(player.ball.groundDebug);
             this.sceneWrapper.scene.remove(player.ball.colliderDebug);
             this.sceneWrapper.scene.remove(player.club.arrow);
         })
@@ -90,6 +94,7 @@ export class Match {
 
             this.sceneWrapper.scene.add(this.currentPlayer.ball.mesh);
             this.sceneWrapper.scene.add(this.currentPlayer.ball.arrow);
+            this.sceneWrapper.scene.add(this.currentPlayer.ball.groundDebug);
             this.sceneWrapper.scene.add(this.currentPlayer.ball.colliderDebug);
             this.sceneWrapper.scene.add(this.currentPlayer.club.arrow);
 
@@ -116,7 +121,7 @@ export class Match {
         const delta = this.timer.getDelta() * Global.timeScale;
     
         for (const monobehavior of this.monobehaviors) monobehavior.update(delta);
-        if (this.simulateEnabled) this.simulate(delta);
+        if (this.physicSimulationEnabled) this.simulatePhysics(delta);
         
         const ball = this.player.ball;
         const club = this.player.club;
@@ -125,15 +130,16 @@ export class Match {
 
     }
 
-    private simulate(delta: number): void {
+    private simulatePhysics(delta: number): void {
         if (!this.currentCourse) return;
         
         for (const player of this.players) {
             const ball = player.ball;
+            if (!player.ball.enabled) continue;
 
             const speed = ball.rigidBody.getSpeed();
             const distance = speed * delta;
-            const maxMovePerStep = ball.radius * 1;
+            const maxMovePerStep = ball.radius * this.interpolation;
                     
             const steps = Math.max(1, Math.ceil(distance / maxMovePerStep));
             const stepDelta = delta / steps;
@@ -142,7 +148,7 @@ export class Match {
                 this.simulateStep(stepDelta, ball, this.currentCourse);
             }
 
-            this.rollback(ball, -1);
+            this.rollback(ball, this.rollbackHeight);
         }
     }
 
@@ -155,7 +161,7 @@ export class Match {
         this.mustStop(ball);
     }
 
-    private gravity(delta: number, ball: Ball, course: Course, threshold: number = 0.0001): void {
+    private gravity(delta: number, ball: Ball, course: Course, threshold: number = 0.001): void {
         this.raycaster.set(ball.mesh.position, this.down);
         this.raycaster.far = Infinity;
 
@@ -168,7 +174,7 @@ export class Match {
         ball.isPenetrating = hit && hit.distance <= ball.radius;
 
         if (ball.isCollidingGround) {
-            ball.lastGroundPosition.copy(ball.mesh.position);
+            ball.lastGroundPosition.copy(hit.point.add(this.up.multiplyScalar(ball.radius)));
         }
 
         if (ball.isPenetrating) {
@@ -201,7 +207,7 @@ export class Match {
             if (!tile) return;
 
             const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
-            ball.colliderDebug.position.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
+            ball.lastCollisionPosition.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
 
             const normal = hit.face!.normal.clone();
             normal.transformDirection(hit.object.matrixWorld).normalize();

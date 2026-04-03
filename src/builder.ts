@@ -4,10 +4,10 @@ import { Ball } from "./ball";
 import { Club } from "./club";
 
 export class Builder {
-    public static planeTile(coordinates: THREE.Vector3Like, geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation = 0x00f000, friction: number = 0.35, absorption: number = 0.55): Tile {
+    public static tile(coordinates: THREE.Vector3Like, geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation = 0x00f000, friction: number = 0.35, absorption: number = 0.55): Tile {
         const material = new THREE.MeshPhongMaterial({ color: color })
         const mesh = new THREE.Mesh(geometry, material);
-        mesh.name = "Plane Tile";
+        mesh.name = "Tile";
         mesh.receiveShadow = true;
         mesh.castShadow = true;
 
