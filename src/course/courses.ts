@@ -11,6 +11,7 @@ const storage = StorageManager.getInstance();
 await storage.loadSTL();
 const plane45 = storage.geometries.get(Tiles.PLANE_45)!;
 const plane = storage.geometries.get(Tiles.PLANE)!;
+const loop = storage.geometries.get(Tiles.LOOP)!;
 const planeCorner = storage.geometries.get(Tiles.CORNER)!;
 const planeHole = storage.geometries.get(Tiles.HOLE)!;
 const planeParallel = storage.geometries.get(Tiles.PARALLEL)!;
@@ -114,6 +115,8 @@ export const level3 = () => {
         geometry: THREE.BufferGeometry;
         rotationY?: number;
         translateY?: number;
+        friction?: number;
+        absorption?: number;
     };
 
     const tileDefinitions: GridTile[] = [
@@ -169,7 +172,7 @@ export const level3 = () => {
             if (found?.translateY) geometry.translate(0, found.translateY, 0);
 
             const color = (x + z) % 2 === 0 ? Colors.DARK_GREEN : Colors.LIGHT_GREEN;
-            tiles.push(Builder.planeTile({ x, y: 0, z }, geometry, color));
+            tiles.push(Builder.planeTile({ x, y: 0, z }, geometry, color, found?.friction, found?.absorption));
         }
     }
 

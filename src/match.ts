@@ -244,7 +244,7 @@ export class Match {
         return isColliding;
     }
 
-    private mustStop(ball: Ball, threshold: number = 0.01): void {
+    private mustStop(ball: Ball, threshold: number = 0.1): void {
         if (!ball.isCollidingGround || ball.rigidBody.getSpeed() > threshold) return;
         
         ball.rigidBody.stop();

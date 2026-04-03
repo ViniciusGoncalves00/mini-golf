@@ -8,15 +8,17 @@ export class Tile extends Monobehavior {
     public readonly normal: THREE.Vector3;
     // public readonly collider: THREE.Box3;
     
-    public readonly friction: number = 0.35;
-    public readonly absorption: number = 0.55;
+    public readonly friction: number;
+    public readonly absorption: number;
 
-    public constructor(coordinates: THREE.Vector3Like, mesh: THREE.Mesh, normal: THREE.Vector3) {
+    public constructor(coordinates: THREE.Vector3Like, mesh: THREE.Mesh, normal: THREE.Vector3, friction: number, absorption: number) {
         super();
         
         this.coordinates = coordinates;
         this.mesh = mesh;
         this.normal = normal;
+        this.friction = friction;
+        this.absorption = absorption;
 
         // this.collider = new THREE.Box3(
         //     new THREE.Vector3(width * coordinates.x - width / 2, height * coordinates.y - height / 2, length * coordinates.z - length / 2),

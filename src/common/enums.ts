@@ -6,6 +6,7 @@ export enum Tiles {
     WALL     = "plane_wall",
     PLANE_45 = "plane_45",
     PLANE    = "plane",
+    LOOP     = "loop",
     RAMP_15_NO_WALLS    = "ramp_15_no_walls",
     RAMP_15_WALL_LEFT   = "ramp_15_wall_left",
     RAMP_15_WALL_RIGHT  = "ramp_15_wall_right",
