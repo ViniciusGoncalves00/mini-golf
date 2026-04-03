@@ -1,7 +1,7 @@
 import Peer from "peerjs";
 import * as THREE from "three";
 import { level1, level3 } from "./course/courses";
-import { Match2 } from "./match";
+import { Match } from "./match";
 import { Server } from "./network/server";
 import { WebRTCTransport, WebSocketTransport } from "./network/transports";
 import { Page } from "./pages/page";
@@ -15,7 +15,7 @@ export class Session {
     public readonly page: Page;
 
     private network: PeerNetwork;
-    private match: Match2 | null = null;
+    private match: Match | null = null;
     
     public constructor() {
         this.network = new PeerNetwork();
@@ -44,7 +44,7 @@ export class Session {
         this.page.hideInterface();
         const player = new Player(this.user);
         const courses = [level3()];
-        this.match = new Match2(player, [player], courses);
+        this.match = new Match(player, [player], courses);
 
         player.club.onFreeShot.push((force) => {
             console.log("Shot force:", force);
@@ -63,7 +63,7 @@ export class Session {
         allPlayers.push(localPlayer);
 
         const courses = [level1()];
-        this.match = new Match2(localPlayer, allPlayers, courses);
+        this.match = new Match(localPlayer, allPlayers, courses);
 
         this.match.players.forEach(player => {
             player.club.onFreeShot.push((force) => {
