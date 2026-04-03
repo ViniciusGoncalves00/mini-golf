@@ -95,7 +95,7 @@ export class Session {
             peers.push(this.network.peer.id);
                     
             this.network.send({
-                type: "playersList",
+                type: "players-list",
                 payload: {
                     players: peers,
                 }
@@ -111,7 +111,7 @@ export class Session {
                     peers.push(this.network.peer.id);
                     
                     this.network.send({
-                        type: "playersList",
+                        type: "players-list",
                         payload: {
                             players: peers,
                         }
@@ -142,10 +142,10 @@ export class Session {
     public setupClientConnection(): void {
         this.network.onReceive.push((peerId, data) => {
             switch (data.type) {
-                case "start":
+                case "match-start":
                     this.startMultiplayerMatch();
                     break;
-                case "playersList":
+                case "players-list":
                     this.page.updatePlayerList(data.payload.players);
                     break;
                 case "shot":
