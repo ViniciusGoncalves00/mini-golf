@@ -24,12 +24,12 @@ export class Match {
 
     public physicSimulationEnabled: boolean = true;
 
-    private timer: THREE.Timer = new THREE.Timer();
-    private raycaster = new THREE.Raycaster();
-    private up = new THREE.Vector3(0, 1, 0);
-    private down = new THREE.Vector3(0, -1, 0);
-    private interpolation: number = 0.5;
-    private rollbackHeight: number = -1;
+    private readonly timer: THREE.Timer = new THREE.Timer();
+    private readonly raycaster = new THREE.Raycaster();
+    private readonly up = new THREE.Vector3(0, 1, 0);
+    private readonly down = new THREE.Vector3(0, -1, 0);
+    private readonly interpolation: number = 0.5;
+    private readonly rollbackHeight: number = 0;
 
     private readonly sceneWrapper: SceneWrapper;
     private readonly cameraWrapper: CameraWrapper;
@@ -174,9 +174,14 @@ export class Match {
         ball.isPenetrating = hit && hit.distance < ball.radius;
 
         if (ball.isCollidingGround) {
-            ball.lastGroundPosition.copy(hit.point.add(this.up.multiplyScalar(ball.radius)));
+            ball.lastGroundPosition.copy(hit.point.add(this.up.clone().multiplyScalar(ball.radius)));
             const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
             ball.lastCollisionPosition.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
+
+            if (hit.normal?.equals(this.up)) {
+                ball.lastSafePosition.copy(ball.lastGroundPosition);
+                ball.lastSafePosition.y += 0.1;
+            };
         }
 
         if (ball.isPenetrating) {
@@ -260,7 +265,8 @@ export class Match {
 
     private rollback(ball: Ball, height: number): void {
         if (ball.mesh.position.y > height) return;
-        ball.mesh.position.copy(ball.lastGroundPosition);
+
+        ball.mesh.position.copy(ball.lastSafePosition);
         ball.rigidBody.stop();
     }
 }

@@ -16,6 +16,7 @@ export class Ball extends Monobehavior {
     //#region
     public lastCollisionPosition: THREE.Vector3 = new THREE.Vector3();
     public lastGroundPosition: THREE.Vector3 = new THREE.Vector3();
+    public lastSafePosition: THREE.Vector3 = new THREE.Vector3();
 
     public readonly radius: number;
     public readonly diameter: number;
