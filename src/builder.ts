@@ -11,7 +11,7 @@ export class Builder {
         mesh.receiveShadow = true;
         mesh.castShadow = true;
 
-        return new Tile(coordinates, mesh, new THREE.Vector3(0, 1, 0), friction, absorption);
+        return new Tile(coordinates, mesh, friction, absorption);
     }
 
     public static ball(color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.021335): Ball {
