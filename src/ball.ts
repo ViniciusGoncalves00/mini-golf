@@ -28,7 +28,7 @@ export class Ball extends Monobehavior {
 
     private readonly stopThreshold = 0.01;
 
-    public constructor(mesh: THREE.Mesh, radius: number = 1) {
+    public constructor(mesh: THREE.Mesh, radius: number) {
         super();
         
         this.mesh = mesh;

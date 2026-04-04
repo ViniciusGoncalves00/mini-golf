@@ -14,7 +14,7 @@ export class Builder {
         return new Tile(coordinates, mesh, new THREE.Vector3(0, 1, 0), friction, absorption);
     }
 
-    public static ball(color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.04): Ball {
+    public static ball(color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.021335): Ball {
         const geometry = new THREE.SphereGeometry(radius);
         const material = new THREE.MeshPhongMaterial({ color: color });
         const mesh = new THREE.Mesh(geometry, material);
