@@ -4,7 +4,7 @@ import { Ball } from "../ball";
 import { Monobehavior } from "../monobehavior";
 
 export class CameraWrapper extends Monobehavior {
-    public distance: number = 1;
+    public distance: number = 2;
     public camera: THREE.PerspectiveCamera;
     public orbitControls: OrbitControls;
 

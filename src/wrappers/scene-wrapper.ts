@@ -8,7 +8,11 @@ export class SceneWrapper extends Monobehavior {
     public globalLightHelper: THREE.DirectionalLightHelper;
     public ambientLight: THREE.AmbientLight;
 
+    private ground: THREE.Mesh;
+    private grid: THREE.Mesh;
+
     private readonly camera: THREE.Camera;
+    private readonly fog: THREE.FogExp2;
 
     public constructor(canvas: HTMLElement, camera: THREE.Camera) {
         super();
@@ -16,7 +20,7 @@ export class SceneWrapper extends Monobehavior {
         this.camera = camera;
 
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0.98, 0.98, 0.98);
+        this.scene.background = new THREE.Color(0xeeeeee);
 
         this.renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -53,6 +57,20 @@ export class SceneWrapper extends Monobehavior {
 
         this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
         this.scene.add(this.ambientLight);
+
+        this.grid = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 100, 100), new THREE.MeshBasicMaterial({ color: 0xeeeeee, wireframe: true, transparent: true, opacity: 0.1 }));
+        this.grid.rotateX(-Math.PI / 2);
+        this.grid.position.set(0.5, 0, 0.5);
+        this.scene.add(this.grid);
+
+        this.ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 100, 100), new THREE.MeshPhongMaterial({ color: 0xeeeeee, transparent: true, opacity: 0.1 }));
+        this.ground.rotateX(-Math.PI / 2);
+        this.ground.position.set(0.5, 0, 0.5);
+        this.ground.receiveShadow = true;
+        this.scene.add(this.ground);
+
+        this.fog = new THREE.FogExp2(0xeeeeee, 0.1);
+        this.scene.fog = this.fog;
     }
 
     public update(delta: number): void {
