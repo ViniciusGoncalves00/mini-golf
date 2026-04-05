@@ -1,12 +1,15 @@
+import { Player } from "../player";
+import { User } from "../user";
+
 export class Page {
     public currentID: string = "home";
     public previousID: string = "home";
 
     public onStartSingleplayer = () => {};
     public onStartMultiplayer = () => {};
-    public onConnect = (value: string) => {};
     public onCreateRoom = () => {};
     public onCloseRoom = () => {};
+    public onJoinRoom = (value: string) => {};
 
     public setHomePage(): void {
         this.setPage("home");
@@ -65,16 +68,16 @@ export class Page {
 
     public tryConnect(): void {
         const peerID = document.getElementById("PeerID")! as HTMLInputElement;
-        this.onConnect(peerID.value);
+        this.onJoinRoom(peerID.value);
     }
 
-    public updatePlayerList(players: string[]): void {
+    public updatePlayerList(players: {ID: string, name: string}[]): void {
         const playerList = document.getElementById("playersList")!;
         playerList.childNodes.forEach((child) => child.remove());
 
         players.forEach((player) => {
             const playerItem = document.createElement("div");
-            playerItem.innerText = player;
+            playerItem.innerText = `ID: ${player.ID} NAME: ${player.name}`;
             playerList.appendChild(playerItem);
         })
     }

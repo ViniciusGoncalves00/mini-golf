@@ -1,4 +1,8 @@
-export enum Tiles {
+export enum StorageKey {
+    USER = "user"
+}
+
+export enum Tile {
     CORNER   = "plane_corner",
     HOLE     = "plane_hole",
     PARALLEL = "plane_parallel",
@@ -13,7 +17,7 @@ export enum Tiles {
     RAMP_15_TWO_WALLS   = "ramp_15_two_walls",
 }
 
-export enum Colors {
+export enum Color {
     LIGHT_GREEN   = 0x00cc00,
     DARK_GREEN    = 0x00aa00,
 }

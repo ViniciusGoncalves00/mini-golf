@@ -3,24 +3,24 @@ import { Builder } from "../builder";
 import { Course } from "../course";
 import { StorageManager } from "../storageManager";
 import { Tile } from "../tile";
-import { Colors, Tiles } from "../common/enums";
+import { Color, Tile } from "../common/enums";
 import { GeometryBuilder } from "../geometry/geometryBuilder";
 import * as THREE from "three";
 
 const storage = StorageManager.getInstance();
 await storage.loadSTL();
-const plane45 = storage.geometries.get(Tiles.PLANE_45)!;
-const plane = storage.geometries.get(Tiles.PLANE)!;
-const loop = storage.geometries.get(Tiles.LOOP)!;
-const planeCorner = storage.geometries.get(Tiles.CORNER)!;
-const planeHole = storage.geometries.get(Tiles.HOLE)!;
-const planeParallel = storage.geometries.get(Tiles.PARALLEL)!;
-const planeU = storage.geometries.get(Tiles.U)!;
-const planeWall = storage.geometries.get(Tiles.WALL)!;
-const ramp15NoWalls = storage.geometries.get(Tiles.RAMP_15_NO_WALLS)!.rotateY(Math.PI);
-const ramp15WallLeft = storage.geometries.get(Tiles.RAMP_15_WALL_LEFT)!.rotateY(Math.PI);
-const ramp15WallRight = storage.geometries.get(Tiles.RAMP_15_WALL_RIGHT)!.rotateY(Math.PI);
-const ramp15TwoWalls = storage.geometries.get(Tiles.RAMP_15_TWO_WALLS)!.rotateY(Math.PI);
+const plane45 = storage.geometries.get(Tile.PLANE_45)!;
+const plane = storage.geometries.get(Tile.PLANE)!;
+const loop = storage.geometries.get(Tile.LOOP)!;
+const planeCorner = storage.geometries.get(Tile.CORNER)!;
+const planeHole = storage.geometries.get(Tile.HOLE)!;
+const planeParallel = storage.geometries.get(Tile.PARALLEL)!;
+const planeU = storage.geometries.get(Tile.U)!;
+const planeWall = storage.geometries.get(Tile.WALL)!;
+const ramp15NoWalls = storage.geometries.get(Tile.RAMP_15_NO_WALLS)!.rotateY(Math.PI);
+const ramp15WallLeft = storage.geometries.get(Tile.RAMP_15_WALL_LEFT)!.rotateY(Math.PI);
+const ramp15WallRight = storage.geometries.get(Tile.RAMP_15_WALL_RIGHT)!.rotateY(Math.PI);
+const ramp15TwoWalls = storage.geometries.get(Tile.RAMP_15_TWO_WALLS)!.rotateY(Math.PI);
 
 export const level1 = () => {
     const tiles: Tile[] = []
@@ -64,7 +64,7 @@ export const level1 = () => {
                 geometry = plane;
             }
 
-            const color = (column + row) % 2 == 0 ? Colors.DARK_GREEN : Colors.LIGHT_GREEN;
+            const color = (column + row) % 2 == 0 ? Color.DARK_GREEN : Color.LIGHT_GREEN;
 
             const tile = Builder.tile({x: column, y: 0, z: row}, geometry, color);
             tiles.push(tile);
@@ -171,7 +171,7 @@ export const level3 = () => {
             if (found?.rotationY) geometry.rotateY(found.rotationY);
             if (found?.translateY) geometry.translate(0, found.translateY, 0);
 
-            const color = (x + z) % 2 === 0 ? Colors.DARK_GREEN : Colors.LIGHT_GREEN;
+            const color = (x + z) % 2 === 0 ? Color.DARK_GREEN : Color.LIGHT_GREEN;
             tiles.push(Builder.tile({ x, y: 0, z }, geometry, color, found?.friction, found?.absorption));
         }
     }

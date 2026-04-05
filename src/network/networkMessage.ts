@@ -1,3 +1,6 @@
+import { Player } from "../player";
+import { User } from "../user";
+
 export enum NetworkMessagesTypes {
     CONNECTED = "connected",
     DISCONNECTED = "disconnected",
@@ -17,22 +20,24 @@ export enum NetworkMessagesTypes {
 }
 
 export type NetworkServerMessage = 
+  | { type: NetworkMessagesTypes.CONNECTED; }
+  | { type: NetworkMessagesTypes.DISCONNECTED; }
   | { type: NetworkMessagesTypes.MATCH_START; }
   | { type: NetworkMessagesTypes.MATCH_FINISH; }
   | { type: NetworkMessagesTypes.COURSE_NEXT; }
-  | { type: NetworkMessagesTypes.PLAYER_NEXT; player: string }
   | { type: NetworkMessagesTypes.SHOT_RESULT; payload: { position: [number, number, number] }}
-  | { type: NetworkMessagesTypes.PLAYERS_LIST; payload: { players: string[] }}
+  | { type: NetworkMessagesTypes.PLAYER_NEXT; payload: { player: { ID: string; name: string } }}
+  | { type: NetworkMessagesTypes.PLAYERS_LIST; payload: { players: { ID: string; name: string }[] }}
 
 export type NetworkHostMessage = 
   | NetworkServerMessage
-  | { type: NetworkMessagesTypes.SHOT_FIRE; payload: { force: [number, number, number] }}
+  | { type: NetworkMessagesTypes.SHOT_FIRE; payload: { vector: [number, number, number] }}
 
 export type NetworkClientMessage =
   | { type: NetworkMessagesTypes.MATCH_LOADED; }
   | { type: NetworkMessagesTypes.COURSE_LOADED; }
 
-  | { type: NetworkMessagesTypes.SHOT_FIRE; payload: { force: [number, number, number] }}
+  | { type: NetworkMessagesTypes.SHOT_FIRE; payload: { vector: [number, number, number] }}
 
 export type NetworkMessage = 
   | NetworkServerMessage

@@ -8,9 +8,8 @@ export class SceneWrapper extends Monobehavior {
     public globalLightHelper: THREE.DirectionalLightHelper;
     public ambientLight: THREE.AmbientLight;
 
-    private ground: THREE.Mesh;
-    private grid: THREE.Mesh;
-
+    private readonly ground: THREE.Mesh;
+    private readonly grid: THREE.Mesh;
     private readonly camera: THREE.PerspectiveCamera;
     private readonly fog: THREE.FogExp2;
 
