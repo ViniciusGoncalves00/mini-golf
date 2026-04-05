@@ -9,7 +9,7 @@ export class Ball extends Monobehavior {
 
     //#region [gizmos]
     public readonly arrow: THREE.ArrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(255, 0, 255));
-    public readonly groundDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16));
+    public readonly safePositionDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16));
     public readonly colliderDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16), new THREE.MeshBasicMaterial({color: 0xff0000}));
     //#endregion
      
@@ -47,7 +47,7 @@ export class Ball extends Monobehavior {
         this.arrow.setDirection(this.rigidBody.getDirection());
         this.arrow.visible = false;
 
-        this.groundDebug.position.copy(this.lastGroundPosition);
+        this.safePositionDebug.position.copy(this.lastSafePosition);
         this.colliderDebug.position.copy(this.lastCollisionPosition);
     }
 }

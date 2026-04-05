@@ -60,7 +60,7 @@ export class SceneWrapper extends Monobehavior {
         this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
         this.scene.add(this.ambientLight);
 
-        this.grid = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 100, 100), new THREE.MeshBasicMaterial({ color: 0xeeeeee, wireframe: true, transparent: true, opacity: 0.05 }));
+        this.grid = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 100, 100), new THREE.MeshBasicMaterial({ color: 0xeeeeee, wireframe: true, transparent: true, opacity: 0.10 }));
         this.grid.rotateX(-Math.PI / 2);
         this.grid.position.set(0.5, 0, 0.5);
         this.scene.add(this.grid);

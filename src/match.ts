@@ -77,7 +77,7 @@ export class Match {
         this.players.forEach(player => {
             this.sceneWrapper.scene.remove(player.ball.mesh);
             this.sceneWrapper.scene.remove(player.ball.arrow);
-            this.sceneWrapper.scene.remove(player.ball.groundDebug);
+            this.sceneWrapper.scene.remove(player.ball.safePositionDebug);
             this.sceneWrapper.scene.remove(player.ball.colliderDebug);
             this.sceneWrapper.scene.remove(player.club.arrow);
         })
@@ -94,7 +94,7 @@ export class Match {
 
             this.sceneWrapper.scene.add(this.currentPlayer.ball.mesh);
             this.sceneWrapper.scene.add(this.currentPlayer.ball.arrow);
-            this.sceneWrapper.scene.add(this.currentPlayer.ball.groundDebug);
+            this.sceneWrapper.scene.add(this.currentPlayer.ball.safePositionDebug);
             this.sceneWrapper.scene.add(this.currentPlayer.ball.colliderDebug);
             this.sceneWrapper.scene.add(this.currentPlayer.club.arrow);
 
