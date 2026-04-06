@@ -1,8 +1,11 @@
 # Mini-Golf
 
-As a child with access to a computer and the internet in the early 21st century, I played many browser games on sites like Miniclip, Nitrome, and others.
+![preview](preview.png)
 
+Growing up in the early 2000s meant playing a variety of browser games. From classic Flash-based game platforms like Miniclip and Nitrome, to social games like Buddy Poke and Happy Harvest on Orkut; or Cafe Mania and Mini Fazenda on Facebook.
 
-Therefore, this project seeks to create a mini-golf game that captures that nostalgic feeling of playing a calm and cozy game.
+So I thought: why not try to create something with a similar feel to what existed at the time?
+
+Thus, this project was born.
 
 The project can be viewed at https://viniciusgoncalves00.github.io/mini-golf/
