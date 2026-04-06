@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-import { StorageKey, Tile } from "./common/enums";
+import { StorageKey, Tiles } from "./common/enums";
 const base = import.meta.env.BASE_URL;
 
 export class StorageManager {
@@ -18,7 +18,7 @@ export class StorageManager {
     }
 
     public async loadSTL(): Promise<void> {
-        const fileNames = Object.values(Tile);
+        const fileNames = Object.values(Tiles);
         const loader = new STLLoader();
         
         for (const fileName of fileNames) {

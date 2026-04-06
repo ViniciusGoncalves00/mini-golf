@@ -21,7 +21,7 @@ export class Session {
     
     public constructor() {
         const user = StorageManager.getInstance().load(StorageKey.USER);
-        this.user = new User(undefined, user.name);
+        this.user = new User(undefined, user?.name);
         this.page = new Page();
 
         this.page.onStartSingleplayer = () => this.startSinglePlayerMatch();

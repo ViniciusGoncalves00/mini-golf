@@ -16,7 +16,7 @@ export class CameraWrapper extends Monobehavior {
         this.ball = ball;
 
         this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.camera.position.set(0, 1, -2);
+        this.camera.position.set(1, 1, -2);
         
         this.orbitControls = new OrbitControls(this.camera, canvas);
         this.orbitControls.enablePan = false;

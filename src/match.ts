@@ -98,7 +98,7 @@ export class Match {
             this.sceneWrapper.scene.add(this.currentPlayer.ball.colliderDebug);
             this.sceneWrapper.scene.add(this.currentPlayer.club.arrow);
 
-            this.currentPlayer.ball.mesh.position.set(0, 1, 0);
+            this.currentPlayer.ball.mesh.position.set(1, 1, 0);
 
             this.sceneWrapper.renderer.domElement.addEventListener("mousemove", (e) => {
                 this.currentPlayer?.club.calculateDirection(this.cameraWrapper.camera, e, this.sceneWrapper.renderer.domElement.getBoundingClientRect(), this.currentPlayer?.ball)

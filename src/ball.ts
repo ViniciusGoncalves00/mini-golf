@@ -9,8 +9,8 @@ export class Ball extends Monobehavior {
 
     //#region [gizmos]
     public readonly arrow: THREE.ArrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(255, 0, 255));
-    public readonly safePositionDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16));
-    public readonly colliderDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16), new THREE.MeshBasicMaterial({color: 0xff0000}));
+    public readonly safePositionDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16), new THREE.MeshBasicMaterial({color: 0x00ff00}));
+    public readonly colliderDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.005, 16, 16), new THREE.MeshBasicMaterial({color: 0xffffff}));
     //#endregion
      
     //#region
@@ -37,6 +37,8 @@ export class Ball extends Monobehavior {
 
         this.collider = new THREE.Sphere(mesh.position, radius);
         this.rigidBody = new RigidBody(mesh.position, mesh.quaternion);
+
+        this.safePositionDebug.visible = false;
     }
 
     public update(delta: number): void {

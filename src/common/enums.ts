@@ -2,7 +2,7 @@ export enum StorageKey {
     USER = "user"
 }
 
-export enum Tile {
+export enum Tiles {
     CORNER   = "plane_corner",
     HOLE     = "plane_hole",
     PARALLEL = "plane_parallel",
