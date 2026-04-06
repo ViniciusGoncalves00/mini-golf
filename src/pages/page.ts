@@ -41,7 +41,7 @@ export class Page {
     }
 
     public setGamePage(): void {
-        this.setPage("game");
+        this.setPage("game-container");
     }
 
     public startSingleplayer(): void {

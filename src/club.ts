@@ -4,10 +4,11 @@ import { Monobehavior } from "./monobehavior";
 
 export class Club extends Monobehavior {
     public enabled: boolean = true;
-    public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.5, new THREE.Color(0, 0, 255));
+    public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.2, new THREE.Color(255, 255, 255));
 
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: ((force: THREE.Vector3) => void)[] = [];
+    public readonly onStrengthChange: ((strength: number) => void)[] = [];
     
     private readonly maxStrength = 10;
     private readonly timeToMaxStrengthInSeconds = 5;
@@ -23,15 +24,26 @@ export class Club extends Monobehavior {
         super();
 
         this.ball = ball;
+
+        const powerBar = document.getElementById("power-bar")!;
+        this.onStrengthChange.push((strength) => {
+            powerBar.style.width = `${strength * 100}%`;
+            powerBar.style.background = `hsl(${(1 - strength) * 120}, 50%, 50%)`;
+        });
+
     }
 
     public update(delta: number) {
         if (this.isHolding) {
             this.strength += this.strengthGainRate * delta;
+
             this.strength = Math.min(this.strength, this.maxStrength);
-            this.arrow.scale.set(this.strength / 5, this.strength / 5, this.strength / 5);
-        } else {
-            this.arrow.scale.set(1, 1, 1);
+
+            const normalized = this.strength / this.maxStrength;
+
+            for (const callback of this.onStrengthChange) {
+                callback(normalized);
+            }
         }
     }
 
@@ -54,6 +66,7 @@ export class Club extends Monobehavior {
         this.isHolding = false;
 
         for (const callback of this.onFreeShot) callback(force);
+        for (const callback of this.onStrengthChange) callback(0);
     }
 
     public showArrow(): void {
