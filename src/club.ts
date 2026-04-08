@@ -6,9 +6,11 @@ export class Club extends Monobehavior {
     public enabled: boolean = true;
     public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.2, new THREE.Color(255, 255, 255));
 
+    //#region [callbacks]
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: ((force: THREE.Vector3) => void)[] = [];
     public readonly onStrengthChange: ((strength: number) => void)[] = [];
+    //#endregion
     
     private readonly maxStrength = 10;
     private readonly timeToMaxStrengthInSeconds = 5;

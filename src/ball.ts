@@ -12,6 +12,10 @@ export class Ball extends Monobehavior {
     public readonly safePositionDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.01, 16, 16), new THREE.MeshBasicMaterial({color: 0x00ff00}));
     public readonly colliderDebug: THREE.Mesh = new THREE.Mesh(new THREE.SphereGeometry(0.005, 16, 16), new THREE.MeshBasicMaterial({color: 0xffffff}));
     //#endregion
+
+    //#region [callbacks]
+    public readonly onStopMoving: (() => void)[] = [];
+    //#region
      
     //#region
     public lastCollisionPosition: THREE.Vector3 = new THREE.Vector3();
