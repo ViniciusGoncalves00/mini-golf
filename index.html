@@ -41,12 +41,13 @@
             </div>
         </div>
         <div id="game-container" class="h-full w-full" hidden>
-            <div class="fixed w-[512px] h-4 left-[calc(50%-256px)] top-[calc(100%-32px)] border rounded-lg bg-black/10" id="power-bar-container">
-                <div class="absolute left-1/5 h-full w-px bg-black"></div>
-                <div class="absolute left-2/5 h-full w-px bg-black"></div>
-                <div class="absolute left-3/5 h-full w-px bg-black"></div>
-                <div class="absolute left-4/5 h-full w-px bg-black"></div>
-                <div class="h-full rounded-lg" id="power-bar"></div>
+            <div id="game-overlay" class="fixed w-full h-full flex flex-col pointer-events-none">
+                <div class="fixed h-[512px] w-4 top-[calc(50%-256px)] left-[calc(100%-32px)] rotate-180 border rounded-lg bg-black/10" id="power-bar-container">
+                    <template x-for="i in 10">
+                        <div class="absolute w-full h-px bg-black" :style="{ top: `${i * 10}%` }"></div>
+                    </template>
+                    <div class="w-full rounded-lg opacity-80" id="power-bar"></div>
+                </div>
             </div>
             <canvas id="game" class="h-full w-full"></canvas>
         </div>

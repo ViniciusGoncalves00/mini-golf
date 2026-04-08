@@ -27,7 +27,7 @@ export class Club extends Monobehavior {
 
         const powerBar = document.getElementById("power-bar")!;
         this.onStrengthChange.push((strength) => {
-            powerBar.style.width = `${strength * 100}%`;
+            powerBar.style.height = `${strength * 100}%`;
             powerBar.style.background = `hsl(${(1 - strength) * 120}, 50%, 50%)`;
         });
 
