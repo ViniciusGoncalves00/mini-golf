@@ -8,6 +8,7 @@ import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { CameraWrapper } from "./wrappers/camera-wrapper";
 import { SceneWrapper } from "./wrappers/scene-wrapper";
 import { Monobehavior } from "./monobehavior";
+import Alpine from 'alpinejs'
 
 export class Match {
     public readonly monobehaviors: Monobehavior[] = [];

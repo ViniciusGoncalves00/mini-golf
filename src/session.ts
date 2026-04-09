@@ -12,6 +12,7 @@ import { PeerHost } from "./network/PeerHost";
 import { PeerClient } from "./network/PeerClient";
 import { NetworkHostMessage, NetworkMessagesTypes } from "./network/networkMessage";
 import Alpine from 'alpinejs'
+import { GamePage } from "./pages/game-page";
 
 export class Session {
     public readonly user: User;
@@ -38,7 +39,7 @@ export class Session {
         const player = new Player(this.user);
         const courses = [level3()];
         this.match = new Match(document.getElementById("game")!, player, [player], courses);
-        Alpine.store("match", this.match);
+        Alpine.store("gamePage", new GamePage([player.user]));
 
         player.club.onFreeShot.push((force) => {
             player.ball.rigidBody.applyForce(force);
@@ -62,7 +63,7 @@ export class Session {
 
         const courses = [level1()];
         this.match = new Match(document.getElementById("game")!, localPlayer, allPlayers, courses);
-        Alpine.store("match", this.match);
+        Alpine.store("gamePage", new GamePage(allPlayers.map(player => player.user)));
     }
 
     public createRoom(): void {

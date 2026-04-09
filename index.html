@@ -44,14 +44,14 @@
         <div id="game-container" class="h-full w-full" hidden>
             <div id="game-overlay" class="fixed w-full h-full flex flex-col pointer-events-none">
                 <div id="game-overlay-top" class="w-full flex px-8 py-4 space-x-4">
-                    <template x-for="player in $store.match?.players">
+                    <template x-for="player in $store.gamePage?.players">
                         <div class="flex rounded-fill skew-x-[-15deg] border border-amber-500">
                             <div class="h-16 aspect-square flex-none flex items-center justify-center bg-zinc-200/80 inset-shadow-[0px_0px_4px] inset-shadow-black/80">
                                 <i class="text-5xl text-amber-500/80 bi bi-person-fill shadow"></i>
                             </div>
                             <div class="w-64 flex flex-col text-white">
                                 <div class="h-1/2 w-full bg-amber-600/80 flex items-center justify-between px-2">
-                                    <div x-text="$store.match?.player.user.ID == player.user.ID ? `${player.user.name} (you)` :player.user.name"></div>
+                                    <div x-text="$store.gamePage?.currentPlayer.user.ID == player.user.ID ? `${player.user.name} (you)` : player.user.name"></div>
                                     <div x-text="player.user.ID"></div>
                                 </div>
                                 <div class="h-1/2 w-full bg-amber-500/80 flex items-center px-2">Stroke 1</div>

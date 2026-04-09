@@ -1,6 +1,3 @@
-import { Player } from "../player";
-import { User } from "../user";
-
 export class Page {
     public currentID: string = "home";
     public previousID: string = "home";
