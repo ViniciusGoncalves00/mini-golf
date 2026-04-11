@@ -1,41 +1,42 @@
 import * as THREE from "three";
+import Alpine from 'alpinejs';
 
-import { Player } from "../match/player";
 import { NetworkHostMessage, NetworkMessagesTypes } from "../network/networkMessage";
 import { PeerClient } from "../network/PeerClient";
 import { PeerHost } from "../network/PeerHost";
 import { Session } from "../session";
 import { State } from "./state";
+import { HomePage } from "../ui/home-page";
 
 export class HomeState extends State {
     public constructor(session: Session) {
-        super(session)
+        super(session);
 
-        this.session.homePage.onStartSingleplayer = () => this.startSinglePlayerMatch();
-        this.session.homePage.onStartMultiplayer = () => this.startMultiplayerMatch();
-        this.session.homePage.onCreateRoom = () => this.createRoom();
-        this.session.homePage.onCloseRoom = () => this.closeRoom();
-        this.session.homePage.onJoinRoom = (peerID) => this.connecTo(peerID);
+        (Alpine.store("homePage") as HomePage).onStartSingleplayer = () => this.startSinglePlayerMatch();
+        (Alpine.store("homePage") as HomePage).onStartMultiplayer = () => this.startMultiplayerMatch();
+        (Alpine.store("homePage") as HomePage).onCreateRoom = () => this.createRoom();
+        (Alpine.store("homePage") as HomePage).onCloseRoom = () => this.closeRoom();
+        (Alpine.store("homePage") as HomePage).onJoinRoom = (peerID) => this.connecTo(peerID);
     }
 
     public enterState(): void {
-        this.session.homePage.attach();
+        (Alpine.store("homePage") as HomePage).attach();
     }
 
     public leaveState(): void {
-        this.session.homePage.dettach();
+        (Alpine.store("homePage") as HomePage).dettach();
     }
 
     private startSinglePlayerMatch(): void {
         this.session.gameState.setMatchType("singleplayer");
-        this.session.context.setState(this.session.gameState);
+        this.session.context.set(this.session.gameState);
     }
     
     private startMultiplayerMatch(): void {
         if (!this.session.network) return;
 
         this.session.gameState.setMatchType("multiplayer");
-        this.session.context.setState(this.session.gameState);
+        this.session.context.set(this.session.gameState);
     }
 
     public createRoom(): void {
@@ -49,7 +50,7 @@ export class HomeState extends State {
 
     public closeRoom(): void {
         this.session.network?.disconnect();
-        this.session.homePage.setMultiPlayerPage();
+        (Alpine.store("homePage") as HomePage).setMultiPlayerPage();
     }
 
     public connecTo(peerID: string): void {
@@ -59,44 +60,39 @@ export class HomeState extends State {
         network.peer.on("open", () => {
             this.setupClientCallbacks();
             network.connectTo(peerID);
-            this.session.homePage.setRoomPage();
+            (Alpine.store("homePage") as HomePage).setRoomPage();
         })
     }
 
     public setupHostCallbacks(): void {
-        const localPlayer: Player = new Player(this.session.user);
-        this.session.homePage.updatePlayerList([localPlayer.user]);
+        (Alpine.store("homePage") as HomePage).updateUsersList([this.session.user]);
 
         const network = this.session.network as PeerHost;
 
         network.onPeerDisconnect.push((peerID) => {
-            const players = Array.from(network.players.values());
-            players.push(localPlayer);
-            const data: { ID: string, name: string }[] = [];
-            players.map(player => data.push({ID: player.user.ID, name: player.user.name }));
+            const users = Array.from(network.users.values());
+            users.push(this.session.user);
 
             const message: NetworkHostMessage = {
-                type: NetworkMessagesTypes.PLAYERS_LIST,
-                payload: { players: data }
+                type: NetworkMessagesTypes.USER_LIST,
+                payload: { users: users }
             }
             network.send(message);
                 
-            this.session.homePage.updatePlayerList(data);
+            (Alpine.store("homePage") as HomePage).updateUsersList(users);
         });
 
         network.onPeerConnect.push((peerID) => {
-            const players = Array.from(network.players.values());
-            players.push(localPlayer);
-            const data: { ID: string, name: string }[] = [];
-            players.map(player => data.push({ID: player.user.ID, name: player.user.name }));
+            const users = Array.from(network.users.values());
+            users.push(this.session.user);
 
             const message: NetworkHostMessage = {
-                type: NetworkMessagesTypes.PLAYERS_LIST,
-                payload: { players: data }
+                type: NetworkMessagesTypes.USER_LIST,
+                payload: { users: users }
             }
 
             network.send(message);
-            this.session.homePage.updatePlayerList(data);
+            (Alpine.store("homePage") as HomePage).updateUsersList(users);
         })
         
         network.onReceiveData.push((peerID, data) => {
@@ -170,8 +166,8 @@ export class HomeState extends State {
                 case NetworkMessagesTypes.MATCH_START:
                     this.startMultiplayerMatch();
                     break;
-                case NetworkMessagesTypes.PLAYERS_LIST:
-                    this.session.homePage.updatePlayerList(data.payload.players);
+                case NetworkMessagesTypes.USER_LIST:
+                    (Alpine.store("homePage") as HomePage).updateUsersList(data.payload.players);
                     break;
                 case NetworkMessagesTypes.SHOT_FIRE:
                     if (!this.session.match) return;

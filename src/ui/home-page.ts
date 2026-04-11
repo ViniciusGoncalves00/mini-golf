@@ -1,3 +1,4 @@
+import { User } from "../user";
 import { Page } from "./page";
 
 export class HomePage extends Page {
@@ -70,14 +71,14 @@ export class HomePage extends Page {
         this.onJoinRoom(peerID.value);
     }
 
-    public updatePlayerList(players: {ID: string, name: string}[]): void {
-        const playerList = document.getElementById("playersList")!;
-        playerList.childNodes.forEach((child) => child.remove());
+    public updateUsersList(users: User[]): void {
+        const usersList = document.getElementById("usersList")!;
+        usersList.childNodes.forEach((child) => child.remove());
 
-        players.forEach((player) => {
-            const playerItem = document.createElement("div");
-            playerItem.innerText = `ID: ${player.ID} NAME: ${player.name}`;
-            playerList.appendChild(playerItem);
+        users.forEach((user) => {
+            const userItem = document.createElement("div");
+            userItem.innerText = `ID: ${user.ID} NAME: ${user.name}`;
+            usersList.appendChild(userItem);
         })
     }
 
@@ -109,7 +110,7 @@ export class HomePage extends Page {
                     <div>My ID: </div>
                     <div id="MyID">My ID</div>
                 </div>
-                <div id="playersList" class="flex flex-col gap-2"></div>
+                <div id="usersList" class="flex flex-col gap-2"></div>
                 <button type="button" @click="$store.homePage.startMultiplayer()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
                 <button type="button" @click="$store.homePage.closeRoom()" class="cursor-pointer bg-white rounded-full py-2 px-4">Close Room</button>
                 <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
@@ -121,7 +122,7 @@ export class HomePage extends Page {
     private setPage(id: string): void {
         this.previousID = this.currentID;
         this.currentID = id;
-        document.getElementById(this.previousID)!.setAttribute("hidden", "");
-        document.getElementById(this.currentID)!.removeAttribute("hidden");
+        document.getElementById(this.previousID)?.setAttribute("hidden", "");
+        document.getElementById(this.currentID)?.removeAttribute("hidden");
     }
 }

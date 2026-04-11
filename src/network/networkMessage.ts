@@ -15,8 +15,8 @@ export enum NetworkMessagesTypes {
     SHOT_FIRE = "shot-fire",
     SHOT_RESULT = "shot-result",
 
-    PLAYER_NEXT = "player-next",
-    PLAYERS_LIST = "players-list",
+    USER_NEXT = "user-next",
+    USER_LIST = "users-list",
 }
 
 export type NetworkServerMessage = 
@@ -26,8 +26,8 @@ export type NetworkServerMessage =
   | { type: NetworkMessagesTypes.MATCH_FINISH; }
   | { type: NetworkMessagesTypes.COURSE_NEXT; }
   | { type: NetworkMessagesTypes.SHOT_RESULT; payload: { position: [number, number, number] }}
-  | { type: NetworkMessagesTypes.PLAYER_NEXT; payload: { player: { ID: string; name: string } }}
-  | { type: NetworkMessagesTypes.PLAYERS_LIST; payload: { players: { ID: string; name: string }[] }}
+  | { type: NetworkMessagesTypes.USER_NEXT; payload: { user: { ID: string; name: string } }}
+  | { type: NetworkMessagesTypes.USER_LIST; payload: { users: { ID: string; name: string }[] }}
 
 export type NetworkHostMessage = 
   | NetworkServerMessage

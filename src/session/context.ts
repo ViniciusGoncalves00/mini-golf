@@ -6,7 +6,7 @@ export class Context {
     
     private _state: State | null = null;
 
-    public setState(state: State): void {
+    public set(state: State): void {
         this._state?.leaveState();
         this._state = state;
         this._state?.enterState();

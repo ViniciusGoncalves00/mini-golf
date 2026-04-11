@@ -9,7 +9,7 @@ export abstract class PeerNetwork {
     
     public onReceiveData: ((peerID: string, data: any) => void)[] = [];
     
-    public readonly players = new Map<string, Player>();
+    public readonly users = new Map<string, User>();
     public readonly peer: Peer;
     
     protected readonly user: User;
@@ -55,13 +55,11 @@ export abstract class PeerNetwork {
             
             const metadata = connection.metadata || {};
 
-            this.players.set(
+            this.users.set(
                 peerID,
-                new Player(
-                    new User(
-                        metadata.userID,
-                        metadata.userName
-                    )
+                new User(
+                    metadata.userID,
+                    metadata.userName
                 )
             );
 
@@ -79,7 +77,7 @@ export abstract class PeerNetwork {
             console.log("Disconnected:", peerID);
 
             this.connections.delete(peerID);
-            this.players.delete(peerID);
+            this.users.delete(peerID);
             this.onPeerDisconnect.forEach(cb => cb(peerID));
         });
 

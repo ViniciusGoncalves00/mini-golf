@@ -2,6 +2,8 @@ import Alpine from 'alpinejs';
 
 import "./style.css";
 import { Session } from "./session";
+import { HomePage } from './ui/home-page';
+import { GamePage } from './ui/game-page';
 
 export class Main {
     private static initialized: boolean = false;
@@ -9,12 +11,14 @@ export class Main {
     public static async init(): Promise<void> {
         if (this.initialized) return;
         this.initialized = true;
-
-        const session = new Session();
         
         document.addEventListener('alpine:init', () => {
-            Alpine.store("homePage", session.homePage);
-            Alpine.store("gamePage", session.gamePage);
+            const parent = document.getElementById("body")!;
+
+            Alpine.store("homePage", new HomePage(parent));
+            Alpine.store("gamePage", new GamePage(parent));
+
+            new Session();
         });
 
         (window as any).Alpine = Alpine;
