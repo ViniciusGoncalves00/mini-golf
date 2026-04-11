@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Ball } from "./ball";
-import { Monobehavior } from "./monobehavior";
+import { Monobehavior } from "../monobehavior";
 
 export class Club extends Monobehavior {
     public enabled: boolean = true;

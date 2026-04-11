@@ -9,69 +9,7 @@
         <title>Mini Golf</title>
         <script type="module" src="src/main.ts"></script>
     </head>
-    <body x-data class="h-screen w-full flex">
-        <div id="interface" class="h-full w-full flex items-center justify-center relative">
-            <div class="bg-grid blur-xs h-full w-full absolute -z-10"></div>
-            <div id="home" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300">
-                <button type="button" @click="$store.ui.setSinglePlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">SinglePlayer</button>
-                <button type="button" @click="$store.ui.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">MultiPlayer</button>
-            </div>
-            <div id="singleplayer" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
-                <button type="button" @click="$store.ui.startSingleplayer()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
-                <button type="button" @click="$store.ui.setHomePage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
-            </div>
-            <div id="multiplayer" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
-                <button type="button" @click="$store.ui.setCreateRoomPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Create Room</button>
-                <button type="button" @click="$store.ui.setJoinRoomPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Join Room</button>
-                <button type="button" @click="$store.ui.setHomePage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
-            </div>
-            <div id="joinRoom" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
-                <input id="PeerID" type="text" placeholder="Enter room ID" class="bg-white rounded-full py-2 px-4">
-                <button id="Connect" @click="$store.ui.tryConnect()" class="cursor-pointer bg-white rounded-full py-2 px-4">Connect</button>
-                <button type="button" @click="$store.ui.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
-            </div>
-            <div id="room" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
-                <div class="flex bg-white rounded-full space-x-2 py-2 px-4">
-                    <div>My ID: </div>
-                    <div id="MyID">My ID</div>
-                </div>
-                <div id="playersList" class="flex flex-col gap-2"></div>
-                <button type="button" @click="$store.ui.startMultiplayer()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
-                <button type="button" @click="$store.ui.closeRoom()" class="cursor-pointer bg-white rounded-full py-2 px-4">Close Room</button>
-                <button type="button" @click="$store.ui.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
-            </div>
-        </div>
-        <div id="game-container" class="h-full w-full" hidden>
-            <div id="game-overlay" class="fixed w-full h-full flex flex-col pointer-events-none">
-                <div id="game-overlay-top" class="w-full flex px-8 py-4 space-x-4">
-                    <template x-for="player in $store.gamePage?.players">
-                        <div class="flex rounded-fill skew-x-[-15deg] border border-amber-500">
-                            <div class="h-16 aspect-square flex-none flex items-center justify-center bg-zinc-200/80 inset-shadow-[0px_0px_4px] inset-shadow-black/80">
-                                <i class="text-5xl text-amber-500/80 bi bi-person-fill shadow"></i>
-                            </div>
-                            <div class="w-64 flex flex-col text-white">
-                                <div class="h-1/2 w-full bg-amber-600/80 flex items-center justify-between px-2">
-                                    <div x-text="$store.gamePage?.currentPlayer.user.ID == player.user.ID ? `${player.user.name} (you)` : player.user.name"></div>
-                                    <div x-text="player.user.ID"></div>
-                                </div>
-                                <div class="h-1/2 w-full bg-amber-500/80 flex items-center px-2">Stroke 1</div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-                <div id="game-overlay-mid" class="w-full h-full flex items-center justify-end p-4">
-                    <div class="h-128 w-4 rotate-180 border rounded-lg bg-black/10" id="power-bar-container">
-                        <template x-for="i in 10">
-                            <div class="absolute w-full h-px bg-black" :style="{ top: `${i * 10}%` }"></div>
-                        </template>
-                        <div class="w-full rounded-lg opacity-80" id="power-bar"></div>
-                    </div>    
-                </div>
-                <div id="game-overlay-bot" class="w-full"></div>
-            </div>
-            <canvas id="game" class="h-full w-full"></canvas>
-        </div>
-    </body>
+    <body id="body" x-data class="h-screen w-full flex"></body>
     <template id="playerRow">
         <div class="cursor-pointer bg-white rounded-full py-2 px-4">Row</div>
     </template>

@@ -1,7 +1,7 @@
 import Peer, { DataConnection, PeerConnectOption } from "peerjs";
 import { NetworkMessage, NetworkMessagesTypes } from "./networkMessage";
 import { User } from "../user";
-import { Player } from "../player";
+import { Player } from "../match/player";
 
 export abstract class PeerNetwork {
     public onPeerConnect: ((peerID: string) => void)[] = [];

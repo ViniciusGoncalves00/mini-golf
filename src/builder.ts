@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { Tile } from "./tile";
-import { Ball } from "./ball";
-import { Club } from "./club";
+import { Tile } from "./course/tile";
+import { Ball } from "./match/ball";
+import { Club } from "./match/club";
 
 export class Builder {
     public static tile(coordinates: THREE.Vector3Like, geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation = 0x00f000, friction: number = 0.35, absorption: number = 0.55): Tile {

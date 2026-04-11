@@ -6,7 +6,7 @@ export class User {
 
     public constructor(id?: string, name: string = "Guest") {
         this.name = name;
-        this.ID = id ?? Math.round(Math.random() * 100).toString();
+        this.ID = id ?? Math.round(Math.random() * 1000).toString();
     }
 
     public setName(name: string): void {

@@ -1,8 +1,8 @@
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Builder } from "../builder";
-import { Course } from "../course";
+import { Course } from "../match/course";
 import { StorageManager } from "../storageManager";
-import { Tile } from "../tile";
+import { Tile } from "./tile";
 import { Color, Tiles } from "../common/enums";
 import { GeometryBuilder } from "../geometry/geometryBuilder";
 import * as THREE from "three";

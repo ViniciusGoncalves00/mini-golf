@@ -13,7 +13,8 @@ export class Main {
         const session = new Session();
         
         document.addEventListener('alpine:init', () => {
-            Alpine.store("ui", session.page);
+            Alpine.store("homePage", session.homePage);
+            Alpine.store("gamePage", session.gamePage);
         });
 
         (window as any).Alpine = Alpine;

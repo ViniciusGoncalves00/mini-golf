@@ -1,4 +1,4 @@
-import { Player } from "../player";
+import { Player } from "../match/player";
 import { User } from "../user";
 
 export enum NetworkMessagesTypes {

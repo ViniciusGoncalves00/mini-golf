@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
-import { Ball } from "../ball";
+import { Ball } from "../match/ball";
 import { Monobehavior } from "../monobehavior";
 
 export class CameraWrapper extends Monobehavior {

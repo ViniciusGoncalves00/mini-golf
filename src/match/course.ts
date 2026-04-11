@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { Tile } from "./tile";
-import { Monobehavior } from "./monobehavior";
+import { Tile } from "../course/tile";
+import { Monobehavior } from "../monobehavior";
 
 export class Course extends Monobehavior {
     public readonly bounds: THREE.Box3 = new THREE.Box3();

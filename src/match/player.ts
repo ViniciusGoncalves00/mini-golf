@@ -1,7 +1,7 @@
 import { Ball } from "./ball";
-import { Builder } from "./builder";
+import { Builder } from "../builder";
 import { Club } from "./club";
-import { User } from "./user";
+import { User } from "../user";
 
 export class Player {
     public readonly ball: Ball = Builder.ball();

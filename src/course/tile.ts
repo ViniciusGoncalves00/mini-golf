@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Monobehavior } from "./monobehavior";
+import { Monobehavior } from "../monobehavior";
 
 export class Tile extends Monobehavior {
     public readonly mesh: THREE.Mesh;

@@ -3,12 +3,11 @@ import { Course } from "./course";
 import { Player } from "./player";
 import { Global } from "./global";
 import { Ball } from "./ball";
-import { World } from "./physics/world";
+import { World } from "../physics/world";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
-import { CameraWrapper } from "./wrappers/camera-wrapper";
-import { SceneWrapper } from "./wrappers/scene-wrapper";
-import { Monobehavior } from "./monobehavior";
-import Alpine from 'alpinejs'
+import { CameraWrapper } from "../wrappers/camera-wrapper";
+import { SceneWrapper } from "../wrappers/scene-wrapper";
+import { Monobehavior } from "../monobehavior";
 
 export class Match {
     public readonly monobehaviors: Monobehavior[] = [];

@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { Monobehavior } from "./monobehavior";
-import { RigidBody } from "./physics/rigidBody";
+import { Monobehavior } from "../monobehavior";
+import { RigidBody } from "../physics/rigidBody";
 
 export class Ball extends Monobehavior {
     public readonly mesh: THREE.Mesh;
