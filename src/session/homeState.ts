@@ -65,7 +65,7 @@ export class HomeState extends State {
     }
 
     public setupHostCallbacks(): void {
-        (Alpine.store("homePage") as HomePage).updateUsersList([this.session.user]);
+        (Alpine.store("homePage") as HomePage).setUsers([this.session.user]);
 
         const network = this.session.network as PeerHost;
 
@@ -79,7 +79,7 @@ export class HomeState extends State {
             }
             network.send(message);
                 
-            (Alpine.store("homePage") as HomePage).updateUsersList(users);
+            (Alpine.store("homePage") as HomePage).setUsers(users);
         });
 
         network.onPeerConnect.push((peerID) => {
@@ -92,7 +92,7 @@ export class HomeState extends State {
             }
 
             network.send(message);
-            (Alpine.store("homePage") as HomePage).updateUsersList(users);
+            (Alpine.store("homePage") as HomePage).setUsers(users);
         })
         
         network.onReceiveData.push((peerID, data) => {
@@ -167,7 +167,7 @@ export class HomeState extends State {
                     this.startMultiplayerMatch();
                     break;
                 case NetworkMessagesTypes.USER_LIST:
-                    (Alpine.store("homePage") as HomePage).updateUsersList(data.payload.players);
+                    (Alpine.store("homePage") as HomePage).setUsers(data.payload.users)
                     break;
                 case NetworkMessagesTypes.SHOT_FIRE:
                     if (!this.session.match) return;

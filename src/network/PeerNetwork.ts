@@ -23,9 +23,6 @@ export abstract class PeerNetwork {
         this.peer.on("open", () => {
             console.log("Peer ID:", this.peer.id);
             this.isReady = true;
-
-            const element = document.getElementById("MyID");
-            if (element) element.innerText = this.peer.id;
         });
 
         this.peer.on("error", (err) => {

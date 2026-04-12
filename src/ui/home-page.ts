@@ -71,17 +71,6 @@ export class HomePage extends Page {
         this.onJoinRoom(peerID.value);
     }
 
-    public updateUsersList(users: User[]): void {
-        const usersList = document.getElementById("usersList")!;
-        usersList.childNodes.forEach((child) => child.remove());
-
-        users.forEach((user) => {
-            const userItem = document.createElement("div");
-            userItem.innerText = `ID: ${user.ID} NAME: ${user.name}`;
-            usersList.appendChild(userItem);
-        })
-    }
-
     protected buildElement(): HTMLElement {
         const element = document.createElement("div");
         element.className = "h-full w-full flex items-center justify-center relative"
@@ -106,11 +95,22 @@ export class HomePage extends Page {
                 <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
             </div>
             <div id="room" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
-                <div class="flex bg-white rounded-full space-x-2 py-2 px-4">
-                    <div>My ID: </div>
-                    <div id="MyID">My ID</div>
+                <div id="usersList" class="flex flex-col gap-2">
+                    <template x-for="user in $store.homePage.users" :key="user.ID">
+                        <div class="flex rounded-fill skew-x-[-15deg] border-2 border-amber-500">
+                            <div class="h-16 aspect-square flex-none flex items-center justify-center bg-zinc-200/80 inset-shadow-[0px_0px_4px] inset-shadow-black/80">
+                                <i class="text-5xl text-amber-500/80 bi bi-person-fill"></i>
+                            </div>
+                            <div class="w-64 flex flex-col text-white">
+                                <div class="h-1/2 w-full bg-amber-600/80 flex items-center justify-between px-2">
+                                    <div x-text="$store.homePage.myUser?.ID === user.ID ? user.name + ' (you)' : user.name"></div>
+                                    <div x-text="'ID: ' + user.ID"></div>
+                                </div>
+                                <div class="h-1/2 w-full bg-amber-500/80 flex items-center px-2">Stroke 1</div>
+                            </div>
+                        </div>
+                    </template>
                 </div>
-                <div id="usersList" class="flex flex-col gap-2"></div>
                 <button type="button" @click="$store.homePage.startMultiplayer()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
                 <button type="button" @click="$store.homePage.closeRoom()" class="cursor-pointer bg-white rounded-full py-2 px-4">Close Room</button>
                 <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>

@@ -18,9 +18,8 @@ export class Session {
     public network: PeerHost | PeerClient | null = null;
     public match: Match | null = null;
     
-    public constructor() {
-        const user = StorageManager.getInstance().load(StorageKey.USER);
-        this.user = new User(undefined, user?.name);
+    public constructor(user: User) {
+        this.user = user;
 
         this.context = new Context();
         this.homeState = new HomeState(this);

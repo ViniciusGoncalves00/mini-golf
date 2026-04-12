@@ -13,4 +13,8 @@ export class User {
         this.name = name;
         StorageManager.getInstance().save("user", this);
     }
+
+    public save(): void {
+        StorageManager.getInstance().save("user", this);
+    }
 }

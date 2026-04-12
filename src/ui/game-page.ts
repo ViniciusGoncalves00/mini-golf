@@ -3,10 +3,9 @@ import { Page } from "./page";
 
 export class GamePage extends Page {
     public currentUser: User | null = null;
-    public users: User[] = [];
 
-    public constructor(parent: HTMLElement) {
-        super(parent);
+    public constructor(parent: HTMLElement, user: User) {
+        super(parent, user);
     }
 
     public setCurrentPlayer(id: string): void {
@@ -23,9 +22,9 @@ export class GamePage extends Page {
             <div id="game-overlay" class="fixed w-full h-full flex flex-col pointer-events-none">
                 <div id="game-overlay-top" class="w-full flex px-8 py-4 space-x-4">
                     <template x-for="user in $store.gamePage.users" :key="user.ID">
-                        <div class="flex rounded-fill skew-x-[-15deg] border border-amber-500">
+                        <div class="flex rounded-fill skew-x-[-15deg] border-2 border-amber-500">
                             <div class="h-16 aspect-square flex-none flex items-center justify-center bg-zinc-200/80 inset-shadow-[0px_0px_4px] inset-shadow-black/80">
-                                <i class="text-5xl text-amber-500/80 bi bi-person-fill shadow"></i>
+                                <i class="text-5xl text-amber-500/80 bi bi-person-fill"></i>
                             </div>
                             <div class="w-64 flex flex-col text-white">
                                 <div class="h-1/2 w-full bg-amber-600/80 flex items-center justify-between px-2">
