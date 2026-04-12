@@ -75,26 +75,28 @@ export class HomePage extends Page {
         const element = document.createElement("div");
         element.className = "h-full w-full flex items-center justify-center relative"
         element.innerHTML =`
-            <div class="bg-grid blur-xs h-full w-full absolute -z-10"></div>
-            <div id="home" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300">
-                <button type="button" @click="$store.homePage.setSinglePlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">SinglePlayer</button>
-                <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">MultiPlayer</button>
+            <div class="bg-grid h-full w-full absolute -z-10"></div>
+            <div id="home" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2">
+                <div class="w-1/4 h-1/4 bg-zinc-200 rounded-full flex items-center justify-center py-2 px-4">Not A Mini Golf</div>
+                <button type="button" @click="$store.homePage.setSinglePlayerPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">SinglePlayer</button>
+                <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">MultiPlayer</button>
+                <button type="button" @click="" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Settings</button>
             </div>
-            <div id="singleplayer" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
-                <button type="button" @click="$store.homePage.startSingleplayer()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
-                <button type="button" @click="$store.homePage.setHomePage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
+            <div id="singleplayer" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2" hidden>
+                <button type="button" @click="$store.homePage.startSingleplayer()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Start</button>
+                <button type="button" @click="$store.homePage.setHomePage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Back</button>
             </div>
-            <div id="multiplayer" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
-                <button type="button" @click="$store.homePage.setCreateRoomPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Create Room</button>
-                <button type="button" @click="$store.homePage.setJoinRoomPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Join Room</button>
-                <button type="button" @click="$store.homePage.setHomePage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
+            <div id="multiplayer" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2" hidden>
+                <button type="button" @click="$store.homePage.setCreateRoomPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Create Room</button>
+                <button type="button" @click="$store.homePage.setJoinRoomPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Join Room</button>
+                <button type="button" @click="$store.homePage.setHomePage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Back</button>
             </div>
-            <div id="joinRoom" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
+            <div id="joinRoom" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2" hidden>
                 <input id="PeerID" type="text" placeholder="Enter room ID" class="bg-white rounded-full py-2 px-4">
-                <button id="Connect" @click="$store.homePage.tryConnect()" class="cursor-pointer bg-white rounded-full py-2 px-4">Connect</button>
-                <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
+                <button id="Connect" @click="$store.homePage.tryConnect()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Connect</button>
+                <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Back</button>
             </div>
-            <div id="room" class="bg-amber-500/80 h-full w-1/2 flex flex-col items-center justify-center gap-2 border-x-2 border-amber-300" hidden>
+            <div id="room" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2" hidden>
                 <div id="usersList" class="flex flex-col gap-2">
                     <template x-for="user in $store.homePage.users" :key="user.ID">
                         <div class="flex rounded-fill skew-x-[-15deg] border-2 border-amber-500">
@@ -106,14 +108,14 @@ export class HomePage extends Page {
                                     <div x-text="$store.homePage.myUser?.ID === user.ID ? user.name + ' (you)' : user.name"></div>
                                     <div x-text="'ID: ' + user.ID"></div>
                                 </div>
-                                <div class="h-1/2 w-full bg-amber-500/80 flex items-center px-2">Stroke 1</div>
+                                <div class="h-1/2 w-full bg-zinc-100 flex items-center px-2">Stroke 1</div>
                             </div>
                         </div>
                     </template>
                 </div>
-                <button type="button" @click="$store.homePage.startMultiplayer()" class="cursor-pointer bg-white rounded-full py-2 px-4">Start</button>
-                <button type="button" @click="$store.homePage.closeRoom()" class="cursor-pointer bg-white rounded-full py-2 px-4">Close Room</button>
-                <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="cursor-pointer bg-white rounded-full py-2 px-4">Back</button>
+                <button type="button" @click="$store.homePage.startMultiplayer()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Start</button>
+                <button type="button" @click="$store.homePage.closeRoom()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Close Room</button>
+                <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Back</button>
             </div>
         `
         return element;

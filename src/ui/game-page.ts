@@ -37,7 +37,7 @@ export class GamePage extends Page {
                     </template>
                 </div>
                 <div id="game-overlay-mid" class="w-full h-full flex items-center justify-end p-4">
-                    <div class="h-128 w-4 rotate-180 border rounded-lg bg-black/10" id="power-bar-container">
+                    <div id="power-bar-container" class="h-128 w-4 rotate-180 border rounded-lg bg-white/10">
                         <template x-for="i in 9">
                             <div class="absolute w-full h-px bg-black" :style="{ top: (i * 10) + '%' }"></div>
                         </template>
