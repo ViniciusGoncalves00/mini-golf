@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { Monobehavior } from "../monobehavior";
 import { RigidBody } from "../physics/rigidBody";
+import { BodyType } from "../common/enums";
 
 export class Ball extends Monobehavior {
-    public readonly mesh: THREE.Mesh;
     public readonly collider: THREE.Sphere;
     public readonly rigidBody: RigidBody;
 
@@ -35,21 +35,17 @@ export class Ball extends Monobehavior {
     public constructor(mesh: THREE.Mesh, radius: number) {
         super();
         
-        this.mesh = mesh;
         this.radius = radius;
         this.diameter = radius * 2;
 
         this.collider = new THREE.Sphere(mesh.position, radius);
-        this.rigidBody = new RigidBody(mesh.position, mesh.quaternion);
+        this.rigidBody = new RigidBody(mesh, BodyType.DYNAMIC);
 
         this.safePositionDebug.visible = false;
     }
 
     public update(delta: number): void {
-        this.mesh.position.copy(this.rigidBody.position);
-        this.mesh.quaternion.copy(this.rigidBody.quaternion);
-        
-        this.arrow.position.copy(this.mesh.position);
+        this.arrow.position.copy(this.rigidBody.mesh.position);
         this.arrow.setDirection(this.rigidBody.getDirection());
         this.arrow.visible = false;
 

@@ -72,7 +72,7 @@ export class Club extends Monobehavior {
     }
 
     public showArrow(): void {
-        this.arrow.position.copy(this.ball.mesh.position);
+        this.arrow.position.copy(this.ball.rigidBody.mesh.position);
         this.arrow.visible = true;
     }
 
@@ -90,12 +90,12 @@ export class Club extends Monobehavior {
         raycaster.setFromCamera(mouse, camera);
 
         const plane = new THREE.Plane();
-        plane.set(this.normal, -ball.mesh.position.y);
+        plane.set(this.normal, -ball.rigidBody.mesh.position.y);
 
         const point = new THREE.Vector3();
 
         if (raycaster.ray.intersectPlane(plane, point)) {
-            const dir = new THREE.Vector3().subVectors(point, ball.mesh.position).normalize().multiplyScalar(-1);
+            const dir = new THREE.Vector3().subVectors(point, ball.rigidBody.mesh.position).normalize().multiplyScalar(-1);
         
             this.direction.set(...dir.toArray());
             this.arrow.setDirection(dir);

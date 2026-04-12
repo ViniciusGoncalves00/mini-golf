@@ -1,24 +1,28 @@
 import * as THREE from "three";
 import { Monobehavior } from "../monobehavior";
-import { World } from "./world";
+import { BodyType } from "../common/enums";
 
 export class RigidBody extends Monobehavior {
-    public readonly position: THREE.Vector3;
-    public readonly quaternion: THREE.Quaternion;
+    public readonly type: BodyType;
+    public size: number = 1;
+    public mass: number = 1;
+    public absorption: number = 0.1;
+    public friction: number = 0.1;
+
+    public readonly mesh: THREE.Mesh;
     public velocity: THREE.Vector3 = new THREE.Vector3();
-    private readonly mass: number = 1;
 
     private wasStopped: boolean = false;
 
-    public constructor(position: THREE.Vector3, quaternion: THREE.Quaternion) {
+    public constructor(mesh: THREE.Mesh, type: BodyType = BodyType.STATIC) {
         super();
-
-        this.position = position;
-        this.quaternion = quaternion;
+        
+        this.mesh = mesh;
+        this.type = type;
     }
 
     public update(delta: number): void {
-        this.position.addScaledVector(this.velocity, delta);
+        this.mesh.position.addScaledVector(this.velocity, delta);
     }
 
     public applyForce(force: THREE.Vector3): RigidBody {

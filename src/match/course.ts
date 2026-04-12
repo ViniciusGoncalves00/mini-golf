@@ -14,11 +14,12 @@ export class Course extends Monobehavior {
         tiles?.forEach(tile => {
             this.tryAddTile(tile.coordinates, tile);
         })
+        this.load();
     }
 
     public load(): void {
         this.tiles.forEach(tile => {
-            tile.mesh.position.set(tile.coordinates.x, tile.coordinates.y, tile.coordinates.z);
+            tile.rigidBody.mesh.position.set(tile.coordinates.x, tile.coordinates.y, tile.coordinates.z);
         })
     }
 

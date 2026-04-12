@@ -1,0 +1,234 @@
+import * as THREE from "three";
+import { Monobehavior } from "../monobehavior";
+import { SceneWrapper } from "../wrappers/scene-wrapper";
+import { CameraWrapper } from "../wrappers/camera-wrapper";
+import { Global } from "./global";
+import { Ambient } from "../physics/ambient";
+import { RigidBody } from "../physics/rigidBody";
+import { VectorUtils } from "../utils";
+import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
+import { BodyType } from "../common/enums";
+
+/**
+ * Class to handle only with objects in a scene.
+ */
+export class World {
+    public readonly monobehaviors: Monobehavior[] = [];
+
+    public readonly rigidBodies: RigidBody[] = [];
+    public readonly staticBodies: RigidBody[] = [];
+    public readonly kinematicBodies: RigidBody[] = [];
+    public readonly dynamicBodies: RigidBody[] = [];
+    
+    private readonly timer: THREE.Timer = new THREE.Timer();
+    private readonly raycaster = new THREE.Raycaster();
+    private readonly interpolation: number = 0.5;
+    private readonly rollbackHeight: number = 0;
+    
+    public readonly sceneWrapper: SceneWrapper;
+    public readonly cameraWrapper: CameraWrapper;
+        
+    public constructor(canvas: HTMLElement) {
+        this.cameraWrapper = new CameraWrapper(canvas);
+        this.monobehaviors.push(this.cameraWrapper);
+
+        this.sceneWrapper = new SceneWrapper(canvas, this.cameraWrapper.camera);
+        this.monobehaviors.push(this.sceneWrapper);
+
+        this.animate();
+    }
+
+    public addBody(body: RigidBody): void {
+        switch (body.type) {
+            case BodyType.DYNAMIC: this.dynamicBodies.push(body); break;
+            case BodyType.KINEMATIC: this.kinematicBodies.push(body); break;
+            case BodyType.STATIC: this.staticBodies.push(body); break;
+            default: break;
+        }
+        this.rigidBodies.push(body);
+    }
+
+    public removeBody(body: RigidBody): void {
+        switch (body.type) {
+            case BodyType.DYNAMIC:
+                var index = this.dynamicBodies.findIndex(b => b == body);
+                this.dynamicBodies.splice(index, 1);
+                break;
+            case BodyType.KINEMATIC:
+                var index = this.kinematicBodies.findIndex(b => b == body);
+                this.kinematicBodies.splice(index, 1);
+                break;
+            case BodyType.STATIC:
+                var index = this.staticBodies.findIndex(b => b == body);
+                this.staticBodies.splice(index, 1);
+                break;
+            default: break;
+        }
+        var index = this.rigidBodies.findIndex(b => b == body);
+        this.rigidBodies.splice(index, 1);
+    }
+    
+    private animate = () => {
+        requestAnimationFrame(this.animate);
+
+        this.timer.update();
+        const delta = this.timer.getDelta() * Global.timeScale;
+    
+        for (const monobehavior of this.monobehaviors) monobehavior.update(delta);
+        for (const dynamicBody of this.dynamicBodies) this.simulateDynamicBody(delta, dynamicBody);
+    }
+    
+    private simulateDynamicBody(delta: number, body: RigidBody): void {
+        const speed = body.getSpeed();
+        const distance = speed * delta;
+        const maxMovePerStep = body.size * this.interpolation;
+                    
+        const steps = Math.max(1, Math.ceil(distance / maxMovePerStep));
+        const stepDelta = delta / steps;
+
+        for (let i = 0; i < steps; i++) {
+            this.applyGravity(stepDelta, body);
+            this.applyDrag(stepDelta, body);
+            this.calculateCollision(body);
+            body.update(stepDelta);
+            this.mustStop(body);
+        }
+    }
+
+    private simulateKinematicBody(delta: number, body: RigidBody): void {
+        this.calculateCollision(body);
+        body.update(delta);
+        this.mustStop(body);
+    }
+    
+    private applyGravity(delta: number, body: RigidBody, threshold: number = 0.001): void {
+        this.raycaster.set(body.mesh.position, VectorUtils.DOWN);
+        this.raycaster.far = Infinity;
+
+        const meshes = this.rigidBodies.values().toArray().map(body => body.mesh);
+        const intersections = this.raycaster.intersectObjects(meshes);
+        const hit = intersections[0];
+
+        const isCollidingGround = hit && hit.distance <= body.size + threshold;
+        const isPenetrating = hit && hit.distance < body.size;
+
+        // if (isCollidingGround) {
+        //     ball.lastGroundPosition.copy(hit.point.add(this.up.clone().multiplyScalar(ball.radius)));
+        //     const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
+        //     ball.lastCollisionPosition.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
+
+        //     if (hit.normal?.equals(this.up)) {
+        //         ball.lastSafePosition.copy(ball.lastGroundPosition);
+        //         ball.lastSafePosition.y += 0.1;
+        //     };
+        // }
+
+        if (isPenetrating) body.mesh.position.y += body.size - hit.distance;
+        if (!isCollidingGround) body.applyForce(Ambient.gravity.clone().multiplyScalar(delta));
+    }
+    
+    private calculateCollision(testBody: RigidBody) {
+        if (!testBody.isMoving()) return;
+
+        const raycaster = new THREE.Raycaster();
+        const forward = testBody.getDirection();
+        raycaster.set(testBody.mesh.position, forward);
+
+        const intersections = raycaster.intersectObjects(this.rigidBodies.map(body => body.mesh));
+        if (intersections.length === 0) return;
+
+        const hit = intersections.find(intersection => intersection.object.uuid !== testBody.mesh.uuid);
+        if (!hit) return;
+
+        if (this.isColliding(forward, hit, testBody.size)) {
+            const collidedBody = this.rigidBodies.find(body => body.mesh.uuid === hit.object.uuid);
+            if (!collidedBody) return;
+
+            if ((testBody.type && collidedBody.type) == BodyType.DYNAMIC) this.applyDynamicCollision(hit, testBody, collidedBody);
+            if (testBody.type == BodyType.DYNAMIC && collidedBody.type == BodyType.KINEMATIC) this.applyDynamicKinematicCollision(hit, testBody, collidedBody);
+            if (testBody.type == BodyType.KINEMATIC && collidedBody.type == BodyType.DYNAMIC) this.applyKinematicDynamicCollision(hit, collidedBody, testBody);
+            if (testBody.type == BodyType.DYNAMIC && collidedBody.type == BodyType.STATIC) this.applyStaticCollision(hit, testBody, collidedBody);
+
+            // const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
+            // ball.lastCollisionPosition.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
+        }
+    }
+
+    private applyDynamicCollision(hit: THREE.Intersection, movingBody: RigidBody, collidedBody: RigidBody): void {
+        const forward = movingBody.getDirection();
+
+        const normal = hit.face!.normal.clone();
+        normal.transformDirection(hit.object.matrixWorld).normalize();
+
+        const dot = forward.dot(normal);
+        const absorptionFactor = (movingBody.absorption + collidedBody.absorption) * Math.abs(dot);
+
+        const force = movingBody.getVelocity().multiplyScalar(absorptionFactor);
+
+        collidedBody.applyForce(force);
+        movingBody.reflect(normal, absorptionFactor);
+    }
+
+    private applyDynamicKinematicCollision(hit: THREE.Intersection, dynamicBody: RigidBody, kinematicBody: RigidBody): void {
+
+    }
+
+    private applyKinematicDynamicCollision(hit: THREE.Intersection, dynamicBody: RigidBody, kinematicBody: RigidBody): void {
+
+    }
+
+    private applyStaticCollision(hit: THREE.Intersection, dynamicBody: RigidBody, staticBody: RigidBody): void {
+        const forward = dynamicBody.getDirection();
+
+        const normal = hit.face!.normal.clone();
+        normal.transformDirection(hit.object.matrixWorld).normalize();
+
+        const dot = forward.dot(normal);
+        const absorptionFactor = (dynamicBody.absorption + staticBody.absorption) * Math.abs(dot);
+        dynamicBody.reflect(normal, absorptionFactor);
+    }
+
+    private applyDrag(delta: number, bodyA: RigidBody): void {
+        // if (bodyA.isCollidingGround) {
+        //     const raycaster = new THREE.Raycaster();
+        //     raycaster.set(bodyA.mesh.position, new THREE.Vector3(0, -1, 0));
+        //     const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
+        //     const hit2 = intersections.find(i => i.object.uuid !== bodyA.mesh.uuid);
+        //     if (!hit2) return;
+
+        //     const tile2 = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit2.object.uuid);
+        //     if (!tile2) return;
+
+        //     bodyA.applyDrag(tile2.friction * delta);
+        // }
+
+        bodyA.applyDrag(Ambient.airDrag * delta);
+    }
+    
+    private isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.0001) {
+        const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
+        const angle = radToDeg(inverseNormal.angleTo(direction));
+
+        const cossine = Math.cos(degToRad(angle));
+        const hypotenuse = hit.distance;
+
+        const adjacentSide = cossine * hypotenuse;
+        const distance = adjacentSide - radius;
+
+        const isColliding = distance < threshold;
+        return isColliding;
+    }
+
+    private mustStop(rigidBody: RigidBody, threshold: number = 0.1): void {
+        // if (!rigidBody.isCollidingGround || rigidBody.rigidBody.getSpeed() > threshold) return;
+        
+        // rigidBody.stop();
+    }
+
+    private rollback(rigidBody: RigidBody, height: number): void {
+        // if (ball.mesh.position.y > height) return;
+
+        // ball.mesh.position.copy(ball.lastSafePosition);
+        // ball.rigidBody.stop();
+    }
+}

@@ -21,3 +21,14 @@ export enum Color {
     LIGHT_GREEN   = 0x00cc00,
     DARK_GREEN    = 0x00aa00,
 }
+
+export enum BodyType {
+    DYNAMIC,
+    KINEMATIC,
+    STATIC,
+}
+
+export enum CameraType {
+    FREE,
+    TARGET,
+}

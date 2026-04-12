@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-export class World {
+export class Ambient {
     public static readonly gravity: THREE.Vector3 = new THREE.Vector3(0, -1, 0);
 
     public static readonly airDrag: number = 0.05;
