@@ -86,6 +86,8 @@ export class World {
             body.update(stepDelta);
             this.mustFreeze(body);
         }
+
+        this.rollback(body, this.rollbackHeight);
     }
 
     private simulateKinematicBody(delta: number, body: RigidBody): void {
@@ -95,15 +97,15 @@ export class World {
     }
     
     private applyGravity(delta: number, body: RigidBody, threshold: number = 0.0001): void {
-        // this.raycaster.set(body.mesh.position, VectorUtils.DOWN);
-        // this.raycaster.far = Infinity;
+        this.raycaster.set(body.mesh.position, VectorUtils.DOWN);
+        this.raycaster.far = Infinity;
 
-        // const meshes = this.rigidBodies.values().toArray().map(body => body.mesh);
-        // const intersections = this.raycaster.intersectObjects(meshes);
-        // const hit = intersections[0];
+        const meshes = this.rigidBodies.values().toArray().map(body => body.mesh);
+        const intersections = this.raycaster.intersectObjects(meshes);
+        const hit = intersections[0];
 
-        // const isCollidingGround = hit && hit.distance <= body.size + threshold;
-        // const isPenetrating = hit && hit.distance < body.size;
+        const isCollidingGround = hit && hit.distance <= body.size + threshold;
+        const isPenetrating = hit && hit.distance < body.size;
 
         // if (isCollidingGround) {
         //     ball.lastGroundPosition.copy(hit.point.add(this.up.clone().multiplyScalar(ball.radius)));
@@ -116,9 +118,9 @@ export class World {
         //     };
         // }
 
-        // if (isPenetrating) body.mesh.position.y += body.size - hit.distance;
-        // if (!isCollidingGround) body.applyForce(Ambient.gravity.multiplyScalar(delta));
-        body.applyForce(Ambient.gravity.multiplyScalar(delta))
+        if (isPenetrating) body.mesh.position.y += body.size - hit.distance;
+        if (!isCollidingGround) body.applyForce(Ambient.gravity.multiplyScalar(delta));
+        // body.applyForce(Ambient.gravity.multiplyScalar(delta))
     }
     
     private calculateCollision(testBody: RigidBody) {
@@ -127,8 +129,6 @@ export class World {
         raycaster.set(testBody.mesh.position, forward);
 
         const intersections = raycaster.intersectObjects(this.rigidBodies.map(body => body.mesh));
-        if (intersections.length === 0) return;
-
         const hit = intersections.find(intersection => intersection.object.uuid !== testBody.mesh.uuid);
         if (!hit) return;
 
@@ -180,21 +180,24 @@ export class World {
         dynamicBody.reflect(normal, absorptionFactor);
     }
 
-    private applyDrag(delta: number, bodyA: RigidBody): void {
-        // if (bodyA.isCollidingGround) {
-        //     const raycaster = new THREE.Raycaster();
-        //     raycaster.set(bodyA.mesh.position, new THREE.Vector3(0, -1, 0));
-        //     const intersections = raycaster.intersectObjects(course.tiles.values().toArray().map(t => t.mesh));
-        //     const hit2 = intersections.find(i => i.object.uuid !== bodyA.mesh.uuid);
-        //     if (!hit2) return;
+    private applyDrag(delta: number, body: RigidBody, threshold: number = 0.01): void {
+        this.raycaster.set(body.mesh.position, VectorUtils.DOWN);
+        this.raycaster.far = Infinity;
 
-        //     const tile2 = course.tiles.values().toArray().find(tile => tile.mesh.uuid === hit2.object.uuid);
-        //     if (!tile2) return;
+        const meshes = this.rigidBodies.values().toArray().map(body => body.mesh);
+        const intersections = this.raycaster.intersectObjects(meshes);
+        const hit = intersections[0];
 
-        //     bodyA.applyDrag(tile2.friction * delta);
-        // }
+        const isCollidingGround = hit && hit.distance <= body.size + threshold;
 
-        bodyA.applyDrag(Ambient.airDrag * delta);
+        if (isCollidingGround) {
+            const hitBody =this.rigidBodies.find(body => body.mesh.uuid === hit.object.uuid);
+            if (!hitBody) return;
+
+            body.applyDrag(hitBody.friction * delta);
+        }
+
+        body.applyDrag(Ambient.airDrag * delta);
     }
     
     private isColliding(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.0001) {
@@ -211,7 +214,7 @@ export class World {
         return isColliding;
     }
 
-    private mustFreeze(body: RigidBody, threshold: number = 0.1): void {
+    private mustFreeze(body: RigidBody, collisionThreshold: number = 0.01, speedThreshold: number = 0.01): void {
         this.raycaster.set(body.mesh.position, VectorUtils.DOWN);
         this.raycaster.far = Infinity;
 
@@ -219,17 +222,17 @@ export class World {
         const intersections = this.raycaster.intersectObjects(meshes);
         const hit = intersections[0];
 
-        const isCollidingGround = hit && hit.distance <= body.size + threshold;
+        const isCollidingGround = hit && hit.distance <= body.size + collisionThreshold;
         const isPenetrating = hit && hit.distance < body.size;
 
         if (isPenetrating) body.mesh.position.y += body.size - hit.distance;
-        if (isCollidingGround && body.getSpeed() < threshold) body.freeze();
+        if (isCollidingGround && body.getSpeed() < speedThreshold) body.freeze();
     }
 
     private rollback(rigidBody: RigidBody, height: number): void {
-        // if (ball.mesh.position.y > height) return;
+        if (rigidBody.mesh.position.y > height) return;
 
-        // ball.mesh.position.copy(ball.lastSafePosition);
-        // ball.rigidBody.stop();
+        rigidBody.mesh.position.copy({x: 0, y: 1, z: 0});
+        rigidBody.stop();
     }
 }
