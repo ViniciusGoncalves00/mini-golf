@@ -3,7 +3,6 @@ import { Ball } from "./ball";
 import { Monobehavior } from "../monobehavior";
 
 export class Club extends Monobehavior {
-    public enabled: boolean = true;
     public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.2, new THREE.Color(255, 255, 255));
 
     //#region [callbacks]
@@ -47,11 +46,11 @@ export class Club extends Monobehavior {
                 callback(normalized);
             }
         }
+        this.arrow.position.copy(this.ball.rigidBody.mesh.position);
     }
 
     public startShot(): void {
-        if (!this.enabled) return;
-        // if (!this.ball.rigidBody.canInteract()) return;
+        if (!this.ball.rigidBody.enabled() || !this.ball.rigidBody.freezed()) return;
 
         this.strength = 0;
         this.isHolding = true;
@@ -60,8 +59,6 @@ export class Club extends Monobehavior {
     }
 
     public freeShot(): void {
-        // if (!this.ball.rigidBody.canInteract()) return;
-
         const force = new THREE.Vector3().copy(this.direction).multiplyScalar(this.strength);
         
         this.strength = 0;
@@ -71,12 +68,11 @@ export class Club extends Monobehavior {
         for (const callback of this.onStrengthChange) callback(0);
     }
 
-    public showArrow(): void {
-        this.arrow.position.copy(this.ball.rigidBody.mesh.position);
+    public showDirectionGizmo(): void {
         this.arrow.visible = true;
     }
 
-    public hideArrow(): void {
+    public hideDirectionGizmo(): void {
         this.arrow.visible = false;
     }
 

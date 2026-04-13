@@ -15,11 +15,11 @@ export class HomePage extends Page {
         this.setPage("home");
     }
 
-    public setSinglePlayerPage(): void {
+    public setSinglePlayerOptionsPage(): void {
         this.setPage("singleplayer");
     }
 
-    public setMultiPlayerPage(): void {
+    public setMultiPlayerOptionsPage(): void {
         this.setPage("multiplayer");
     }
 
@@ -40,20 +40,20 @@ export class HomePage extends Page {
         this.setPage("joinRoom");
     }
 
-    public setGamePage(): void {
-        this.setPage("game-container");
-    }
+    // public setGamePage(): void {
+    //     this.setPage("game-container");
+    // }
 
     public startSingleplayer(): void {
-        this.setGamePage();
-        this.hideInterface();
+        // this.setGamePage();
+        // this.hideInterface();
 
         this.onStartSingleplayer();
     }
 
     public startMultiplayer(): void {
-        this.setGamePage();
-        this.hideInterface();
+        // this.setGamePage();
+        // this.hideInterface();
 
         this.onStartMultiplayer();
     }
@@ -78,8 +78,8 @@ export class HomePage extends Page {
             <div class="bg-grid h-full w-full absolute -z-10"></div>
             <div id="home" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2">
                 <div class="w-1/4 h-1/4 bg-zinc-200 rounded-full flex items-center justify-center py-2 px-4">Not A Mini Golf</div>
-                <button type="button" @click="$store.homePage.setSinglePlayerPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">SinglePlayer</button>
-                <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">MultiPlayer</button>
+                <button type="button" @click="$store.homePage.setSinglePlayerOptionsPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">SinglePlayer</button>
+                <button type="button" @click="$store.homePage.setMultiPlayerOptionsPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">MultiPlayer</button>
                 <button type="button" @click="" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Settings</button>
             </div>
             <div id="singleplayer" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2" hidden>
@@ -94,7 +94,7 @@ export class HomePage extends Page {
             <div id="joinRoom" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2" hidden>
                 <input id="PeerID" type="text" placeholder="Enter room ID" class="bg-white rounded-full py-2 px-4">
                 <button id="Connect" @click="$store.homePage.tryConnect()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Connect</button>
-                <button type="button" @click="$store.homePage.setMultiPlayerPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Back</button>
+                <button type="button" @click="$store.homePage.setMultiPlayerOptionsPage()" class="w-1/4 bg-zinc-200 hover:bg-green-700 transition-colors duration-300 hover:text-white rounded-full flex items-center justify-center cursor-pointer py-2 px-4">Back</button>
             </div>
             <div id="room" class="bg-zinc-100 h-full w-1/2 shadow-2xl flex flex-col items-center justify-center space-y-2" hidden>
                 <div id="usersList" class="flex flex-col gap-2">

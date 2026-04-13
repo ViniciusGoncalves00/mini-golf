@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { Monobehavior } from "../monobehavior";
 import { SceneWrapper } from "../wrappers/scene-wrapper";
 import { CameraWrapper } from "../wrappers/camera-wrapper";
-import { Global } from "./global";
 import { Ambient } from "../physics/ambient";
 import { RigidBody } from "../physics/rigidBody";
 import { VectorUtils } from "../utils";
@@ -13,14 +12,11 @@ import { BodyType } from "../common/enums";
  * Class to handle only with objects in a scene.
  */
 export class World {
-    public readonly monobehaviors: Monobehavior[] = [];
-
     public readonly rigidBodies: RigidBody[] = [];
     public readonly staticBodies: RigidBody[] = [];
     public readonly kinematicBodies: RigidBody[] = [];
     public readonly dynamicBodies: RigidBody[] = [];
     
-    private readonly timer: THREE.Timer = new THREE.Timer();
     private readonly raycaster = new THREE.Raycaster();
     private readonly interpolation: number = 0.5;
     private readonly rollbackHeight: number = 0;
@@ -30,12 +26,17 @@ export class World {
         
     public constructor(canvas: HTMLElement) {
         this.cameraWrapper = new CameraWrapper(canvas);
-        this.monobehaviors.push(this.cameraWrapper);
-
         this.sceneWrapper = new SceneWrapper(canvas, this.cameraWrapper.camera);
-        this.monobehaviors.push(this.sceneWrapper);
+    }
 
-        this.animate();
+    public update(delta: number) {
+        this.cameraWrapper.update(delta);
+        this.sceneWrapper.update(delta);
+
+        for (const dynamicBody of this.dynamicBodies) {
+            if (dynamicBody.freezed()) continue;
+            this.simulateDynamicBody(delta, dynamicBody);
+        };
     }
 
     public addBody(body: RigidBody): void {
@@ -46,6 +47,7 @@ export class World {
             default: break;
         }
         this.rigidBodies.push(body);
+        this.sceneWrapper.scene.add(body.mesh);
     }
 
     public removeBody(body: RigidBody): void {
@@ -66,16 +68,7 @@ export class World {
         }
         var index = this.rigidBodies.findIndex(b => b == body);
         this.rigidBodies.splice(index, 1);
-    }
-    
-    private animate = () => {
-        requestAnimationFrame(this.animate);
-
-        this.timer.update();
-        const delta = this.timer.getDelta() * Global.timeScale;
-    
-        for (const monobehavior of this.monobehaviors) monobehavior.update(delta);
-        for (const dynamicBody of this.dynamicBodies) this.simulateDynamicBody(delta, dynamicBody);
+        this.sceneWrapper.scene.remove(body.mesh);
     }
     
     private simulateDynamicBody(delta: number, body: RigidBody): void {
@@ -91,26 +84,26 @@ export class World {
             this.applyDrag(stepDelta, body);
             this.calculateCollision(body);
             body.update(stepDelta);
-            this.mustStop(body);
+            this.mustFreeze(body);
         }
     }
 
     private simulateKinematicBody(delta: number, body: RigidBody): void {
         this.calculateCollision(body);
         body.update(delta);
-        this.mustStop(body);
+        this.mustFreeze(body);
     }
     
-    private applyGravity(delta: number, body: RigidBody, threshold: number = 0.001): void {
-        this.raycaster.set(body.mesh.position, VectorUtils.DOWN);
-        this.raycaster.far = Infinity;
+    private applyGravity(delta: number, body: RigidBody, threshold: number = 0.0001): void {
+        // this.raycaster.set(body.mesh.position, VectorUtils.DOWN);
+        // this.raycaster.far = Infinity;
 
-        const meshes = this.rigidBodies.values().toArray().map(body => body.mesh);
-        const intersections = this.raycaster.intersectObjects(meshes);
-        const hit = intersections[0];
+        // const meshes = this.rigidBodies.values().toArray().map(body => body.mesh);
+        // const intersections = this.raycaster.intersectObjects(meshes);
+        // const hit = intersections[0];
 
-        const isCollidingGround = hit && hit.distance <= body.size + threshold;
-        const isPenetrating = hit && hit.distance < body.size;
+        // const isCollidingGround = hit && hit.distance <= body.size + threshold;
+        // const isPenetrating = hit && hit.distance < body.size;
 
         // if (isCollidingGround) {
         //     ball.lastGroundPosition.copy(hit.point.add(this.up.clone().multiplyScalar(ball.radius)));
@@ -123,13 +116,12 @@ export class World {
         //     };
         // }
 
-        if (isPenetrating) body.mesh.position.y += body.size - hit.distance;
-        if (!isCollidingGround) body.applyForce(Ambient.gravity.clone().multiplyScalar(delta));
+        // if (isPenetrating) body.mesh.position.y += body.size - hit.distance;
+        // if (!isCollidingGround) body.applyForce(Ambient.gravity.multiplyScalar(delta));
+        body.applyForce(Ambient.gravity.multiplyScalar(delta))
     }
     
     private calculateCollision(testBody: RigidBody) {
-        if (!testBody.isMoving()) return;
-
         const raycaster = new THREE.Raycaster();
         const forward = testBody.getDirection();
         raycaster.set(testBody.mesh.position, forward);
@@ -145,9 +137,9 @@ export class World {
             if (!collidedBody) return;
 
             if ((testBody.type && collidedBody.type) == BodyType.DYNAMIC) this.applyDynamicCollision(hit, testBody, collidedBody);
-            if (testBody.type == BodyType.DYNAMIC && collidedBody.type == BodyType.KINEMATIC) this.applyDynamicKinematicCollision(hit, testBody, collidedBody);
-            if (testBody.type == BodyType.KINEMATIC && collidedBody.type == BodyType.DYNAMIC) this.applyKinematicDynamicCollision(hit, collidedBody, testBody);
-            if (testBody.type == BodyType.DYNAMIC && collidedBody.type == BodyType.STATIC) this.applyStaticCollision(hit, testBody, collidedBody);
+            else if (testBody.type == BodyType.DYNAMIC && collidedBody.type == BodyType.KINEMATIC) this.applyDynamicKinematicCollision(hit, testBody, collidedBody);
+            else if (testBody.type == BodyType.KINEMATIC && collidedBody.type == BodyType.DYNAMIC) this.applyKinematicDynamicCollision(hit, collidedBody, testBody);
+            else if (testBody.type == BodyType.DYNAMIC && collidedBody.type == BodyType.STATIC) this.applyStaticCollision(hit, testBody, collidedBody);
 
             // const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
             // ball.lastCollisionPosition.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
@@ -219,10 +211,19 @@ export class World {
         return isColliding;
     }
 
-    private mustStop(rigidBody: RigidBody, threshold: number = 0.1): void {
-        // if (!rigidBody.isCollidingGround || rigidBody.rigidBody.getSpeed() > threshold) return;
-        
-        // rigidBody.stop();
+    private mustFreeze(body: RigidBody, threshold: number = 0.1): void {
+        this.raycaster.set(body.mesh.position, VectorUtils.DOWN);
+        this.raycaster.far = Infinity;
+
+        const meshes = this.rigidBodies.values().toArray().map(body => body.mesh);
+        const intersections = this.raycaster.intersectObjects(meshes);
+        const hit = intersections[0];
+
+        const isCollidingGround = hit && hit.distance <= body.size + threshold;
+        const isPenetrating = hit && hit.distance < body.size;
+
+        if (isPenetrating) body.mesh.position.y += body.size - hit.distance;
+        if (isCollidingGround && body.getSpeed() < threshold) body.freeze();
     }
 
     private rollback(rigidBody: RigidBody, height: number): void {

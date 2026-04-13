@@ -27,7 +27,6 @@ export class Ball extends Monobehavior {
 
     public isCollidingGround: boolean = false;
     public isPenetrating: boolean = false;
-    public isLoaded: boolean = false;
     //#endregion
 
     private readonly stopThreshold = 0.01;
@@ -40,6 +39,7 @@ export class Ball extends Monobehavior {
 
         this.collider = new THREE.Sphere(mesh.position, radius);
         this.rigidBody = new RigidBody(mesh, BodyType.DYNAMIC);
+        this.rigidBody.size = radius;
 
         this.safePositionDebug.visible = false;
     }

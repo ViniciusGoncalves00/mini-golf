@@ -7,6 +7,8 @@ import { PeerHost } from "../network/PeerHost";
 import { Session } from "../session";
 import { State } from "./state";
 import { HomePage } from "../ui/home-page";
+import { MatchMode } from "../common/enums";
+import { MultiPlayerMatch } from "../match/multiplayer-match";
 
 export class HomeState extends State {
     public constructor(session: Session) {
@@ -28,14 +30,12 @@ export class HomeState extends State {
     }
 
     private startSinglePlayerMatch(): void {
-        this.session.gameState.setMatchType("singleplayer");
+        this.session.gameState.setMatchMode(MatchMode.SINGLEPLAYER);
         this.session.context.set(this.session.gameState);
     }
     
     private startMultiplayerMatch(): void {
-        if (!this.session.network) return;
-
-        this.session.gameState.setMatchType("multiplayer");
+        this.session.gameState.setMatchMode(MatchMode.MULTIPLAYER);
         this.session.context.set(this.session.gameState);
     }
 
@@ -44,13 +44,13 @@ export class HomeState extends State {
 
         const network = this.session.network as PeerHost;
         network.peer.on("open", () => {
-            this.setupHostCallbacks();
+            this.setHostSide();
         })
     }
 
     public closeRoom(): void {
         this.session.network?.disconnect();
-        (Alpine.store("homePage") as HomePage).setMultiPlayerPage();
+        (Alpine.store("homePage") as HomePage).setMultiPlayerOptionsPage();
     }
 
     public connecTo(peerID: string): void {
@@ -58,13 +58,13 @@ export class HomeState extends State {
 
         const network = this.session.network as PeerClient;
         network.peer.on("open", () => {
-            this.setupClientCallbacks();
+            this.setClientSide();
             network.connectTo(peerID);
             (Alpine.store("homePage") as HomePage).setRoomPage();
         })
     }
 
-    public setupHostCallbacks(): void {
+    public setHostSide(): void {
         (Alpine.store("homePage") as HomePage).setUsers([this.session.user]);
 
         const network = this.session.network as PeerHost;
@@ -92,6 +92,7 @@ export class HomeState extends State {
             }
 
             network.send(message);
+            
             (Alpine.store("homePage") as HomePage).setUsers(users);
         })
         
@@ -128,54 +129,34 @@ export class HomeState extends State {
                 //     break;
                 case NetworkMessagesTypes.SHOT_FIRE:
                     if (!this.session.match) return;
+                    const match = this.session.match as MultiPlayerMatch;
+                    if (peerID !== match.currentPlayer?.user.ID) return;
 
+                    const player = match.players.find(player => player.user.ID === peerID);
+                    if (!player) return;
+
+                    player.ball.rigidBody.unfreeze();
+                    player.ball.rigidBody.applyForce(new THREE.Vector3(...data.payload.vector));
+                    
                     const message: NetworkHostMessage = {
                         type: NetworkMessagesTypes.SHOT_FIRE,
                         payload: { vector: data.payload.vector },
                     }
-                    
                     network.send(message);
-
-                    const player = this.session.match.players.find(player => player.user.ID === peerID);
-                    if (!player) return;
-
-                    player.ball.rigidBody.applyForce(new THREE.Vector3(...data.payload.vector));
                 default:
                     break;
             }
         })
     }
 
-    public setupClientCallbacks(): void {
-        // const player = network.players.get(peerID);
-        // player?.club.onFreeShot.push((force) => {
-        //     const message: NetworkHostMessage = {
-        //         type: NetworkMessagesTypes.SHOT_FIRE,
-        //         payload: { vector: [force.x, force.y, force.z] },
-        //     }
-
-        //     network.send(message);
-        // })
-
+    public setClientSide(): void {
         this.session.network?.onReceiveData.push((peerId, data) => {
-            if (!this.session.network) return; 
-
-            console.log("Client Received:", data)
-
             switch (data.type) {
                 case NetworkMessagesTypes.MATCH_START:
                     this.startMultiplayerMatch();
                     break;
                 case NetworkMessagesTypes.USER_LIST:
                     (Alpine.store("homePage") as HomePage).setUsers(data.payload.users)
-                    break;
-                case NetworkMessagesTypes.SHOT_FIRE:
-                    if (!this.session.match) return;
-                    
-                    const player = this.session.match.players.find(player => player.user.ID === peerId);
-                    if (!player) return;
-
-                    player.ball.rigidBody.applyForce(new THREE.Vector3(...data.payload.vector));
                     break;
                 default:
                     break;

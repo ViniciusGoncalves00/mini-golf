@@ -32,3 +32,8 @@ export enum CameraType {
     FREE,
     TARGET,
 }
+
+export enum MatchMode {
+    SINGLEPLAYER,
+    MULTIPLAYER,
+}

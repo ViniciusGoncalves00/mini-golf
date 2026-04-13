@@ -10,7 +10,7 @@ export class CameraWrapper extends Monobehavior {
     public camera: THREE.PerspectiveCamera;
     public orbitControls: OrbitControls;
 
-    public controlType: CameraType = CameraType.FREE;
+    public cameraMode: CameraType = CameraType.FREE;
     private target: RigidBody | null = null;
 
     public constructor(canvas: HTMLElement) {
@@ -25,7 +25,7 @@ export class CameraWrapper extends Monobehavior {
     public update(delta: number): void {
         const camera = this.camera;
 
-        if (this.controlType === CameraType.TARGET && this.target) {
+        if (this.cameraMode === CameraType.TARGET && this.target) {
             const target = this.target;
 
             const direction = new THREE.Vector3().subVectors(camera.position, target.mesh.position).normalize();
@@ -39,14 +39,14 @@ export class CameraWrapper extends Monobehavior {
     }
 
     public setTargetMode(body: RigidBody): void {
-        this.controlType = CameraType.TARGET;
+        this.cameraMode = CameraType.TARGET;
         this.target = body;
 
         this.orbitControls.enablePan = false;
     }
 
     public setFreeMode(): void {
-        this.controlType = CameraType.FREE;
+        this.cameraMode = CameraType.FREE;
         this.target = null;
 
         this.orbitControls.enablePan = true;

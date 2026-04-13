@@ -8,11 +8,13 @@ export class RigidBody extends Monobehavior {
     public mass: number = 1;
     public absorption: number = 0.1;
     public friction: number = 0.1;
-
     public readonly mesh: THREE.Mesh;
-    public velocity: THREE.Vector3 = new THREE.Vector3();
 
-    private wasStopped: boolean = false;
+    public onFreeze: (() => void)[] = [];
+    public onUnfreeze: (() => void)[] = [];
+    
+    private velocity: THREE.Vector3 = new THREE.Vector3();
+    private _freezed: boolean = false;
 
     public constructor(mesh: THREE.Mesh, type: BodyType = BodyType.STATIC) {
         super();
@@ -27,7 +29,6 @@ export class RigidBody extends Monobehavior {
 
     public applyForce(force: THREE.Vector3): RigidBody {
         this.velocity.add(force);
-        this.wasStopped = false;
         return this;
     }
 
@@ -43,12 +44,21 @@ export class RigidBody extends Monobehavior {
 
     public stop(): RigidBody {
         this.velocity.set(0, 0, 0);
-        this.wasStopped = true;
         return this;
     }
 
-    public canInteract(): boolean {
-        return this.wasStopped;
+    public freezed(): boolean {
+        return this._freezed;
+    }
+
+    public freeze(): void {
+        this._freezed = true;
+        for (const callback of this.onFreeze) callback();
+    }
+
+    public unfreeze(): void {
+        this._freezed = false;
+        for (const callback of this.onUnfreeze) callback();
     }
 
     public isMoving(): boolean {
