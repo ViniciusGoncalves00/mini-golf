@@ -1,6 +1,3 @@
-import { Player } from "../match/player";
-import { User } from "../user";
-
 export enum NetworkMessagesTypes {
     CONNECTED = "connected",
     DISCONNECTED = "disconnected",
