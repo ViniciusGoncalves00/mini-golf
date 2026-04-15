@@ -223,16 +223,13 @@ export class World {
         const hit = intersections[0];
 
         const isCollidingGround = hit && hit.distance <= body.size + collisionThreshold;
-        const isPenetrating = hit && hit.distance < body.size;
-
-        if (isPenetrating) body.mesh.position.y += body.size - hit.distance;
         if (isCollidingGround && body.getSpeed() < speedThreshold) body.freeze();
     }
 
     private rollback(rigidBody: RigidBody, height: number): void {
         if (rigidBody.mesh.position.y > height) return;
 
-        rigidBody.mesh.position.copy({x: 0, y: 1, z: 0});
+        rigidBody.mesh.position.copy({x: 0, y: 0.1, z: 0});
         rigidBody.stop();
     }
 }
