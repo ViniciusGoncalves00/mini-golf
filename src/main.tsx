@@ -1,0 +1,20 @@
+import React from "react";
+import { StrictMode } from 'react';
+import ReactDOM from "react-dom/client";
+import "./style.css";
+import PageState from "./ui/PageState";
+import { Session } from "./session";
+import { SessionProvider } from "./ui/SessionContext";
+import { RoomProvider } from "./ui/room/RoomContext";
+
+const session = new Session();
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+        <SessionProvider session={session}>
+            <RoomProvider>
+                <PageState />
+            </RoomProvider>
+        </SessionProvider>
+    </StrictMode>
+);

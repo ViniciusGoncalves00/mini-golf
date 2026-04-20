@@ -8,64 +8,59 @@ export class Club extends Monobehavior {
     //#region [callbacks]
     public readonly onStartShot: (() => void)[] = [];
     public readonly onFreeShot: ((force: THREE.Vector3) => void)[] = [];
-    public readonly onStrengthChange: ((strength: number) => void)[] = [];
+    public readonly onPercentageChanges: ((strength: number) => void)[] = [];
     //#endregion
     
     private readonly maxStrength = 10;
     private readonly timeToMaxStrengthInSeconds = 5;
-    private readonly strengthGainRate = this.maxStrength / this.timeToMaxStrengthInSeconds;
-    private strength = 0;
+    private readonly percentageGainRate = 1 / this.timeToMaxStrengthInSeconds;
+    private percentage = 0;
     private isHolding = false;
 
     private normal = new THREE.Vector3(0, 1, 0);
     private direction = new THREE.Vector3();
-    private ball: Ball;
 
-    public constructor(ball: Ball) {
+    public constructor() {
         super();
 
-        this.ball = ball;
-
-        const powerBar = document.getElementById("power-bar")!;
-        this.onStrengthChange.push((strength) => {
-            powerBar.style.height = `${strength * 100}%`;
-            powerBar.style.background = `hsl(${(1 - strength) * 120}, 50%, 50%)`;
+        this.onPercentageChanges.push((percentage) => {
+            const powerBar = document.getElementById("power-bar")!;
+            powerBar.style.height = `${percentage * 100}%`;
+            powerBar.style.background = `hsl(${(1 - percentage) * 120}, 50%, 50%)`;
         });
-
     }
 
     public update(delta: number) {
         if (this.isHolding) {
-            this.strength += this.strengthGainRate * delta;
+            this.percentage += this.percentageGainRate * delta;
 
-            this.strength = Math.min(this.strength, this.maxStrength);
-
-            const normalized = this.strength / this.maxStrength;
-
-            for (const callback of this.onStrengthChange) {
-                callback(normalized);
+            this.percentage = Math.min(this.percentage, 1);
+            for (const callback of this.onPercentageChanges) {
+                callback(this.percentage);
             }
         }
+
         this.arrow.position.copy(this.ball.rigidBody.mesh.position);
     }
 
     public startShot(): void {
         if (!this.ball.rigidBody.enabled() || !this.ball.rigidBody.freezed()) return;
 
-        this.strength = 0;
+        this.percentage = 0;
         this.isHolding = true;
 
         for (const callback of this.onStartShot) callback();
     }
 
     public freeShot(): void {
-        const force = new THREE.Vector3().copy(this.direction).multiplyScalar(this.strength);
+        const strength = this.percentage * this.maxStrength;
+        const force = new THREE.Vector3().copy(this.direction).multiplyScalar(strength);
         
-        this.strength = 0;
+        this.percentage = 0;
         this.isHolding = false;
 
         for (const callback of this.onFreeShot) callback(force);
-        for (const callback of this.onStrengthChange) callback(0);
+        for (const callback of this.onPercentageChanges) callback(0);
     }
 
     public showDirectionGizmo(): void {

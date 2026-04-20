@@ -1,5 +1,6 @@
 export enum StorageKey {
-    USER = "user"
+    SESSION = "session",
+    USER = "user",
 }
 
 export enum Tiles {

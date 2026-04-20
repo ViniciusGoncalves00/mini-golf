@@ -1,10 +1,8 @@
 import { Course } from "./course";
 import { Player } from "./player";
 import { Match } from "./match";
+import { CameraType } from "../common/enums";
 
-/**
- * Class to handle only with all match logic (world/scene, players, ui).
- */
 export class SinglePlayerMatch extends Match {
     public readonly player: Player;
     
@@ -16,6 +14,35 @@ export class SinglePlayerMatch extends Match {
         player.club.hideDirectionGizmo();
         player.ball.rigidBody.onFreeze.push(() => player.club.showDirectionGizmo());
         player.ball.rigidBody.onUnfreeze.push(() => player.club.hideDirectionGizmo());
+
+        player.club.onFreeShot.push((force) => {
+            player.ball.rigidBody.unfreeze();
+            player.ball.rigidBody.applyForce(force);
+            player.club.hideDirectionGizmo();
+        })
+
+        this.world.sceneWrapper.renderer.domElement.addEventListener("mousemove", (e) => {
+            player.club.calculateDirection(this.world.cameraWrapper.camera, e, this.world.sceneWrapper.renderer.domElement.getBoundingClientRect(), player.ball)
+        })
+
+        this.world.sceneWrapper.renderer.domElement.addEventListener("mousedown", (e) => {
+            if (e.button == 2) player.club.startShot();
+        })
+
+        this.world.sceneWrapper.renderer.domElement.addEventListener("mouseup", (e) => {
+            if (e.button == 2) player.club.freeShot();
+        })
+
+        this.world.cameraWrapper.setTargetMode(player.ball.rigidBody);
+        document.addEventListener("keypress", (e) => {
+            if (e.key === "t") {
+                if (this.world.cameraWrapper.cameraMode === CameraType.FREE) {
+                    this.world.cameraWrapper.setTargetMode(player.ball.rigidBody);
+                } else if (this.world.cameraWrapper.cameraMode === CameraType.TARGET) {
+                    this.world.cameraWrapper.setFreeMode();
+                }
+            }
+        })
 
         this.loadPlayer(player);
     }

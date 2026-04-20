@@ -15,6 +15,7 @@ export class MultiPlayerMatch extends Match {
         super(canvas, courses);
 
         this.players = players;
+        
         this.nextPlayer();
     }
 

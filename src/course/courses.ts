@@ -7,7 +7,7 @@ import { Color, Tiles } from "../common/enums";
 import { GeometryBuilder } from "../geometry/geometryBuilder";
 import * as THREE from "three";
 
-const storage = StorageManager.getInstance();
+const storage = StorageManager.instance();
 await storage.loadSTL();
 const plane45 = storage.geometries.get(Tiles.PLANE_45)!;
 const plane = storage.geometries.get(Tiles.PLANE)!;

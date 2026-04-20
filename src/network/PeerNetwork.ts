@@ -17,7 +17,7 @@ export abstract class PeerNetwork {
 
     public constructor(user: User) {
         this.user = user;
-        this.peer = new Peer(user.ID);
+        this.peer = new Peer(user.getID().value);
 
         this.peer.on("open", () => {
             console.log("Peer ID:", this.peer.id);

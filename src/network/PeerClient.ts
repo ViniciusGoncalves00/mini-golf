@@ -36,8 +36,8 @@ export class PeerClient extends PeerNetwork {
             label: this.peer.id,
             reliable: true,
             metadata: {
-                userID: this.user.ID,
-                userName: this.user.name,
+                userID: this.user.getID(),
+                userName: this.user.getName(),
                 timestamp: Date.now(),
             }
         }
