@@ -14,10 +14,11 @@ export class Builder {
         return new Tile(coordinates, mesh, friction, absorption);
     }
 
-    public static ball(color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.021335): Ball {
+    public static ball(id: string, color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.021335): Ball {
         const geometry = new THREE.SphereGeometry(radius);
         const material = new THREE.MeshPhongMaterial({ color: color });
         const mesh = new THREE.Mesh(geometry, material);
+        mesh.uuid = id;
         mesh.name = "Ball";
         mesh.receiveShadow = true;
         mesh.castShadow = true;
@@ -25,7 +26,7 @@ export class Builder {
         return new Ball(mesh, radius);
     }
 
-    public static club(ball: Ball): Club {
-        return  new Club(ball);
+    public static club(): Club {
+        return  new Club();
     }
 }

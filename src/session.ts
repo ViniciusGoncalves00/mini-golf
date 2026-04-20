@@ -8,7 +8,6 @@ import { ID } from "./common/ID";
 import { Name } from "./common/Name";
 import { SinglePlayerMatch } from "./match/singleplayer-match";
 import { level3 } from "./course/courses";
-import { Player } from "./match/player";
 import { Room } from "./room";
 import { NetworkHostMessage, NetworkMessagesTypes } from "./network/networkMessage";
 
@@ -30,12 +29,11 @@ export class Session {
     }
 
     public startMatch(): void {
-        const player = new Player(this.user);
         const courses = [level3()];
 
         setTimeout(() => {
             const canvas = document.getElementById("game")!;
-            this.match = new SinglePlayerMatch(canvas, courses, player);
+            this.match = new SinglePlayerMatch(canvas, courses, [this.user]);
             this.match.start();
         }, (100));
     }

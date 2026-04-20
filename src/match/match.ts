@@ -4,6 +4,9 @@ import { World } from "./world";
 import { Global } from "./global";
 import { Monobehavior } from "../monobehavior";
 import { Club } from "./club";
+import { User } from "../user";
+import { Ball } from "./ball";
+import { Builder } from "../builder";
 
 /**
  * Class to handle only with all match logic (world/scene, players, ui).
@@ -11,22 +14,27 @@ import { Club } from "./club";
 export abstract class Match {
     public readonly courses: Course[] = [];
     public readonly world: World;
-
+    public readonly users: User[] = [];
+    
     protected currentCourse: Course | null = null;
     protected currentCourseIndex: number = -1;
-
+    
+    protected readonly balls: Ball[] = [];
     protected readonly monobehaviors: Monobehavior[] = [];
+    protected readonly club: Club = new Club();
 
-    private readonly club: Club = new Club();
     private readonly timer: THREE.Timer = new THREE.Timer();
     private frame: number = 0;
     
-    public constructor(canvas: HTMLElement, courses: Course[]) {
+    public constructor(canvas: HTMLElement, courses: Course[], users: User[]) {
         this.world = new World(canvas);
+        this.world.sceneWrapper.scene.add(this.club.arrow);
+        this.club.hideDirectionGizmo();
 
         this.courses = courses;
+        this.users = users;
 
-        this.monobehaviors.push(player.club);
+        this.monobehaviors.push(this.club);
         
         this.nextCourse();
     }
@@ -70,36 +78,34 @@ export abstract class Match {
         })
     }
 
-    // protected loadPlayer(player: Player): void {
-    //     player.isLoaded = true;
+    protected placeBall(user: User): void {
+        const ball = Builder.ball(user.getID().value);
+        this.balls.push(ball);
+        
+        this.monobehaviors.push(ball);
 
-    //     this.monobehaviors.push(player.ball);
-    //     this.monobehaviors.push(player.club);
+        ball.rigidBody.onUnfreeze.push(() => this.club.hideDirectionGizmo());
 
-    //     this.world.addBody(player.ball.rigidBody);
-    //     this.world.sceneWrapper.scene.add(player.ball.arrow);
-    //     this.world.sceneWrapper.scene.add(player.ball.safePositionDebug);
-    //     this.world.sceneWrapper.scene.add(player.ball.colliderDebug);
-    //     this.world.sceneWrapper.scene.add(player.club.arrow);
+        this.world.addBody(ball.rigidBody);
+        this.world.sceneWrapper.scene.add(ball.arrow);
+        this.world.sceneWrapper.scene.add(ball.safePositionDebug);
+        this.world.sceneWrapper.scene.add(ball.colliderDebug);
 
-    //     player.ball.rigidBody.mesh.position.set(1, 1, 0);
-    // }
+        ball.rigidBody.mesh.position.set(1, 1, 0);
+    }
 
-    // protected unloadPlayer(player: Player): void {
-    //     player.isLoaded = false;
+    protected removeBall(user: User): void {
+        var index = this.balls.findIndex((b) => b.rigidBody.mesh.uuid === user.getID().value);
+        const [ball] = this.balls.splice(index, 1);
 
-    //     var index = this.monobehaviors.findIndex(obj => obj == player.ball);
-    //     this.monobehaviors.splice(index, 1);
+        var index = this.monobehaviors.findIndex(obj => obj == ball);
+        this.monobehaviors.splice(index, 1);
 
-    //     var index = this.monobehaviors.findIndex(obj => obj == player.club);
-    //     this.monobehaviors.splice(index, 1);
-
-    //     this.world.removeBody(player.ball.rigidBody);
-    //     this.world.sceneWrapper.scene.remove(player.ball.arrow);
-    //     this.world.sceneWrapper.scene.remove(player.ball.safePositionDebug);
-    //     this.world.sceneWrapper.scene.remove(player.ball.colliderDebug);
-    //     this.world.sceneWrapper.scene.remove(player.club.arrow);
-    // }
+        this.world.removeBody(ball.rigidBody);
+        this.world.sceneWrapper.scene.remove(ball.arrow);
+        this.world.sceneWrapper.scene.remove(ball.safePositionDebug);
+        this.world.sceneWrapper.scene.remove(ball.colliderDebug);
+    }
 
     private animate = () => {
         this.frame = requestAnimationFrame(this.animate);

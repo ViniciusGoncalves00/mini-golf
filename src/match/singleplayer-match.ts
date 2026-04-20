@@ -1,49 +1,56 @@
 import { Course } from "./course";
-import { Player } from "./player";
 import { Match } from "./match";
 import { CameraType } from "../common/enums";
+import { User } from "../user";
 
 export class SinglePlayerMatch extends Match {
-    public readonly player: Player;
-    
-    public constructor(canvas: HTMLElement, courses: Course[], player: Player) {
-        super(canvas, courses);
+    public constructor(canvas: HTMLElement, courses: Course[], players: User[]) {
+        super(canvas, courses, players);
 
-        this.player = player;
+        const user = this.users[0];
+        this.placeBall(user);
 
-        player.club.hideDirectionGizmo();
-        player.ball.rigidBody.onFreeze.push(() => player.club.showDirectionGizmo());
-        player.ball.rigidBody.onUnfreeze.push(() => player.club.hideDirectionGizmo());
+        this.balls[0].rigidBody.onFreeze.push(() => this.club.showDirectionGizmo());
+        this.balls[0].rigidBody.onUnfreeze.push(() => this.club.hideDirectionGizmo());
+        
+        this.club.onFreeShot.push((force) => {
+            const body = this.world.rigidBodies.find((rb) => rb.mesh.uuid === user.getID().value);
+            if (!body) return;
 
-        player.club.onFreeShot.push((force) => {
-            player.ball.rigidBody.unfreeze();
-            player.ball.rigidBody.applyForce(force);
-            player.club.hideDirectionGizmo();
+            body.unfreeze();
+            body.applyForce(force);
+            this.club.hideDirectionGizmo();
         })
 
         this.world.sceneWrapper.renderer.domElement.addEventListener("mousemove", (e) => {
-            player.club.calculateDirection(this.world.cameraWrapper.camera, e, this.world.sceneWrapper.renderer.domElement.getBoundingClientRect(), player.ball)
+            const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.uuid === user.getID().value);
+            if (!rigidBody) return;
+
+            this.club.calculateDirection(this.world.cameraWrapper.camera, e, this.world.sceneWrapper.renderer.domElement.getBoundingClientRect(), rigidBody)
         })
 
         this.world.sceneWrapper.renderer.domElement.addEventListener("mousedown", (e) => {
-            if (e.button == 2) player.club.startShot();
+            if (e.button == 2) this.club.startShot();
         })
 
         this.world.sceneWrapper.renderer.domElement.addEventListener("mouseup", (e) => {
-            if (e.button == 2) player.club.freeShot();
+            if (e.button == 2) this.club.freeShot();
         })
 
-        this.world.cameraWrapper.setTargetMode(player.ball.rigidBody);
+        const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.uuid === user.getID().value);
+        if (rigidBody) this.world.cameraWrapper.setTargetMode(rigidBody);
+        
         document.addEventListener("keypress", (e) => {
             if (e.key === "t") {
                 if (this.world.cameraWrapper.cameraMode === CameraType.FREE) {
-                    this.world.cameraWrapper.setTargetMode(player.ball.rigidBody);
+                    const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.uuid === user.getID().value);
+                    if (!rigidBody) return;
+
+                    this.world.cameraWrapper.setTargetMode(rigidBody);
                 } else if (this.world.cameraWrapper.cameraMode === CameraType.TARGET) {
                     this.world.cameraWrapper.setFreeMode();
                 }
             }
         })
-
-        this.loadPlayer(player);
     }
 }

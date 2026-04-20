@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { Ball } from "./ball";
 import { Monobehavior } from "../monobehavior";
+import { RigidBody } from "../physics/rigidBody";
 
 export class Club extends Monobehavior {
     public arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.2, new THREE.Color(255, 255, 255));
@@ -39,12 +40,10 @@ export class Club extends Monobehavior {
                 callback(this.percentage);
             }
         }
-
-        this.arrow.position.copy(this.ball.rigidBody.mesh.position);
     }
 
     public startShot(): void {
-        if (!this.ball.rigidBody.enabled() || !this.ball.rigidBody.freezed()) return;
+        if (!this.enabled()) return;
 
         this.percentage = 0;
         this.isHolding = true;
@@ -71,7 +70,9 @@ export class Club extends Monobehavior {
         this.arrow.visible = false;
     }
 
-    public calculateDirection(camera: THREE.PerspectiveCamera, event: MouseEvent, rect: DOMRect, ball: Ball): void {
+    public calculateDirection(camera: THREE.PerspectiveCamera, event: MouseEvent, rect: DOMRect, body: RigidBody): void {
+        this.arrow.position.copy(body.mesh.position);
+
         const mouse = new THREE.Vector2(
             ((event.clientX - rect.left) / rect.width) * 2 - 1,
             -((event.clientY - rect.top) / rect.height) * 2 + 1,
@@ -81,12 +82,12 @@ export class Club extends Monobehavior {
         raycaster.setFromCamera(mouse, camera);
 
         const plane = new THREE.Plane();
-        plane.set(this.normal, -ball.rigidBody.mesh.position.y);
+        plane.set(this.normal, -body.mesh.position.y);
 
         const point = new THREE.Vector3();
 
         if (raycaster.ray.intersectPlane(plane, point)) {
-            const dir = new THREE.Vector3().subVectors(point, ball.rigidBody.mesh.position).normalize().multiplyScalar(-1);
+            const dir = new THREE.Vector3().subVectors(point, body.mesh.position).normalize().multiplyScalar(-1);
         
             this.direction.set(...dir.toArray());
             this.arrow.setDirection(dir);
