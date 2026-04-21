@@ -1,4 +1,4 @@
-import { User } from "../user";
+import { User } from "../core/user";
 
 export abstract class Page {
     public myUser: User;

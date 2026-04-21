@@ -1,6 +1,6 @@
 import { useState } from "react";
 import React from "react";
-import { User } from "../../user";
+import { User } from "../../core/user";
 
 type Props = {
   users: User[];

@@ -1,5 +1,5 @@
 import React from "react";
-import { Session } from "../session";
+import { Session } from "../core/session";
 
 const SessionContext = React.createContext<Session | null>(null);
 

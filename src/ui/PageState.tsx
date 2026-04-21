@@ -20,8 +20,8 @@ export default function PageState() {
         onSelectMultiPlayerMenu={() => setScreen("MultiPlayerMenu")}
         onSelectSettingsMenu={() => setScreen("SettingsMenu")}
         />;
-    case "SinglePlayerMenu": return <SinglePlayerMenu onBack={() => setScreen("MainMenu")} onStart={() => {setScreen("GameMenu"); session.startMatch()}} />;
-    case "GameMenu": return <GameMenu users={[session.user]} currentUserId={session.user.getID()} />;
+    case "SinglePlayerMenu": return <SinglePlayerMenu onBack={() => setScreen("MainMenu")} onStart={() => {setScreen("GameMenu"); session.startSinglePlayerMatch()}} />;
+    case "GameMenu": return <GameMenu users={[session.user]} currentUserId={session.user.getID().value} />;
     case "MultiPlayerMenu": return <MultiPlayerMenu onBack={() => setScreen("MainMenu")} onCreateRoom={() => setScreen("RoomMenu")} onEnterRoom={() => setScreen("RoomMenu")} />;
     case "RoomMenu": return <RoomMenu onBack={() => setScreen("MultiPlayerMenu")} onStart={() => setScreen("GameMenu")} onLeave={() => setScreen("MultiPlayerMenu")} />;
     case "SettingsMenu": return <SettingsMenu onBack={() => setScreen("MainMenu")} />;

@@ -1,7 +1,7 @@
-import { Course } from "./course";
 import { Match } from "./match";
 import { CameraType } from "../common/enums";
 import { User } from "../user";
+import { Course } from "../course/course";
 
 export class SinglePlayerMatch extends Match {
     public constructor(canvas: HTMLElement, courses: Course[], players: User[]) {

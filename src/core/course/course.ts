@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Tile } from "../course/tile";
+import { Tile } from "./tile";
 import { Monobehavior } from "../monobehavior";
 
 export class Course extends Monobehavior {

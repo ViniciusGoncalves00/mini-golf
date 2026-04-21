@@ -1,16 +1,13 @@
 import * as THREE from "three";
-import { Course } from "./course";
-import { World } from "./world";
-import { Global } from "./global";
-import { Monobehavior } from "../monobehavior";
-import { Club } from "./club";
-import { User } from "../user";
-import { Ball } from "./ball";
 import { Builder } from "../builder";
+import { Monobehavior } from "../monobehavior";
+import { User } from "../user";
+import { World } from "./world";
+import { Ball } from "./ball";
+import { Club } from "./club";
+import { Global } from "./global";
+import { Course } from "../course/course";
 
-/**
- * Class to handle only with all match logic (world/scene, players, ui).
- */
 export abstract class Match {
     public readonly courses: Course[] = [];
     public readonly world: World;

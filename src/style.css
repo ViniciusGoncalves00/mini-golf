@@ -1,5 +1,6 @@
 @import "bootstrap-icons/font/bootstrap-icons.css";
 @import "tailwindcss";
+@plugin "daisyui";
 
 .bg-grid {
   --size: 128px;
@@ -14,4 +15,20 @@
   );
 
   background-size: var(--size) var(--size);
+}
+
+@utility btn {
+  @apply bg-green-600 hover:bg-green-700 text-white border border-white rounded-full;
+}
+
+@utility btn-danger {
+  @apply bg-red-600 hover:bg-red-700;
+}
+
+@utility btn-disabled {
+  @apply opacity-80;
+}
+
+@utility btn-progress {
+  @apply bg-black/20 ease-linear pointer-events-none;
 }

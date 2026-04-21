@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+        "@/*": ["src/*"]
+    },
     "jsx": "react",
     "strictNullChecks": true,
     "allowJs": true

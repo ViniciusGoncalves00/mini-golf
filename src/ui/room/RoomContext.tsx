@@ -1,26 +1,11 @@
 import React from "react";
-import { User } from "../../user";
+import { Room } from "../../core/room";
 
-type Room = {
-    players: User[];
-    hostID: string | null;
-};
+const RoomContext = React.createContext<Room | null>(null);
 
-type RoomContextType = {
-  room: Room;
-  setRoom: React.Dispatch<React.SetStateAction<Room>>;
-};
-
-const RoomContext = React.createContext<RoomContextType | null>(null);
-
-export function RoomProvider({ children }: { children: React.ReactNode }) {
-    const [room, setRoom] = React.useState<Room>({
-        players: [],
-        hostID: null,
-    });
-
+export function RoomProvider({ room, children }: { room: Room; children: React.ReactNode }) {
     return (
-        <RoomContext.Provider value={{ room, setRoom }}>
+        <RoomContext.Provider value={room}>
             {children}
         </RoomContext.Provider>
     );

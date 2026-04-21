@@ -7,7 +7,201 @@
         </style>
         <meta charset="UTF-8" />
         <title>Mini Golf</title>
-        <script type="module" src="src/main.tsx"></script>
+        <!-- <script type="module" src="src/main.tsx"></script> -->
+        <script type="module" src="src/main.ts"></script>
     </head>
-    <body id="root" class="h-screen w-full"></body>
+    <body id="root" class="h-screen w-full" x-data="{ current: 'main' }">
+        <main x-show="current == 'main'" class="bg-grid h-full w-full flex flex-col gap-4 items-center relative">
+            <section class="h-1/3 flex flex-col items-center justify-end text-white">
+                <p class="flex text-4xl font-bold space-x-2">
+                    <span class="line-through">Mini</span>
+                    <span>Golf</span>
+                </p>
+                <p class="flex text-sm space-x-2">
+                    <span>Logged in as</span>
+                    <span class="font-semibold">Unknown</span>
+                </p>
+            </section>
+            <section class="h-1/3 flex-none flex flex-col space-y-2">
+                <button class="btn uppercase font-bold" @click="current = 'singleplayer'">singleplayer</button>
+                <button class="btn uppercase font-bold" @click="current = 'multiplayer'">multiplayer</button>
+                <button class="btn uppercase font-bold" @click="current = 'settings'">settings</button>
+                <button class="btn btn-disabled uppercase font-bold" disabled>credits</button>
+                <button class="btn btn-disabled uppercase font-bold" disabled>quit</button>
+            </section>
+            <section class="w-full h-1/3 p-4 text-white flex items-end justify-between">
+                <div>0.0.1</div>
+                <div x-data="holdButton()" class="rounded-full relative overflow-hidden">
+                    <div 
+                        :class="progress === 0 ? 'duration-0' : 'duration-3000'"
+                        class="btn-progress z-10 absolute left-0 top-0 h-full transition-all"
+                        :style="`width: ${progress}%`"
+                    ></div>
+                    <button
+                        class="btn btn-danger uppercase font-bold relative overflow-hidden"
+                        @mousedown="start"
+                        @mouseup="stop"
+                        @mouseleave="stop"
+                        @touchstart.prevent="start"
+                        @touchend="stop"
+                    >
+                        Reset
+                    </button>
+                </div>
+                <a href="https://www.linkedin.com/in/viniciusgonçalves00" target="_blank">LinkedIn</a>
+            </section>
+        </main>
+        <main x-show="current == 'singleplayer'" class="bg-grid h-full w-full flex flex-col gap-4 items-center relative">
+            <section class="h-1/3 flex flex-col items-center justify-end text-white"></section>
+            <section class="h-1/3 flex-none flex flex-col space-y-2">
+                <button class="btn uppercase font-bold" @click="current = 'game'; $store.session.startSinglePlayerMatch()">start</button>
+            </section>
+            <section class="w-full h-1/3 p-4 text-white flex items-end justify-between">
+                <div></div>
+                <button class="btn uppercase font-bold" @click="current = 'main'">back</button>
+                <div></div>
+            </section>
+        </main>
+        <main x-show="current == 'multiplayer'" class="bg-grid h-full w-full flex flex-col gap-4 items-center relative">
+            <section class="h-1/3 flex flex-col items-center justify-end text-white"></section>
+            <section class="h-1/3 flex-none flex flex-col space-y-2">
+                <button class="btn uppercase font-bold" @click="current = 'room', $store.session.createRoom()">create room</button>
+                <button class="btn uppercase font-bold" @click="current = 'room'">enter room</button>
+            </section>
+            <section class="w-full h-1/3 p-4 text-white flex items-end justify-between">
+                <div></div>
+                <button class="btn uppercase font-bold" @click="current = 'main'">back</button>
+                <div></div>
+            </section>
+        </main>
+        <main x-show="current == 'room'" class="bg-grid h-full w-full flex flex-col gap-4 items-center relative">
+            <section class="h-1/3 flex flex-col items-center justify-end text-white"></section>
+            <section class="h-1/3 flex-none flex flex-col space-y-2">
+                <div class="btn" x-text="`Room ID: ${ $store.room.host?.getID().value}`"></div>
+                <template x-for="user in $store.room.users">
+                    <div class="btn flex space-x-1">
+                        <div class="" x-text="`${user.getName().get()}`"></div>
+                        <div x-show="user.getID().value == $store.session.user.getID().value">(you)</div>
+                        <div x-show="user.getID().value == $store.room.host.getID().value">(host)</div>
+                    </div>
+                </template>
+                <button x-show="$store.room.host?.getID().value == $store.session.user.getID().value" class="btn uppercase font-bold" @click="current = 'game'; $store.session.startMultiPlayerMatch()">start</button>
+            </section>
+            <section class="w-full h-1/3 p-4 text-white flex items-end justify-between">
+                <div></div>
+                <button class="btn uppercase font-bold" @click="current = 'multiplayer'">leave</button>
+                <div></div>
+            </section>
+        </main>
+        <main x-show="current == 'settings'" class="bg-grid h-full w-full flex flex-col gap-4 items-center relative">
+            <section class="h-1/3 flex flex-col items-center justify-end text-white"></section>
+            <section class="h-1/3 flex-none flex flex-col space-y-2"></section>
+            <section class="w-full h-1/3 p-4 text-white flex items-end justify-between">
+                <div></div>
+                <button class="btn uppercase font-bold" @click="current = 'main'">back</button>
+                <div></div>
+            </section>
+        </main>
+        <main x-show="current == 'game'" class="relative h-full w-full flex flex-col gap-4 items-center">
+            <div class="absolute w-full h-full flex flex-col pointer-events-none">
+              <!-- {showHelp && (
+                <div className="absolute w-full h-full bg-zinc-200/80 flex items-center justify-center">
+                  <div className="bg-zinc-200 border rounded-lg border-amber-500 p-4 flex flex-col pointer-events-auto">
+
+                    <div
+                      className="w-full h-4 flex items-end cursor-pointer"
+                      onClick={() => setShowHelp(false)}
+                    >
+                      <div className="h-full aspect-square">X</div>
+                    </div>
+                
+                    <div className="w-full h-4">How to play</div>
+                    <div className="w-full h-4">Mouse Left: Orbit Camera</div>
+                    <div className="w-full h-4">Mouse Right: Shot the ball</div>
+                    <div className="w-full h-4">T: Toggle free camera</div>
+                  </div>
+                </div>
+              )} -->
+            
+                <div class="w-full flex px-8 py-4 space-x-4">
+                    <template x-for="user in $store.room.users">
+                        <div :key=user.getID().value class="flex skew-x-[-15deg] border-2 border-amber-500">
+                            <div class="h-16 aspect-square flex items-center justify-center bg-zinc-200/80">
+                                <i class="text-5xl text-amber-500/80 bi bi-person-fill"></i>
+                            </div>
+                          
+                            <div class="w-64 flex flex-col text-white">
+                                <div class="h-1/2 w-full bg-amber-600/80 flex items-center justify-between px-2">
+                                    <div class="flex space-x-1">
+                                        <div class="" x-text="`${user.getName().get()}`"></div>
+                                        <div x-show="user.getID().value == $store.session.user.getID().value">(you)</div>
+                                    </div>
+                                    <div x-text="user.getID().value"></div>
+                                </div>
+                            
+                                <div class="h-1/2 w-full bg-amber-500/80 flex items-center px-2">Stroke 1</div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+          
+                <div class="w-full h-full flex items-center justify-end p-4 text-black">
+                    <div class="h-128 w-4 border border-black rounded-lg bg-white/10 relative">
+                        <template x-for="percent in [10, 20, 30, 40, 50, 60, 70, 80, 90]">
+                            <div
+                                :key="percent"
+                                class="absolute w-full h-px bg-black text-xs text-center opacity-80 z-10"
+                                :style="`top: ${100 - percent}%`"
+                                x-text="percent"
+                                ></div>
+                        </template>
+                        <div class="w-full h-full rotate-180">
+                            <div id="power-bar" class="w-full rounded-lg opacity-80"></div>
+                        </div>
+                    </div>
+                </div>
+              <div class="w-full"></div>
+            </div>
+            <canvas id="game" class="h-full w-full"></canvas>
+        </main>
+    </body>
 </html>
+
+<script>
+function holdButton() {
+    return {
+        progress: 0,
+        timeout: null,
+
+        start() {
+            // evita múltiplos starts
+            if (this.timeout) return;
+
+            // dispara animação
+            this.progress = 100;
+
+            // agenda conclusão
+            this.timeout = setTimeout(() => {
+                this.complete();
+                this.reset();
+            }, 3000);
+        },
+
+        stop() {
+            this.reset();
+        },
+
+        reset() {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+
+            // zera instantaneamente (sem animação)
+            this.progress = 0;
+        },
+
+        complete() {
+            alert("Reset confirmado!");
+        }
+    }
+}
+</script>

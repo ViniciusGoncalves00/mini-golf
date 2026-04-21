@@ -18,8 +18,7 @@ export class Builder {
         const geometry = new THREE.SphereGeometry(radius);
         const material = new THREE.MeshPhongMaterial({ color: color });
         const mesh = new THREE.Mesh(geometry, material);
-        mesh.uuid = id;
-        mesh.name = "Ball";
+        mesh.name = id;
         mesh.receiveShadow = true;
         mesh.castShadow = true;
         

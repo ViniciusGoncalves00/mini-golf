@@ -1,4 +1,3 @@
-import { Match } from "./match/match";
 import { User } from "./user";
 import { PeerHost } from "./network/PeerHost";
 import { PeerClient } from "./network/PeerClient";
@@ -6,18 +5,20 @@ import { StorageManager } from "./storageManager";
 import { StorageKey } from "./common/enums";
 import { ID } from "./common/ID";
 import { Name } from "./common/Name";
-import { SinglePlayerMatch } from "./match/singleplayer-match";
-import { level3 } from "./course/courses";
+import { level1, level3 } from "./course/courses";
 import { Room } from "./room";
 import { NetworkHostMessage, NetworkMessagesTypes } from "./network/networkMessage";
+import { Match } from "./match/match";
+import { MultiPlayerMatch } from "./match/multiplayer-match";
+import { SinglePlayerMatch } from "./match/singleplayer-match";
 
 export class Session {
     public readonly user: User;
 
-    private network: PeerHost | PeerClient | null = null;
-    private match: Match | null = null;
-    private matchHandler: (() => void) | null = null;
-    public room: Room | null = null;
+    public network: PeerHost | PeerClient | null = null;
+    public match: Match | null = null;
+    public matchHandler: (() => void) | null = null;
+    public room: Room = new Room();
     
     public constructor() {
         const userData = StorageManager.instance().load(StorageKey.USER);
@@ -28,7 +29,7 @@ export class Session {
         StorageManager.instance().save(StorageKey.SESSION, this);
     }
 
-    public startMatch(): void {
+    public startSinglePlayerMatch(): void {
         const courses = [level3()];
 
         setTimeout(() => {
@@ -38,9 +39,20 @@ export class Session {
         }, (100));
     }
 
+    public startMultiPlayerMatch(): void {
+        const courses = [level1()];
+
+        setTimeout(() => {
+            const canvas = document.getElementById("game")!;
+            this.match = new MultiPlayerMatch(canvas, courses, [this.user, new User(ID.generate(), Name.generate())], this.user);
+            this.match.start();
+        }, (100));
+    }
+
     public createRoom(): void {
         this.network = new PeerHost(this.user);
-        this.room = new Room(this.user.getID(), [this.user]);
+        this.room.setHost(this.user);
+        this.room.addUser(this.user);
 
         this.network.peer.on("open", () => {
             this.network?.onPeerDisconnect.push((peerID) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "./components/Button";
 import { useSession } from "./SessionContext";
-import { StorageManager } from "../storageManager";
+import { StorageManager } from "../core/storageManager";
 
 type MainMenuProps = {
     onSelectSinglePlayerMenu: () => void;
