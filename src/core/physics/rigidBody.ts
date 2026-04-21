@@ -53,6 +53,7 @@ export class RigidBody extends Monobehavior {
 
     public freeze(): void {
         this._freezed = true;
+        this.stop();
         for (const callback of this.onFreeze) callback();
     }
 
