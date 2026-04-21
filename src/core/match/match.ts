@@ -26,7 +26,7 @@ export abstract class Match {
     public constructor(canvas: HTMLElement, courses: Course[], users: User[]) {
         this.world = new World(canvas);
         this.world.sceneWrapper.scene.add(this.club.arrow);
-        this.club.hideDirectionGizmo();
+        this.club.disable();
 
         this.courses = courses;
         this.users = users;
@@ -80,8 +80,6 @@ export abstract class Match {
         this.balls.push(ball);
         
         this.monobehaviors.push(ball);
-
-        ball.rigidBody.onUnfreeze.push(() => this.club.hideDirectionGizmo());
 
         this.world.addBody(ball.rigidBody);
         this.world.sceneWrapper.scene.add(ball.arrow);

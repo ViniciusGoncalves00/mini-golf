@@ -62,11 +62,13 @@ export class Club extends Monobehavior {
         for (const callback of this.onPercentageChanges) callback(0);
     }
 
-    public showDirectionGizmo(): void {
+    public enable(): void {
+        super.enable();
         this.arrow.visible = true;
     }
 
-    public hideDirectionGizmo(): void {
+    public disable(): void {
+        super.disable();
         this.arrow.visible = false;
     }
 

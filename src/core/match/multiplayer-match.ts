@@ -21,7 +21,7 @@ export class MultiPlayerMatch extends Match {
 
             body.unfreeze();
             body.applyForce(force);
-            this.club.hideDirectionGizmo();
+            this.club.disable();
         })
 
         canvas.addEventListener("mousemove", (e) => {
@@ -70,14 +70,16 @@ export class MultiPlayerMatch extends Match {
         if (this.turnIndex >= this.users.length) this.turnIndex = 0;
         const current = this.users[this.turnIndex];
 
-        const loaded = this.balls.some((ball) => ball.rigidBody.mesh.name === this.myUser.getID().value);
+        const loaded = this.balls.some((ball) => ball.rigidBody.mesh.name === current.getID().value);
         if (!loaded) {
             const ball = this.placeBall(current);
             ball.rigidBody.onFreeze.push(this.onNextPlayer);
         }
 
+        console.log(current)
+
         if (current.getID().value === this.myUser.getID().value) {
-            this.club.showDirectionGizmo();
+            this.club.enable();
         }
     }
 

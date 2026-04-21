@@ -10,8 +10,8 @@ export class SinglePlayerMatch extends Match {
         const user = this.users[0];
         const ball = this.placeBall(user);
 
-        ball.rigidBody.onFreeze.push(() => this.club.showDirectionGizmo());
-        ball.rigidBody.onUnfreeze.push(() => this.club.hideDirectionGizmo());
+        ball.rigidBody.onFreeze.push(() => this.club.enable());
+        ball.rigidBody.onUnfreeze.push(() => this.club.disable());
         
         this.club.onFreeShot.push((force) => {
             const body = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().value);
@@ -19,7 +19,6 @@ export class SinglePlayerMatch extends Match {
 
             body.unfreeze();
             body.applyForce(force);
-            this.club.hideDirectionGizmo();
         })
 
         canvas.addEventListener("mousemove", (e) => {
