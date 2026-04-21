@@ -155,7 +155,7 @@ export class World {
         const dot = forward.dot(normal);
         const absorptionFactor = (movingBody.absorption + collidedBody.absorption) * Math.abs(dot);
 
-        const force = movingBody.getVelocity().multiplyScalar(absorptionFactor);
+        const force = movingBody.getVelocity().multiplyScalar(1 - absorptionFactor);
 
         collidedBody.unfreeze();
         collidedBody.applyForce(force);

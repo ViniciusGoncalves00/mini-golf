@@ -76,8 +76,6 @@ export class MultiPlayerMatch extends Match {
             ball.rigidBody.onFreeze.push(this.onNextPlayer);
         }
 
-        console.log(current)
-
         if (current.getID().value === this.myUser.getID().value) {
             this.club.enable();
         }
