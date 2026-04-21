@@ -75,7 +75,7 @@ export abstract class Match {
         })
     }
 
-    protected placeBall(user: User): void {
+    protected placeBall(user: User): Ball {
         const ball = Builder.ball(user.getID().value);
         this.balls.push(ball);
         
@@ -89,10 +89,11 @@ export abstract class Match {
         this.world.sceneWrapper.scene.add(ball.colliderDebug);
 
         ball.rigidBody.mesh.position.set(1, 1, 0);
+        return ball;
     }
 
     protected removeBall(user: User): void {
-        var index = this.balls.findIndex((b) => b.rigidBody.mesh.uuid === user.getID().value);
+        var index = this.balls.findIndex((b) => b.rigidBody.mesh.name === user.getID().value);
         const [ball] = this.balls.splice(index, 1);
 
         var index = this.monobehaviors.findIndex(obj => obj == ball);

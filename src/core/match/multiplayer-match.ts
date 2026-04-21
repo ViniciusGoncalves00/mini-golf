@@ -1,3 +1,4 @@
+import { CameraType } from "../common/enums";
 import { Course } from "../course/course";
 import { User } from "../user";
 import { Match } from "./match";
@@ -13,8 +14,48 @@ export class MultiPlayerMatch extends Match {
         super(canvas, courses, users);
 
         this.myUser = myUser;
+
+        this.club.onFreeShot.push((force) => {
+            const body = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().value);
+            if (!body) return;
+
+            body.unfreeze();
+            body.applyForce(force);
+            this.club.hideDirectionGizmo();
+        })
+
+        canvas.addEventListener("mousemove", (e) => {
+            const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().value);
+            if (!rigidBody) return;
+
+            this.club.calculateDirection(this.world.cameraWrapper.camera, e, canvas.getBoundingClientRect(), rigidBody)
+        })
+
+        canvas.addEventListener("mousedown", (e) => {
+            if (e.button == 2) this.club.startShot();
+        })
+
+        canvas.addEventListener("mouseup", (e) => {
+            if (e.button == 2) this.club.freeShot();
+        })
+
+        // const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().value);
+        // if (rigidBody) this.world.cameraWrapper.setTargetMode(rigidBody);
         
-        // this.nextPlayer();
+        document.addEventListener("keypress", (e) => {
+            if (e.key === "t") {
+                if (this.world.cameraWrapper.cameraMode === CameraType.FREE) {
+                    const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().value);
+                    if (!rigidBody) return;
+
+                    this.world.cameraWrapper.setTargetMode(rigidBody);
+                } else if (this.world.cameraWrapper.cameraMode === CameraType.TARGET) {
+                    this.world.cameraWrapper.setFreeMode();
+                }
+            }
+        })
+        
+        this.nextPlayer();
     }
 
     // public nextCourse(): void {
@@ -24,35 +65,21 @@ export class MultiPlayerMatch extends Match {
     //     this.turnIndex = -1;
     // }
 
-    // public nextPlayer(): void {
-    //     const current = this.currentPlayer;
+    public nextPlayer(): void {
+        this.turnIndex++;
+        if (this.turnIndex >= this.users.length) this.turnIndex = 0;
+        const current = this.users[this.turnIndex];
 
-    //     if (current) {
-    //         const callbacks = current.ball.rigidBody.onFreeze;
+        const loaded = this.balls.some((ball) => ball.rigidBody.mesh.name === this.myUser.getID().value);
+        if (!loaded) {
+            const ball = this.placeBall(current);
+            ball.rigidBody.onFreeze.push(this.onNextPlayer);
+        }
 
-    //         const index = callbacks.findIndex(cb => cb === this.onNextPlayer);
-    //         if (index !== -1) {
-    //             callbacks.splice(index, 1);
-    //         }
-
-    //         current.ball.rigidBody.disable();
-    //     }
-
-    //     this.turnIndex++;
-    //     if (this.turnIndex >= this.players.length) this.turnIndex = 0;
-    //     this.currentPlayer = this.players[this.turnIndex];
-
-    //     const player = this.currentPlayer;
-
-    //     player.ball.rigidBody.onFreeze.push(this.onNextPlayer);
-    //     player.ball.rigidBody.enable();
-    //     player.club.showDirectionGizmo();
-    //     player.ball.onDisable.push(() => player.club.hideDirectionGizmo())
-
-    //     if (!player.isLoaded) {
-    //         this.loadPlayer(player);
-    //     }
-    // }
+        if (current.getID().value === this.myUser.getID().value) {
+            this.club.showDirectionGizmo();
+        }
+    }
 
     // public loadCourse(course: Course): void {
     //     course.tiles.values().forEach((tile) => {
@@ -68,7 +95,9 @@ export class MultiPlayerMatch extends Match {
     //     })
     // }
 
-    // private onNextPlayer = () => {
-    //     this.nextPlayer();
-    // }
+    private onNextPlayer = () => {
+        if (this.balls.some((ball) => ball.rigidBody.isMoving())) return;
+        
+        this.nextPlayer();
+    }
 }
