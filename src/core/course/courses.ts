@@ -1,14 +1,15 @@
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Builder } from "../builder";
 import { Course } from "./course";
-import { StorageManager } from "../storageManager";
+import { StorageLoader } from "../storageLoader";
 import { Tile } from "./tile";
 import { GeometryBuilder } from "../geometry/geometryBuilder";
 import * as THREE from "three";
 import { Color, Tiles } from "../common/enums";
 
-const storage = StorageManager.instance();
+const storage = StorageLoader.instance();
 await storage.loadSTL();
+await storage.loadTextures();
 const plane45 = storage.geometries.get(Tiles.PLANE_45)!;
 const plane = storage.geometries.get(Tiles.PLANE)!;
 const loop = storage.geometries.get(Tiles.LOOP)!;

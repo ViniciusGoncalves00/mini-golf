@@ -1,5 +1,5 @@
 import * as Component from "./component";
-import { StorageManager } from "@/core/storageManager";
+import { StorageLoader } from "@/core/storageLoader";
 
 export class Pages {
     private static base(): HTMLElement {
@@ -38,7 +38,7 @@ export class Pages {
         Component.Button.create({text: "Quit", onClick: () => {}, parent: section2, disabled: true});
         
         section3.appendChild(version);
-        Component.Button.create({text: "Reset", onClick: () => StorageManager.instance().clear(), parent: section3, variant: "danger", holdToConfirm: true});
+        Component.Button.create({text: "Reset", onClick: () => StorageLoader.instance().clear(), parent: section3, variant: "danger", holdToConfirm: true});
         section3.appendChild(links);
     }
 
@@ -70,7 +70,7 @@ export class Pages {
         Component.Button.create({text: "Quit", onClick: () => {}, parent: section2, disabled: true});
         
         section3.appendChild(version);
-        Component.Button.create({text: "Reset", onClick: () => StorageManager.instance().clear(), parent: section3, variant: "danger", holdToConfirm: true});
+        Component.Button.create({text: "Reset", onClick: () => StorageLoader.instance().clear(), parent: section3, variant: "danger", holdToConfirm: true});
         section3.appendChild(links);
     }
 }

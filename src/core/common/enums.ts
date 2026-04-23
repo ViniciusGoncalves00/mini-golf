@@ -18,6 +18,10 @@ export enum Tiles {
     RAMP_15_TWO_WALLS   = "ramp_15_two_walls",
 }
 
+export enum Textures {
+    GRASS_NORMAL = "grass_normal",
+}
+
 export enum Color {
     LIGHT_GREEN   = 0x00cc00,
     DARK_GREEN    = 0x00aa00,

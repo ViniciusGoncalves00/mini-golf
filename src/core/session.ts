@@ -1,7 +1,7 @@
 import { User } from "./user";
 import { PeerHost } from "./network/PeerHost";
 import { PeerClient } from "./network/PeerClient";
-import { StorageManager } from "./storageManager";
+import { StorageLoader } from "./storageLoader";
 import { StorageKey } from "./common/enums";
 import { ID } from "./common/ID";
 import { Name } from "./common/Name";
@@ -22,7 +22,7 @@ export class Session {
     public room: Room = new Room();
     
     public constructor() {
-        const userData = StorageManager.instance().load(StorageKey.USER);
+        const userData = StorageLoader.instance().load(StorageKey.USER);
         this.user = userData ? User.load(userData) : new User(ID.generate(), Name.generate());
     }
 
@@ -31,7 +31,7 @@ export class Session {
     }
 
     public save(): void {
-        StorageManager.instance().save(StorageKey.SESSION, this);
+        StorageLoader.instance().save(StorageKey.SESSION, this);
     }
 
     public startSinglePlayerMatch(): void {

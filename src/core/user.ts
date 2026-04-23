@@ -1,7 +1,7 @@
 import { StorageKey } from "./common/enums";
 import { ID } from "./common/ID";
 import { Name } from "./common/Name";
-import { StorageManager } from "./storageManager";
+import { StorageLoader } from "./storageLoader";
 
 export class User {
     private readonly ID: ID;
@@ -15,7 +15,7 @@ export class User {
     }
 
     public save(): void {
-        StorageManager.instance().save(StorageKey.USER, this);
+        StorageLoader.instance().save(StorageKey.USER, this);
     }
 
     public static load(data: any): User {
@@ -35,6 +35,6 @@ export class User {
 
     public setName(name: string): void {
         this.name.set(name);
-        StorageManager.instance().save(StorageKey.USER, this);
+        StorageLoader.instance().save(StorageKey.USER, this);
     }
 }

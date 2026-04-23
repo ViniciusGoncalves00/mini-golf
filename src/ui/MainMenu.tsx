@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "./components/Button";
 import { useSession } from "./SessionContext";
-import { StorageManager } from "../core/storageManager";
+import { StorageLoader } from "../core/storageLoader";
 
 type MainMenuProps = {
     onSelectSinglePlayerMenu: () => void;
@@ -30,7 +30,7 @@ export default function MainMenu(props : MainMenuProps) {
             </div>
             <div className="w-full h-1/3 p-4 text-white flex-none flex items-end justify-between">
                 <div>v.1.0.0</div>
-                <Button holdToConfirm variant="danger" onClick={() => StorageManager.instance().clear()}>Reset</Button>
+                <Button holdToConfirm variant="danger" onClick={() => StorageLoader.instance().clear()}>Reset</Button>
                 <div>
                     <a href="https://www.linkedin.com/in/viniciusgonçalves00" target="_blank" rel="noopener noreferrer">LinkedIn</a>
                 </div>
