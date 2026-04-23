@@ -2,7 +2,7 @@ import Peer, { DataConnection, PeerConnectOption } from "peerjs";
 import { NetworkMessage, NetworkMessagesTypes } from "./networkMessage";
 import { User } from "../user";
 
-export abstract class PeerNetwork {
+export class PeerNetwork {
     public onPeerConnect: ((peerID: string) => void)[] = [];
     public onPeerDisconnect: ((peerID: string) => void)[] = [];
     
@@ -33,6 +33,48 @@ export abstract class PeerNetwork {
         for (const connection of this.connections.values()) {
             if (connection.open) connection.send(data);
         }
+    }
+
+    public sendTo(peerID: string, data: NetworkMessage) {
+        const connection = this.connections.get(peerID);
+        if (connection?.open) connection.send(data);
+    }
+
+    public connectTo(peerID: string) {
+        if (!this.isReady) {
+            console.warn("Peer is not ready yet.");
+            return;
+        }
+
+        if (this.peer.id === peerID) {
+            console.warn("Attempt to connect within oneself.");
+            return;
+        }
+
+        if (this.connections.has(peerID)) {
+            console.warn("Already connected to this peer.");
+            return;
+        }
+
+        // if (this.connections.size >= this.maxConnections) {
+        //     console.warn("Maximum number of connections reached.");
+        //     return;
+        // }
+
+        console.log(`Trying to connect with ID: ${peerID}`);
+
+        const options: PeerConnectOption = {
+            label: this.peer.id,
+            reliable: true,
+            metadata: {
+                userID: this.user.getID(),
+                userName: this.user.getName(),
+                timestamp: Date.now(),
+            }
+        }
+        // this.peer.connect(peerID, options);
+        const connection = this.peer.connect(peerID, options);
+        this.registerConnection(connection);
     }
 
     public disconnect(): void {

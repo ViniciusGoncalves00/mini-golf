@@ -11,11 +11,12 @@ import { NetworkHostMessage, NetworkMessagesTypes } from "./network/networkMessa
 import { Match } from "./match/match";
 import { MultiPlayerMatch } from "./match/multiplayer-match";
 import { SinglePlayerMatch } from "./match/singleplayer-match";
+import { PeerNetwork } from "./network/PeerNetwork";
 
 export class Session {
     public readonly user: User;
 
-    public network: PeerHost | PeerClient | null = null;
+    public network: PeerNetwork | null = null;
     public match: Match | null = null;
     public matchHandler: (() => void) | null = null;
     public room: Room = new Room();
@@ -23,6 +24,10 @@ export class Session {
     public constructor() {
         const userData = StorageManager.instance().load(StorageKey.USER);
         this.user = userData ? User.load(userData) : new User(ID.generate(), Name.generate());
+    }
+
+    public loadNetwork(): void {
+        this.network = new PeerNetwork(this.user);
     }
 
     public save(): void {
@@ -44,47 +49,60 @@ export class Session {
 
         setTimeout(() => {
             const canvas = document.getElementById("game")!;
-            this.match = new MultiPlayerMatch(canvas, courses, [this.user, new User(ID.generate(), Name.generate())], this.user);
+            this.match = new MultiPlayerMatch(canvas, courses, this.room.users, this.user);
             this.match.start();
         }, (100));
     }
 
     public createRoom(): void {
-        this.network = new PeerHost(this.user);
+        const network = this.network as PeerNetwork;
+
+        // this.network = new PeerHost(this.user);
         this.room.setHost(this.user);
         this.room.addUser(this.user);
 
-        this.network.peer.on("open", () => {
-            this.network?.onPeerDisconnect.push((peerID) => {
-                const users: { ID: string; name: string }[] = [];
+        network.onPeerDisconnect.push((peerID) => {
+            const users: { ID: string; name: string }[] = [];
 
-                this.room?.users.forEach((user, index) => {
-                    users.push({
-                        ID: user.getID().value,
-                        name: user.getName().get()
-                    })
-                });
-
-                const message: NetworkHostMessage = {
-                    type: NetworkMessagesTypes.USER_LIST,
-                    payload: { users: users }
-                }
-                this.network?.send(message);
+            this.room.users.forEach((user, index) => {
+                users.push({
+                    ID: user.getID().value,
+                    name: user.getName().get()
+                })
             });
 
-        // network.onPeerConnect.push((peerID) => {
-        //     const users = Array.from(network.users.values());
-        //     users.push(this.session.user);
+            const message: NetworkHostMessage = {
+                type: NetworkMessagesTypes.USER_LIST,
+                payload: { users: users }
+            }
+            network.send(message);
+        });
 
-        //     const message: NetworkHostMessage = {
-        //         type: NetworkMessagesTypes.USER_LIST,
-        //         payload: { users: users }
-        //     }
+        network.onPeerConnect.push((peerID) => {
+            console.log("Peer connected:", peerID);
+            const users: { ID: string; name: string }[] = [];
+            network.users.values().forEach((user, index) => {
+                users.push({
+                    ID: user.getID().value,
+                    name: user.getName().get()
+                })
+            });
+            users.push({
+                ID: this.user.getID().value,
+                name: this.user.getName().get()
+            });
 
-        //     network.send(message);
-            
-        //     (Alpine.store("homePage") as HomePage).setUsers(users);
-        // })
+            const message: NetworkHostMessage = {
+                type: NetworkMessagesTypes.USER_LIST,
+                payload: { users: users }
+            }
+
+            this.room.addUser(network.users.get(peerID)!);
+            network.send(message);
         })
+    }
+
+    public connectTo(peerID: string): void {
+        this.network?.connectTo(peerID);
     }
 }

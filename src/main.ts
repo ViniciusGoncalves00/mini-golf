@@ -13,6 +13,7 @@ export class Main {
             const session = new Session();
             Alpine.store("session", session);
             Alpine.store("room", session.room);
+            session.loadNetwork();
         });
 
         (window as any).Alpine = Alpine;
