@@ -59,9 +59,12 @@ Add most of the game's elements, such as user interface, sounds, improves the ex
 * [ ] FX
     * [ ] On collision ("dust")
     * [ ] Ball tail
-* [ ] SFX
-    * [ ] On collision
-    * [ ] On shot
+* [ ] Sound System
+    * [ ] SFX
+        * [ ] On collision.
+        * [ ] On shot.
+        * [ ] Ambient.
+    * [ ] Music
 
 # Phase 4 — Continuous Improvements
 
