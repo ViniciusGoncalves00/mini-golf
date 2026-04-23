@@ -45,21 +45,25 @@ Add most of the game's elements, such as user interface, sounds, improves the ex
     * [✔] The ball loses speed based on the terrain. [24/03/2026]
     * [✔] The ball loses speed based on the collision. [24/03/2026]
     * [✔] Apply a continuous physics detection. [03/04/2026]
-    * [ ] The ball collide with other balls.
+    * [✔] The ball collide with other balls. [21/04/2026]
+    * [ ] Add support to handle with rigid bodies (static, kinematic and dynamics).
 * [ ] UI elements.
-    * [ ] Main Menu.
+    * [✔] Main Menu. [18/04/2026]
+    * [ ] Multiplayer Menu.
+    * [ ] Settings Menu.
+    * [ ] Credits Menu.
     * [ ] Game Menu.
         * [ ] Show the minimum shots.
         * [ ] Show the total shots.
         * [ ] Show the courses table.
-* [ ] Adapt the elements for multiplayer mode when necessary. (multiplayer)
-    * [ ] Show the current player.
 * [ ] FX
     * [ ] On collision ("dust")
     * [ ] Ball tail
 * [ ] SFX
     * [ ] On collision
     * [ ] On shot
+
+# Phase 4 — Continuous Improvements
 
 # Ideas
 
