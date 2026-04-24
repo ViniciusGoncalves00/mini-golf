@@ -23,6 +23,8 @@ export class World {
     
     public readonly sceneWrapper: SceneWrapper;
     public readonly cameraWrapper: CameraWrapper;
+
+    public onCollision: ((bodyA: RigidBody, bodyB: RigidBody) => void)[] = [];
         
     public constructor(canvas: HTMLElement) {
         this.cameraWrapper = new CameraWrapper(canvas);
@@ -156,6 +158,8 @@ export class World {
 
             // const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
             // ball.lastCollisionPosition.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
+
+            for (const callback of this.onCollision) callback(testBody, collidedBody);
         }
     }
 

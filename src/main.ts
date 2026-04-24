@@ -1,6 +1,8 @@
 import "./style.css";
 import { Session } from "./core/session";
 import Alpine from 'alpinejs';
+import { AudioSystem } from "./audio/audio-system";
+import { sounds } from "./audio/audio-list";
 
 export class Main {
     private static initialized: boolean = false;
@@ -14,6 +16,8 @@ export class Main {
             Alpine.store("session", session);
             Alpine.store("room", session.room);
             session.loadNetwork();
+
+            AudioSystem.instance().load(sounds);
         });
 
         (window as any).Alpine = Alpine;
