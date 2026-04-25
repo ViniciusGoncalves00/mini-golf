@@ -8,6 +8,7 @@ import { Club } from "./club";
 import { Global } from "./global";
 import { Course } from "../course/course";
 import { AudioAPI, AudioKey } from "@/audio/audio-API";
+import { BodyType } from "../common/enums";
 
 export abstract class Match {
     public readonly courses: Course[] = [];
@@ -34,12 +35,21 @@ export abstract class Match {
 
         this.monobehaviors.push(this.club);
         this.world.onCollision.push((bodyA, bodyB, intensity) => {
-            window.dispatchEvent(new CustomEvent(AudioAPI.AUDIO_PLAY, {
-                detail: {
-                    audio: AudioKey.GRASS,
-                    volume: intensity,
-                },
-            }))
+            if (bodyA.type === BodyType.DYNAMIC && bodyB.type === BodyType.DYNAMIC) {
+                window.dispatchEvent(new CustomEvent(AudioAPI.AUDIO_PLAY, {
+                    detail: {
+                        audio: AudioKey.SHOT,
+                        volume: intensity,
+                    },
+                }))
+            } else {
+                window.dispatchEvent(new CustomEvent(AudioAPI.AUDIO_PLAY, {
+                    detail: {
+                        audio: AudioKey.GRASS,
+                        volume: intensity,
+                    },
+                }))
+            }
         })
         
         this.nextCourse();

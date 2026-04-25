@@ -18,7 +18,7 @@ export class World {
     public readonly dynamicBodies: RigidBody[] = [];
     
     private readonly raycaster = new THREE.Raycaster();
-    private readonly interpolation: number = 0.5;
+    private readonly interpolation: number = 1;
     private readonly rollbackHeight: number = 0;
     
     public readonly sceneWrapper: SceneWrapper;
@@ -30,6 +30,38 @@ export class World {
         this.cameraWrapper = new CameraWrapper(canvas);
         this.sceneWrapper = new SceneWrapper(canvas, this.cameraWrapper.camera);
         this.sceneWrapper.scene.add(this.cameraWrapper.cameraLight);
+
+        let amount = 0;
+        let total = 200;
+        setInterval(() => {
+            if (amount < total) {
+                    for (let index = 0; index < 1; index++) {
+                    const size = 0.023;
+                    const test = new RigidBody(new THREE.Mesh(new THREE.SphereGeometry(size, 12, 6), new THREE.MeshPhysicalMaterial({color: 0xf0f0f0})), BodyType.DYNAMIC);
+                    test.size = size;
+                    test.absorption = 0.25;
+                    test.mesh.castShadow = true;
+                    test.mesh.position.set(Math.random() * 2, Math.random() * 3, Math.random() * 10);
+                    test.enable();
+                    test.unfreeze();
+                    this.addBody(test)
+
+                    amount++;
+                }
+            }
+        }, 10);
+
+        // for (let index = 0; index < 200; index++) {
+        //     const size = 0.023;
+        //     const test = new RigidBody(new THREE.Mesh(new THREE.SphereGeometry(size, 12, 6), new THREE.MeshPhysicalMaterial({color: 0xf0f0f0})), BodyType.DYNAMIC);
+        //     test.size = size;
+        //     test.absorption = 0.25;
+        //     test.mesh.castShadow = true;
+        //     test.mesh.position.set(Math.random() * 2, Math.random(), Math.random() * 3);
+        //     test.enable();
+        //     test.unfreeze();
+        //     this.addBody(test)
+        // }
     }
 
     public update(delta: number) {
@@ -86,11 +118,11 @@ export class World {
         for (let i = 0; i < steps; i++) {
             if (body.freezed()) break;
             
-            const { upon, under, grounded, intersection } = this.groundCollisionData(body);
+            this.calculateCollision(body);
 
+            const { upon, under, grounded, intersection } = this.groundCollisionData(body)
             this.applyGravity(stepDelta, body, upon, intersection);
             this.applyDrag(stepDelta, body, upon, intersection);
-            this.calculateCollision(body);
 
             body.update(stepDelta);
 
@@ -227,11 +259,11 @@ export class World {
             const hitBody = this.staticBodies.find(body => body.mesh.uuid === hit.object.uuid);
             if (!hitBody) return;
 
-            body.applyDrag(hitBody.friction * delta);
+            body.applyDrag((body.friction + hitBody.friction) * delta);
         }
     }
     
-    private isSphereCollidingForward(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.0001) {
+    private isSphereCollidingForward(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.0001): boolean {
         const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
         const angle = radToDeg(inverseNormal.angleTo(direction));
 
@@ -245,6 +277,15 @@ export class World {
         return isColliding;
     }
 
+    private boxCollision(body: RigidBody): void {
+        const pos = body.mesh.position;
+        const size = body.size;
+
+        const min = new THREE.Vector3(pos.x - size, pos.y - size, pos.z - size);
+        const max = new THREE.Vector3(pos.x + size, pos.y + size, pos.z + size);
+        const box = new THREE.Box3(min, max);
+    }
+
     private mustFreeze(body: RigidBody, isGrounded: boolean, speedThreshold: number = 0.01): void {
         if (isGrounded && body.getSpeed() < speedThreshold) body.freeze();
     }
@@ -252,7 +293,7 @@ export class World {
     private rollback(rigidBody: RigidBody, height: number): void {
         if (rigidBody.mesh.position.y > height) return;
 
-        rigidBody.mesh.position.copy({x: 0, y: 0.1, z: 0});
+        rigidBody.mesh.position.copy({x: 1, y: 1, z: 0});
         rigidBody.stop();
     }
 }
