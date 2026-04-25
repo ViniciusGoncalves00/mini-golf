@@ -46,7 +46,8 @@ Add most of the game's elements, such as user interface, sounds, improves the ex
     * [✔] The ball loses speed based on the collision. [24/03/2026]
     * [✔] Apply a continuous physics detection. [03/04/2026]
     * [✔] The ball collide with other balls. [21/04/2026]
-    * [ ] Add support to handle with rigid bodies (static, kinematic and dynamics).
+    * [ ] Add support to handle with rigid bodies types (static, kinematic and dynamics).
+    * [ ] Allow use volume cast to dynamic bodies movement (sphere cast, box cast, capsule cast).
 * [ ] UI elements.
     * [✔] Main Menu. [18/04/2026]
     * [ ] Multiplayer Menu.
