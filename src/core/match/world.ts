@@ -31,12 +31,12 @@ export class World {
         this.sceneWrapper.scene.add(this.cameraWrapper.cameraLight);
 
         let amount = 0;
-        let total = 500;
+        let total = 1000;
         setInterval(() => {
             if (amount < total) {
                     for (let index = 0; index < 1; index++) {
                     const size = 0.023;
-                    const test = new RigidBody(new THREE.Mesh(new THREE.SphereGeometry(size, 12, 6), new THREE.MeshPhysicalMaterial({color: 0xf0f0f0})), BodyType.DYNAMIC);
+                    const test = new RigidBody(new THREE.Mesh(new THREE.SphereGeometry(size), new THREE.MeshPhysicalMaterial({color: 0xf0f0f0})), BodyType.DYNAMIC);
                     test.size = size;
                     test.absorption = 0.25;
                     test.mesh.castShadow = true;
@@ -48,7 +48,7 @@ export class World {
                     amount++;
                 }
             }
-        }, 10);
+        }, 20);
     }
 
     public update(delta: number) {
