@@ -44,15 +44,21 @@ export class AudioSystem {
         sources: Map<AudioKey, string[]>,
         voices: number = 4
     ): AudioSystem {
+        const maxSize = 100;
+
         for (const [key, srcList] of sources) {
             const pool = new Pool<AudioSource>(() => {
                 return new AudioSource(srcList, {
                     preload: true
                 });
-            });
+            }, maxSize);
 
             for (let i = 0; i < voices; i++) {
-                pool.release(pool.acquire());
+                const object = pool.acquire();
+                if (object) {
+                    pool.release(object);
+                }
+
             }
 
             this.pools.set(key, pool);
@@ -71,6 +77,8 @@ export class AudioSystem {
         if (!pool) return;
 
         const source = pool.acquire();
+        if (!source) return;
+        
         source.setVolume(volume);
         source.playRandom();
 
