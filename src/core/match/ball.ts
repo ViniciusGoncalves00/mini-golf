@@ -31,7 +31,7 @@ export class Ball extends Monobehavior {
 
     private readonly stopThreshold = 0.01;
 
-    public constructor(mesh: THREE.Mesh, radius: number) {
+    public constructor(mesh: THREE.Mesh, radius: number, friction: number, absorption: number) {
         super();
         
         this.radius = radius;
@@ -39,6 +39,8 @@ export class Ball extends Monobehavior {
 
         this.collider = new THREE.Sphere(mesh.position, radius);
         this.rigidBody = new RigidBody(mesh, BodyType.DYNAMIC);
+        this.rigidBody.friction = friction;
+        this.rigidBody.absorption = absorption;
         this.rigidBody.size = radius;
 
         this.safePositionDebug.visible = false;
