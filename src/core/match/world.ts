@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { Monobehavior } from "../monobehavior";
 import { SceneWrapper } from "../wrappers/scene-wrapper";
 import { CameraWrapper } from "../wrappers/camera-wrapper";
 import { Ambient } from "../physics/ambient";
@@ -32,7 +31,7 @@ export class World {
         this.sceneWrapper.scene.add(this.cameraWrapper.cameraLight);
 
         let amount = 0;
-        let total = 200;
+        let total = 500;
         setInterval(() => {
             if (amount < total) {
                     for (let index = 0; index < 1; index++) {
@@ -50,18 +49,6 @@ export class World {
                 }
             }
         }, 10);
-
-        // for (let index = 0; index < 200; index++) {
-        //     const size = 0.023;
-        //     const test = new RigidBody(new THREE.Mesh(new THREE.SphereGeometry(size, 12, 6), new THREE.MeshPhysicalMaterial({color: 0xf0f0f0})), BodyType.DYNAMIC);
-        //     test.size = size;
-        //     test.absorption = 0.25;
-        //     test.mesh.castShadow = true;
-        //     test.mesh.position.set(Math.random() * 2, Math.random(), Math.random() * 3);
-        //     test.enable();
-        //     test.unfreeze();
-        //     this.addBody(test)
-        // }
     }
 
     public update(delta: number) {
@@ -118,7 +105,9 @@ export class World {
         for (let i = 0; i < steps; i++) {
             if (body.freezed()) break;
             
-            this.calculateCollision(body);
+            this.calculateDynamicCollision(body);
+            this.calculateStaticCollision(body);
+            // this.calculateCollision(body);
 
             const { upon, under, grounded, intersection } = this.groundCollisionData(body)
             this.applyGravity(stepDelta, body, upon, intersection);
@@ -194,8 +183,48 @@ export class World {
         }
     }
 
+    private calculateDynamicCollision(testBody: RigidBody): void {
+        for (let index = 0; index < this.dynamicBodies.length; index++) {
+            const body = this.dynamicBodies[index];
+            if (testBody.mesh.uuid === body.mesh.uuid) continue;
+            
+            const distance = testBody.mesh.position.distanceTo(body.mesh.position);
+            const hit = distance <= testBody.size + body.size;
+
+            if (!hit) continue;
+
+            const forward = body.mesh.position.clone().sub(testBody.mesh.position).normalize();
+            const dot = testBody.getDirection().dot(forward);
+            if (dot <= 0) continue;
+
+            this.raycaster.set(testBody.mesh.position, forward);
+
+            const intersection = this.raycaster.intersectObject(body.mesh)[0];
+            this.applyDynamicCollision(intersection, testBody, body);
+            return;
+        }
+    }
+
+    private calculateStaticCollision(testBody: RigidBody): void {
+        const raycaster = new THREE.Raycaster();
+        const forward = testBody.getDirection();
+        raycaster.set(testBody.mesh.position, forward);
+
+        const intersections = raycaster.intersectObjects(this.staticBodies.map(body => body.mesh));
+        const hit = intersections.find(intersection => intersection.object.uuid !== testBody.mesh.uuid);
+        if (!hit) return;
+
+        if (this.isSphereCollidingForward(forward, hit, testBody.size)) {
+            const collidedBody = this.staticBodies.find(body => body.mesh.uuid === hit.object.uuid);
+            if (!collidedBody) return;
+
+            this.applyStaticCollision(hit, testBody, collidedBody)
+        }
+    }
+
     private applyDynamicCollision(hit: THREE.Intersection, movingBody: RigidBody, collidedBody: RigidBody): void {
         const forward = movingBody.getDirection();
+        if (!hit || !hit.face) return;
 
         const normal = hit.face!.normal.clone();
         normal.transformDirection(hit.object.matrixWorld).normalize();
@@ -222,6 +251,7 @@ export class World {
 
     private applyStaticCollision(hit: THREE.Intersection, dynamicBody: RigidBody, staticBody: RigidBody): void {
         const forward = dynamicBody.getDirection();
+        if (!hit.face) return;
 
         const normal = hit.face!.normal.clone();
         normal.transformDirection(hit.object.matrixWorld).normalize();
@@ -264,6 +294,8 @@ export class World {
     }
     
     private isSphereCollidingForward(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.0001): boolean {
+        if (!hit.face) return false;
+
         const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
         const angle = radToDeg(inverseNormal.angleTo(direction));
 
