@@ -89,7 +89,6 @@ export class StorageLoader {
             );
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(5, 5);
             this.textures.set(fileName, texture);
         }
     }

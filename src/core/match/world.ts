@@ -24,11 +24,12 @@ export class World {
     public readonly sceneWrapper: SceneWrapper;
     public readonly cameraWrapper: CameraWrapper;
 
-    public onCollision: ((bodyA: RigidBody, bodyB: RigidBody) => void)[] = [];
+    public onCollision: ((bodyA: RigidBody, bodyB: RigidBody, intensity: number) => void)[] = [];
         
     public constructor(canvas: HTMLElement) {
         this.cameraWrapper = new CameraWrapper(canvas);
         this.sceneWrapper = new SceneWrapper(canvas, this.cameraWrapper.camera);
+        this.sceneWrapper.scene.add(this.cameraWrapper.cameraLight);
     }
 
     public update(delta: number) {
@@ -158,8 +159,6 @@ export class World {
 
             // const inverseNormal = hit.face!.normal.clone().multiplyScalar(-1);
             // ball.lastCollisionPosition.copy(ball.mesh.position.clone().add(inverseNormal.multiplyScalar(ball.radius)));
-
-            for (const callback of this.onCollision) callback(testBody, collidedBody);
         }
     }
 
@@ -177,6 +176,8 @@ export class World {
         collidedBody.unfreeze();
         collidedBody.applyForce(force);
         movingBody.reflect(normal, absorptionFactor);
+
+        for (const callback of this.onCollision) callback(movingBody, collidedBody, THREE.MathUtils.clamp(movingBody.getSpeed(), 0, 1) * Math.abs(dot));
     }
 
     private applyDynamicKinematicCollision(hit: THREE.Intersection, dynamicBody: RigidBody, kinematicBody: RigidBody): void {
@@ -196,6 +197,8 @@ export class World {
         const dot = forward.dot(normal);
         const absorptionFactor = (dynamicBody.absorption + staticBody.absorption) * Math.abs(dot);
         dynamicBody.reflect(normal, absorptionFactor);
+
+        for (const callback of this.onCollision) callback(dynamicBody, staticBody, THREE.MathUtils.clamp(dynamicBody.getSpeed(), 0, 1)* Math.abs(dot));
     }
 
     private groundCollisionData(body: RigidBody, buffer: number = 1.05): {

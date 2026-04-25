@@ -8,6 +8,7 @@ import { CameraType } from "../common/enums";
 export class CameraWrapper extends Monobehavior {
     public distance: number = 2;
     public camera: THREE.PerspectiveCamera;
+    public cameraLight: THREE.DirectionalLight;
     public orbitControls: OrbitControls;
 
     public cameraMode: CameraType = CameraType.FREE;
@@ -19,6 +20,7 @@ export class CameraWrapper extends Monobehavior {
         this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.set(1, 1, -2);
         
+        this.cameraLight = new THREE.DirectionalLight(0xffffff, 0.1);
         this.orbitControls = new OrbitControls(this.camera, canvas);
     }
 
@@ -34,6 +36,9 @@ export class CameraWrapper extends Monobehavior {
             camera.position.copy(position);
             this.orbitControls.target.copy(target.mesh.position);
         }
+
+        this.cameraLight.position.copy(this.camera.position);
+        this.cameraLight.lookAt(this.camera.getWorldDirection(new THREE.Vector3()));
 
         this.orbitControls.update();
     }

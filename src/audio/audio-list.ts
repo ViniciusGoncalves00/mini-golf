@@ -8,6 +8,7 @@ export const sounds = new Map<AudioKey, string[]>([
     [AudioKey.SHOT_MEDIUM, [`${base}/sfx/club/medium_1.mp3`, `${base}/sfx/club/medium_2.mp3`,]],
     [AudioKey.SHOT_STRONG, [`${base}/sfx/club/strong_1.mp3`, `${base}/sfx/club/strong_2.mp3`]],
     [AudioKey.SHOT_CANCEL, [`${base}/sfx/club/free.mp3`]],
+    [AudioKey.GRASS,       [`${base}/sfx/club/grass_1.mp3`, `${base}/sfx/club/grass_2.mp3`, `${base}/sfx/club/grass_3.mp3`]],
 ]);
 
 // export enum AudioList {

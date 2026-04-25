@@ -11,4 +11,6 @@ export enum AudioKey {
     SHOT_MEDIUM,
     SHOT_STRONG,
     SHOT_CANCEL,
+
+    GRASS,
 }
