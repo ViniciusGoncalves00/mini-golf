@@ -1,8 +1,8 @@
 export class Name {
-    private value: string;
+    private _value: string;
 
     public constructor(value: string) {
-        this.value = value;
+        this._value = value;
     }
 
     public static generate(): Name {
@@ -10,12 +10,16 @@ export class Name {
         const value = Math.random().toString().substring(2, 2 + precision);
         return new Name(`Guest ${value}`);
     }
+    
+    public static load(data: any): Name {
+        return new Name(data._value);
+    }
 
     public get(): string {
-        return this.value;
+        return this._value;
     }
 
     public set(name: string): void {
-        this.value = name;
+        this._value = name;
     }
 }

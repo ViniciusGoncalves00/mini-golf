@@ -19,8 +19,8 @@ export class User {
     }
 
     public static load(data: any): User {
-        const id = data?.ID?.value ? new ID(data?.ID.value) : ID.generate();
-        const name = data?.name?.value ? new Name(data.name.value) : Name.generate();
+        const id = data?.ID ? ID.load(data.ID) : ID.generate();
+        const name = data?.name ? Name.load(data.name) : Name.generate();
 
         return new User(id, name);
     }

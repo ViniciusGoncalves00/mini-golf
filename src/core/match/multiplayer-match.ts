@@ -16,7 +16,7 @@ export class MultiPlayerMatch extends Match {
         this.myUser = myUser;
 
         this.club.onFreeShot.push((force) => {
-            const body = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().value);
+            const body = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().get());
             if (!body) return;
 
             body.unfreeze();
@@ -25,7 +25,7 @@ export class MultiPlayerMatch extends Match {
         })
 
         canvas.addEventListener("mousemove", (e) => {
-            const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().value);
+            const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().get());
             if (!rigidBody) return;
 
             this.club.calculateDirection(this.world.cameraWrapper.camera, e, canvas.getBoundingClientRect(), rigidBody)
@@ -39,13 +39,13 @@ export class MultiPlayerMatch extends Match {
             if (e.button == 2) this.club.freeShot();
         })
 
-        // const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().value);
+        // const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().get());
         // if (rigidBody) this.world.cameraWrapper.setTargetMode(rigidBody);
         
         document.addEventListener("keypress", (e) => {
             if (e.key === "t") {
                 if (this.world.cameraWrapper.cameraMode === CameraType.FREE) {
-                    const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().value);
+                    const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().get());
                     if (!rigidBody) return;
 
                     this.world.cameraWrapper.setTargetMode(rigidBody);
@@ -70,13 +70,13 @@ export class MultiPlayerMatch extends Match {
         if (this.turnIndex >= this.users.length) this.turnIndex = 0;
         const current = this.users[this.turnIndex];
 
-        const loaded = this.balls.some((ball) => ball.rigidBody.mesh.name === current.getID().value);
+        const loaded = this.balls.some((ball) => ball.rigidBody.mesh.name === current.getID().get());
         if (!loaded) {
             const ball = this.placeBall(current);
             ball.rigidBody.onFreeze.push(this.onNextPlayer);
         }
 
-        if (current.getID().value === this.myUser.getID().value) {
+        if (current.getID().get() === this.myUser.getID().get()) {
             this.club.enable();
         }
     }

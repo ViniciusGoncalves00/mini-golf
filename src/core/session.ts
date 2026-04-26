@@ -66,7 +66,7 @@ export class Session {
 
             this.room.users.forEach((user, index) => {
                 users.push({
-                    ID: user.getID().value,
+                    ID: user.getID().get(),
                     name: user.getName().get()
                 })
             });
@@ -81,14 +81,16 @@ export class Session {
         network.onPeerConnect.push((peerID) => {
             console.log("Peer connected:", peerID);
             const users: { ID: string; name: string }[] = [];
-            network.users.values().forEach((user, index) => {
+
+            for (const user of network.users.values()) {
+                console.log(user)
                 users.push({
-                    ID: user.getID().value,
+                    ID: user.getID().get(),
                     name: user.getName().get()
-                })
-            });
+                });
+            }
             users.push({
-                ID: this.user.getID().value,
+                ID: this.user.getID().get(),
                 name: this.user.getName().get()
             });
 

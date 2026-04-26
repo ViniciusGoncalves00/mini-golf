@@ -95,7 +95,7 @@ export abstract class Match {
     }
 
     protected placeBall(user: User): Ball {
-        const ball = Builder.ball(user.getID().value);
+        const ball = Builder.ball(user.getID().get());
         this.balls.push(ball);
         
         this.monobehaviors.push(ball);
@@ -110,7 +110,7 @@ export abstract class Match {
     }
 
     protected removeBall(user: User): void {
-        var index = this.balls.findIndex((b) => b.rigidBody.mesh.name === user.getID().value);
+        var index = this.balls.findIndex((b) => b.rigidBody.mesh.name === user.getID().get());
         const [ball] = this.balls.splice(index, 1);
 
         var index = this.monobehaviors.findIndex(obj => obj == ball);

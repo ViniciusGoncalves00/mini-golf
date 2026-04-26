@@ -14,7 +14,7 @@ export class SinglePlayerMatch extends Match {
         ball.rigidBody.onUnfreeze.push(() => this.club.disable());
         
         this.club.onFreeShot.push((force) => {
-            const body = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().value);
+            const body = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().get());
             if (!body) return;
 
             body.unfreeze();
@@ -22,7 +22,7 @@ export class SinglePlayerMatch extends Match {
         })
 
         canvas.addEventListener("mousemove", (e) => {
-            const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().value);
+            const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().get());
             if (!rigidBody) return;
 
             this.club.calculateDirection(this.world.cameraWrapper.camera, e, canvas.getBoundingClientRect(), rigidBody)
@@ -36,13 +36,13 @@ export class SinglePlayerMatch extends Match {
             if (e.button == 2) this.club.freeShot();
         })
 
-        const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().value);
+        const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().get());
         if (rigidBody) this.world.cameraWrapper.setTargetMode(rigidBody);
         
         document.addEventListener("keypress", (e) => {
             if (e.key === "t") {
                 if (this.world.cameraWrapper.cameraMode === CameraType.FREE) {
-                    const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().value);
+                    const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().get());
                     if (!rigidBody) return;
 
                     this.world.cameraWrapper.setTargetMode(rigidBody);

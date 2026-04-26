@@ -1,6 +1,8 @@
 import Peer, { DataConnection, PeerConnectOption } from "peerjs";
 import { NetworkMessage, NetworkMessagesTypes } from "./networkMessage";
 import { User } from "../user";
+import { ID } from "../common/ID";
+import { Name } from "../common/Name";
 
 export class PeerNetwork {
     public onPeerConnect: ((peerID: string) => void)[] = [];
@@ -17,7 +19,7 @@ export class PeerNetwork {
 
     public constructor(user: User) {
         this.user = user;
-        this.peer = new Peer(user.getID().value);
+        this.peer = new Peer(user.getID().get());
 
         this.peer.on("open", () => {
             console.log("Peer ID:", this.peer.id);
@@ -26,6 +28,10 @@ export class PeerNetwork {
 
         this.peer.on("error", (err) => {
             console.error("Peer error:", err);
+        });
+
+        this.peer.on("connection", (conn) => {
+            this.registerConnection(conn);
         });
     }
 
@@ -96,11 +102,10 @@ export class PeerNetwork {
             this.users.set(
                 peerID,
                 new User(
-                    metadata.userID,
-                    metadata.userName
+                    new ID(metadata.userID),
+                    new Name(metadata.userName)
                 )
             );
-
             
             this.onPeerConnect.forEach(cb => cb(peerID));
             // connection.send({ type: NetworkMessagesTypes.CONNECTED });
