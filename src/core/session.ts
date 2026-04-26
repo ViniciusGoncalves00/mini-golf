@@ -49,6 +49,11 @@ export class Session {
     }
 
     public startMultiPlayerMatch(): void {
+        const network = this.network as PeerNetwork;
+        if (this.room.host?.getID().get() === this.user.getID().get()) {
+            MessageHandler.dispatchStartGame(network);
+        }
+
         const courses = [level1()];
 
         setTimeout(() => {
@@ -65,26 +70,17 @@ export class Session {
         this.room.setHost(this.user);
         this.room.addUser(this.user);
 
+        const room = (Alpine.store("room") as Room);
+
         network.onPeerDisconnect.push((peerID) => {
-            const users: { ID: string; name: string }[] = [];
-
-            this.room.users.forEach((user, index) => {
-                users.push({
-                    ID: user.getID().get(),
-                    name: user.getName().get()
-                })
-            });
-
-            const message: NetworkHostMessage = {
-                type: NetworkMessagesType.USER_LIST,
-                payload: { users: users }
-            }
-            network.send(message);
-        });
+            room.removeUser(peerID);
+            MessageHandler.dispatchRoom(network, room);
+        }
+    );
 
         network.onPeerConnect.push((peerID) => {
-            this.room.addUser(network.users.get(peerID)!);
-            MessageHandler.dispatchRoomData(network, this.room);
+            room.addUser(network.users.get(peerID)!);
+            MessageHandler.dispatchRoom(network, room);
         })
     }
 
@@ -93,13 +89,15 @@ export class Session {
         if (!connected) return;
 
         const network = this.network as PeerNetwork;
+        
         network.onReceiveData.push((peerId, data) => {
             switch (data.type) {
                 case NetworkMessagesType.MATCH_START:
+                    this.startMultiPlayerMatch();
                     (Alpine.store("pageManager") as PageManager).setPage(Page.GAME)
                     break;
                 case NetworkMessagesType.USER_LIST:
-                    const room = MessageHandler.receiveRoomData(data);
+                    const room = MessageHandler.receiveRoom(data);
                     (Alpine.store("room") as Room).setHost(room.host!);
                     (Alpine.store("room") as Room).setUsers(room.users);
                     break;

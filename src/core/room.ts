@@ -32,6 +32,12 @@ export class Room {
         this.users.push(user);
     }
 
+    public removeUser(id: string): void {
+        const index = this.users.findIndex((user) => user.getID().get() === id);
+        if (index === -1) return;
+        this.users.splice(index, 1);
+    }
+
     public setUsers(users: User[]): void {
         this.users.splice(0);
         this.users.push(...users);

@@ -1,7 +1,7 @@
 import { Room } from "../room";
 import { NetworkMessage, NetworkMessagesType } from "./network-message";
 
-export abstract class Message {
+export class Message {
     public readonly ID: string;
     public readonly timestamp: number;
     public readonly type: NetworkMessagesType;
