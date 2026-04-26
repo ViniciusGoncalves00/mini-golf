@@ -1,5 +1,5 @@
 import { User } from "../user";
-import { NetworkMessage } from "./networkMessage";
+import { NetworkMessage } from "./network-message";
 import { PeerNetwork } from "./PeerNetwork";
 
 export class PeerHost extends PeerNetwork {

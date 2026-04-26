@@ -11,8 +11,8 @@ export class ID {
         return new ID(value);
     }
 
-    public static load(data: any): ID {
-        return new ID(data._value);
+    public static load(value: string): ID {
+        return new ID(value);
     }
 
     public get(): string {

@@ -10,19 +10,24 @@ export class User {
     public constructor(id: ID, name: Name) {
         this.name = name;
         this.ID = id;
-
-        this.save();
     }
 
     public save(): void {
-        StorageLoader.instance().save(StorageKey.USER, this);
+        StorageLoader.instance().save(StorageKey.USER, this.toJSON());
     }
 
-    public static load(data: any): User {
+    public static fromJSON(data: any): User {
         const id = data?.ID ? ID.load(data.ID) : ID.generate();
         const name = data?.name ? Name.load(data.name) : Name.generate();
 
         return new User(id, name);
+    }
+
+    public toJSON(): any {
+        return {
+            ID: this.ID.get(),
+            name: this.name.get(),
+        }
     }
 
     public getName(): Name {

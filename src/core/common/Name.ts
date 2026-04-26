@@ -11,8 +11,8 @@ export class Name {
         return new Name(`Guest ${value}`);
     }
     
-    public static load(data: any): Name {
-        return new Name(data._value);
+    public static load(value: string): Name {
+        return new Name(value);
     }
 
     public get(): string {

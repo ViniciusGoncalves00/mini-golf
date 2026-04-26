@@ -7,11 +7,14 @@ import { ID } from "./common/ID";
 import { Name } from "./common/Name";
 import { level1, level3 } from "./course/courses";
 import { Room } from "./room";
-import { NetworkHostMessage, NetworkMessagesTypes } from "./network/networkMessage";
+import { NetworkHostMessage, NetworkMessagesType } from "./network/network-message";
 import { Match } from "./match/match";
 import { MultiPlayerMatch } from "./match/multiplayer-match";
 import { SinglePlayerMatch } from "./match/singleplayer-match";
 import { PeerNetwork } from "./network/PeerNetwork";
+import Alpine from 'alpinejs';
+import { Page, PageManager } from "@/ui/page";
+import { MessageHandler } from "./network/message-handler";
 
 export class Session {
     public readonly user: User;
@@ -23,7 +26,8 @@ export class Session {
     
     public constructor() {
         const userData = StorageLoader.instance().load(StorageKey.USER);
-        this.user = userData ? User.load(userData) : new User(ID.generate(), Name.generate());
+        this.user = userData ? User.fromJSON(userData) : new User(ID.generate(), Name.generate());
+        this.user.save();
     }
 
     public loadNetwork(): void {
@@ -72,39 +76,37 @@ export class Session {
             });
 
             const message: NetworkHostMessage = {
-                type: NetworkMessagesTypes.USER_LIST,
+                type: NetworkMessagesType.USER_LIST,
                 payload: { users: users }
             }
             network.send(message);
         });
 
         network.onPeerConnect.push((peerID) => {
-            console.log("Peer connected:", peerID);
-            const users: { ID: string; name: string }[] = [];
-
-            for (const user of network.users.values()) {
-                console.log(user)
-                users.push({
-                    ID: user.getID().get(),
-                    name: user.getName().get()
-                });
-            }
-            users.push({
-                ID: this.user.getID().get(),
-                name: this.user.getName().get()
-            });
-
-            const message: NetworkHostMessage = {
-                type: NetworkMessagesTypes.USER_LIST,
-                payload: { users: users }
-            }
-
             this.room.addUser(network.users.get(peerID)!);
-            network.send(message);
+            MessageHandler.dispatchUserList(network, this.user);
         })
     }
 
     public connectTo(peerID: string): void {
-        this.network?.connectTo(peerID);
+        const connected = this.network?.connectTo(peerID);
+        if (!connected) return;
+
+        const network = this.network as PeerNetwork;
+        network.onReceiveData.push((peerId, data) => {
+            switch (data.type) {
+                case NetworkMessagesType.MATCH_START:
+                    (Alpine.store("pageManager") as PageManager).setPage(Page.GAME)
+                    break;
+                case NetworkMessagesType.USER_LIST:
+                    const users = MessageHandler.receiveUserList(data);
+                    (Alpine.store("room") as Room).setUsers(users);
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        (Alpine.store("pageManager") as PageManager).setPage(Page.ROOM);
     }
 }

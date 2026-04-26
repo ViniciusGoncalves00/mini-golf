@@ -15,8 +15,11 @@ export class Room {
 
     public addUser(user: User): void {
         if (this.users.find(u => u.getID().get() === user.getID().get())) return;
-
-        // this.users = [...this.users, user];
         this.users.push(user);
+    }
+
+    public setUsers(users: User[]): void {
+        this.users.splice(0);
+        this.users.push(...users);
     }
 }

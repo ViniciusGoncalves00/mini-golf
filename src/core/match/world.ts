@@ -31,7 +31,7 @@ export class World {
         this.sceneWrapper.scene.add(this.cameraWrapper.cameraLight);
 
         let amount = 0;
-        let total = 1000;
+        let total = 0;
         setInterval(() => {
             if (amount < total) {
                     for (let index = 0; index < 1; index++) {

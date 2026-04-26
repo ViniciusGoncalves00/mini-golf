@@ -1,5 +1,5 @@
 import Peer, { DataConnection, PeerConnectOption } from "peerjs";
-import { NetworkMessage, NetworkMessagesTypes } from "./networkMessage";
+import { NetworkMessage, NetworkMessagesType } from "./network-message";
 import { User } from "../user";
 import { ID } from "../common/ID";
 import { Name } from "../common/Name";
@@ -46,7 +46,7 @@ export class PeerNetwork {
         if (connection?.open) connection.send(data);
     }
 
-    public connectTo(peerID: string) {
+    public connectTo(peerID: string): DataConnection | undefined {
         if (!this.isReady) {
             console.warn("Peer is not ready yet.");
             return;
@@ -73,14 +73,15 @@ export class PeerNetwork {
             label: this.peer.id,
             reliable: true,
             metadata: {
-                userID: this.user.getID(),
-                userName: this.user.getName(),
+                userID: this.user.getID().get(),
+                userName: this.user.getName().get(),
                 timestamp: Date.now(),
             }
         }
         // this.peer.connect(peerID, options);
         const connection = this.peer.connect(peerID, options);
         this.registerConnection(connection);
+        return connection;
     }
 
     public disconnect(): void {
