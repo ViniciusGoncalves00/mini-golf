@@ -9,6 +9,20 @@ export class Room {
         this.users = users;
     }
 
+    public toJSON(): any {
+        return {
+            host: this.host?.toJSON(),
+            users: this.users.map(user => (user.toJSON())),
+        }
+    }
+
+    public static fromJSON(data: any): Room {
+        return new Room(
+            User.fromJSON(data.host),
+            data.users.map((userData: any) => User.fromJSON(userData)),
+        )
+    }
+
     public setHost(user: User): void {
         this.host = user;
     }

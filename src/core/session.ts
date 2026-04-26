@@ -84,7 +84,7 @@ export class Session {
 
         network.onPeerConnect.push((peerID) => {
             this.room.addUser(network.users.get(peerID)!);
-            MessageHandler.dispatchUserList(network, this.user);
+            MessageHandler.dispatchRoomData(network, this.room);
         })
     }
 
@@ -99,8 +99,9 @@ export class Session {
                     (Alpine.store("pageManager") as PageManager).setPage(Page.GAME)
                     break;
                 case NetworkMessagesType.USER_LIST:
-                    const users = MessageHandler.receiveUserList(data);
-                    (Alpine.store("room") as Room).setUsers(users);
+                    const room = MessageHandler.receiveRoomData(data);
+                    (Alpine.store("room") as Room).setHost(room.host!);
+                    (Alpine.store("room") as Room).setUsers(room.users);
                     break;
                 default:
                     break;

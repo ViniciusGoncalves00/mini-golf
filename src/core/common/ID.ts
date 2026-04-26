@@ -15,6 +15,10 @@ export class ID {
         return new ID(value);
     }
 
+    public toJSON(): string {
+        return this._value;
+    }
+
     public get(): string {
         return this._value;
     }

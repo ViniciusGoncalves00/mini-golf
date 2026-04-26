@@ -1,4 +1,4 @@
-import { User } from "../user";
+import { Room } from "../room";
 import { NetworkMessage, NetworkMessagesType } from "./network-message";
 
 export abstract class Message {
@@ -21,19 +21,17 @@ export abstract class Message {
     }
 }
 
-export class UserListMessage extends Message {
-    public users: User[];
+export class RoomDataMessage extends Message {
+    public room: Room;
 
-    public constructor(ID: string, timestamp: number, type: NetworkMessagesType, users: User[]) {
+    public constructor(ID: string, timestamp: number, type: NetworkMessagesType, room: Room) {
         super(ID, timestamp, type);
-        this.users = users;
+        this.room = room;
     }
 
     public toJSON() {
         const obj = super.toJSON();
-        obj.payload = {
-            users: this.users.map(user => (user.toJSON()))
-        };
+        obj.payload = this.room.toJSON();
         return obj;
     }
 }
