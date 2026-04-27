@@ -14,13 +14,13 @@ export abstract class Match {
     public readonly courses: Course[] = [];
     public readonly world: World;
     public readonly users: User[] = [];
+    public readonly club: Club = new Club();
     
     protected currentCourse: Course | null = null;
     protected currentCourseIndex: number = -1;
     
     protected readonly balls: Ball[] = [];
     protected readonly monobehaviors: Monobehavior[] = [];
-    protected readonly club: Club = new Club();
 
     private readonly timer: THREE.Timer = new THREE.Timer();
     private frame: number = 0;

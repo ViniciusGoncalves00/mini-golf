@@ -42,4 +42,8 @@ export class User {
         this.name.set(name);
         StorageLoader.instance().save(StorageKey.USER, this);
     }
+
+    public isEquals(user: User): boolean {
+        return user.getID().get() === this.ID.get();
+    }
 }

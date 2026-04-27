@@ -318,7 +318,7 @@ export class World {
         const box = new THREE.Box3(min, max);
     }
 
-    private mustFreeze(body: RigidBody, isGrounded: boolean, speedThreshold: number = 0.01): void {
+    private mustFreeze(body: RigidBody, isGrounded: boolean, speedThreshold: number = 0.1): void {
         if (isGrounded && body.getSpeed() < speedThreshold) body.freeze();
     }
 

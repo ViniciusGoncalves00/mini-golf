@@ -1,7 +1,9 @@
+import * as THREE from "three";
 import { CameraType } from "../common/enums";
 import { Course } from "../course/course";
 import { User } from "../user";
 import { Match } from "./match";
+import { MessageHandler } from "../network/message-handler";
 
 /**
  * Class to handle only with all match logic (world/scene, players, ui).
@@ -14,15 +16,6 @@ export class MultiPlayerMatch extends Match {
         super(canvas, courses, users);
 
         this.myUser = myUser;
-
-        this.club.onFreeShot.push((force) => {
-            const body = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().get());
-            if (!body) return;
-
-            body.unfreeze();
-            body.applyForce(force);
-            this.club.disable();
-        })
 
         canvas.addEventListener("mousemove", (e) => {
             const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().get());
@@ -99,5 +92,17 @@ export class MultiPlayerMatch extends Match {
         if (this.balls.some((ball) => ball.rigidBody.isMoving())) return;
         
         this.nextPlayer();
+    }
+
+    public applyForce(target: User, force: THREE.Vector3): void {
+        const ball = this.balls.find((ball) => ball.rigidBody.mesh.name === target.getID().get());
+        if (!ball) return;
+
+        ball.rigidBody.unfreeze();
+        ball.rigidBody.applyForce(force);
+        
+        if (this.myUser.isEquals(target)) {
+            this.club.disable();
+        }
     }
 }

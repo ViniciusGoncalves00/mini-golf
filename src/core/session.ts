@@ -50,17 +50,39 @@ export class Session {
 
     public startMultiPlayerMatch(): void {
         const network = this.network as PeerNetwork;
-        if (this.room.host?.getID().get() === this.user.getID().get()) {
-            MessageHandler.dispatchStartGame(network);
-        }
 
         const courses = [level1()];
 
-        setTimeout(() => {
-            const canvas = document.getElementById("game")!;
-            this.match = new MultiPlayerMatch(canvas, courses, this.room.users, this.user);
-            this.match.start();
-        }, (100));
+        const canvas = document.getElementById("game")!;
+        this.match = new MultiPlayerMatch(canvas, courses, this.room.users, this.user);
+        this.match.start();
+
+        const match = this.match as MultiPlayerMatch; 
+
+        if (this.room.host?.isEquals(this.user)) {
+            MessageHandler.dispatchStartGame(network, this.user);
+            
+            match.club.onFreeShot.push((force) => {
+                match.applyForce(this.user, force);
+                MessageHandler.dispatchFireShot(network, this.user, this.user, force);
+            })
+
+            network.onReceiveData.push((peerId, data) => {
+                switch (data.type) {
+                    case NetworkMessagesType.SHOT_FIRE:
+                        const shotInfo = MessageHandler.receiveFireShot(data);
+                        match.applyForce(shotInfo.origin, shotInfo.force);
+                        MessageHandler.dispatchFireShot(network, this.user, shotInfo.origin, shotInfo.force);
+                        break;
+                    default:
+                        break;
+                }
+            });
+        } else {
+            match.club.onFreeShot.push((force) => {
+                MessageHandler.dispatchFireShot(network, this.user, this.user, force);
+            })
+        }
     }
 
     public createRoom(): void {
@@ -74,13 +96,13 @@ export class Session {
 
         network.onPeerDisconnect.push((peerID) => {
             room.removeUser(peerID);
-            MessageHandler.dispatchRoom(network, room);
+            MessageHandler.dispatchRoom(network, this.user, room);
         }
     );
 
         network.onPeerConnect.push((peerID) => {
             room.addUser(network.users.get(peerID)!);
-            MessageHandler.dispatchRoom(network, room);
+            MessageHandler.dispatchRoom(network, this.user, room);
         })
     }
 
@@ -95,6 +117,10 @@ export class Session {
                 case NetworkMessagesType.MATCH_START:
                     this.startMultiPlayerMatch();
                     (Alpine.store("pageManager") as PageManager).setPage(Page.GAME)
+                    break;
+                case NetworkMessagesType.SHOT_FIRE:
+                    const shotInfo = MessageHandler.receiveFireShot(data);
+                    (this.match as MultiPlayerMatch).applyForce(shotInfo.origin, shotInfo.force);
                     break;
                 case NetworkMessagesType.USER_LIST:
                     const room = MessageHandler.receiveRoom(data);
