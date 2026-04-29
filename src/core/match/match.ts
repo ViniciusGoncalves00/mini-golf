@@ -23,6 +23,8 @@ export abstract class Match {
     protected readonly monobehaviors: Monobehavior[] = [];
 
     private readonly timer: THREE.Timer = new THREE.Timer();
+    private hertz: number = 1 / 60;
+    private accumulator: number = 0;
     private frame: number = 0;
     
     public constructor(canvas: HTMLElement, courses: Course[], users: User[]) {
@@ -124,11 +126,14 @@ export abstract class Match {
 
     private animate = () => {
         this.frame = requestAnimationFrame(this.animate);
-
         this.timer.update();
         const delta = this.timer.getDelta() * Global.timeScale;
+        this.accumulator += delta;
+        while (this.accumulator >= this.hertz) {
+            for (const monobehavior of this.monobehaviors) monobehavior.update(this.hertz);
+            this.world.update(this.hertz);
 
-        for (const monobehavior of this.monobehaviors) monobehavior.update(delta);
-        this.world.update(delta);
+            this.accumulator -= this.hertz;
+        }
     }
 }

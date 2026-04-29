@@ -49,6 +49,8 @@ export class World {
                 }
             }
         }, 20);
+
+        this.dynamicBodies.sort((a, b) => Number(a.mesh.name) - Number(b.mesh.name));
     }
 
     public update(delta: number) {
@@ -63,11 +65,15 @@ export class World {
 
     public addBody(body: RigidBody): void {
         switch (body.type) {
-            case BodyType.DYNAMIC: this.dynamicBodies.push(body); break;
+            case BodyType.DYNAMIC: 
+                this.dynamicBodies.push(body);
+                this.dynamicBodies.sort((a, b) => Number(a.mesh.name) - Number(b.mesh.name));
+                break;
             case BodyType.KINEMATIC: this.kinematicBodies.push(body); break;
             case BodyType.STATIC: this.staticBodies.push(body); break;
             default: break;
         }
+        
         this.rigidBodies.push(body);
         this.sceneWrapper.scene.add(body.mesh);
     }
@@ -278,7 +284,7 @@ export class World {
 
         const upon = hit && hit.distance < body.size * buffer;
         const under = hit && hit.distance < body.size;
-        const grounded = hit && Math.abs(hit.distance - body.size) < 0.0001;
+        const grounded = hit && Math.abs(hit.distance - body.size) < 0.001;
         return { upon: upon, under: under, grounded: grounded, intersection: hit ? hit : null };
     }
 
@@ -318,7 +324,7 @@ export class World {
         const box = new THREE.Box3(min, max);
     }
 
-    private mustFreeze(body: RigidBody, isGrounded: boolean, speedThreshold: number = 0.1): void {
+    private mustFreeze(body: RigidBody, isGrounded: boolean, speedThreshold: number = 0.01): void {
         if (isGrounded && body.getSpeed() < speedThreshold) body.freeze();
     }
 
