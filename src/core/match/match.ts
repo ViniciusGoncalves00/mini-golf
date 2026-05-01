@@ -107,7 +107,8 @@ export abstract class Match {
         this.world.sceneWrapper.scene.add(ball.safePositionDebug);
         this.world.sceneWrapper.scene.add(ball.colliderDebug);
 
-        ball.rigidBody.mesh.position.set(1, 1, 0);
+        ball.rigidBody.mesh.position.set(1, 0.071335, 0);
+        ball.rigidBody.freeze();
         return ball;
     }
 

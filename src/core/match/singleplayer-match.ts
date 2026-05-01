@@ -12,6 +12,7 @@ export class SinglePlayerMatch extends Match {
 
         ball.rigidBody.onFreeze.push(() => this.club.enable());
         ball.rigidBody.onUnfreeze.push(() => this.club.disable());
+        this.club.enable();
         
         this.club.onFreeShot.push((force) => {
             const body = this.world.rigidBodies.find((rb) => rb.mesh.name === user.getID().get());

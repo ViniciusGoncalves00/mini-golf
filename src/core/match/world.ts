@@ -113,16 +113,15 @@ export class World {
             
             this.calculateDynamicCollision(body);
             this.calculateStaticCollision(body);
-            // this.calculateCollision(body);
 
-            const { upon, under, grounded, intersection } = this.groundCollisionData(body)
-            this.applyGravity(stepDelta, body, upon, intersection);
-            this.applyDrag(stepDelta, body, upon, intersection);
+            const collisionInfo = this.groundCollisionData(body)
+            this.applyGravity(stepDelta, body, collisionInfo.upon, collisionInfo.intersection);
+            this.applyDrag(stepDelta, body, collisionInfo.upon, collisionInfo.intersection);
 
             body.update(stepDelta);
 
-            if (under && intersection) this.correctPenetration(body, intersection);
-            this.mustFreeze(body, grounded);
+            if (collisionInfo.under && collisionInfo.intersection) this.correctPenetration(body, collisionInfo.intersection);
+            this.mustFreeze(body, collisionInfo.grounded);
         }
 
         this.rollback(body, this.rollbackHeight);
