@@ -7,7 +7,7 @@ export class RigidBody extends Monobehavior {
     public size: number = 1;
     public mass: number = 1;
     public absorption: number = 0.1;
-    public friction: number = 0.1;
+    public dragCoeficient: number = 0.1;
     public readonly mesh: THREE.Mesh;
 
     public onFreeze: (() => void)[] = [];
@@ -32,8 +32,93 @@ export class RigidBody extends Monobehavior {
         return this;
     }
 
-    public applyDrag(factor: number): RigidBody {
-        this.velocity.multiplyScalar(1 - (factor * this.getSpeed()));
+    public applyDrag(dragCoeficient: number, fluidViscosity: number): RigidBody {
+        const speed = this.getSpeed();
+        const drag = dragCoeficient * fluidViscosity * Math.pow(speed, 2);
+        this.velocity.multiplyScalar(1 - drag);
+        return this;
+    }
+
+    public applyFriction(
+        delta: number,
+        normal: THREE.Vector3,
+        options?: {
+            muForward?: number,
+            muSide?: number,
+            forward?: THREE.Vector3,
+            gravity?: THREE.Vector3,
+        }
+    ): RigidBody {
+    
+        if (this.velocity.lengthSq() === 0) return this;
+    
+        const velocity = this.velocity.clone();
+    
+        // remove componente normal
+        const vNormal = normal.clone().multiplyScalar(velocity.dot(normal));
+        const vTangent = velocity.clone().sub(vNormal);
+    
+        if (vTangent.lengthSq() === 0) return this;
+    
+        const gravity = options?.gravity ?? new THREE.Vector3(0, -9.81, 0);
+    
+        // aproximação da força normal
+        const normalForce = Math.abs(gravity.dot(normal)) * this.mass;
+    
+        // modo isotrópico (fallback)
+        if (!options?.forward) {
+            const mu = options?.muForward ?? 0.5;
+        
+            const frictionMag = mu * normalForce;
+        
+            const frictionDir = vTangent.clone().normalize().multiplyScalar(-1);
+            const friction = frictionDir.multiplyScalar(frictionMag * delta);
+        
+            // clamp (não inverter velocidade)
+            if (friction.length() > vTangent.length()) {
+                this.velocity.sub(vTangent);
+            } else {
+                this.velocity.add(friction);
+            }
+        
+            return this;
+        }
+    
+        // ===== ANISOTRÓPICO =====
+    
+        const forward = options.forward.clone().normalize();
+        const side = new THREE.Vector3().crossVectors(normal, forward).normalize();
+    
+        const muForward = options.muForward ?? 0.3;
+        const muSide = options.muSide ?? 1.0;
+    
+        // decomposição
+        const vForward = forward.clone().multiplyScalar(vTangent.dot(forward));
+        const vSide = side.clone().multiplyScalar(vTangent.dot(side));
+    
+        // helper
+        const applyAxisFriction = (
+            vComponent: THREE.Vector3,
+            mu: number
+        ) => {
+            if (vComponent.lengthSq() === 0) return new THREE.Vector3();
+        
+            const frictionMag = mu * normalForce;
+            const frictionDir = vComponent.clone().normalize().multiplyScalar(-1);
+            const friction = frictionDir.multiplyScalar(frictionMag * delta);
+        
+            if (friction.length() > vComponent.length()) {
+                return vComponent.clone().multiplyScalar(-1);
+            }
+        
+            return friction;
+        };
+    
+        const dvForward = applyAxisFriction(vForward, muForward);
+        const dvSide = applyAxisFriction(vSide, muSide);
+    
+        this.velocity.add(dvForward).add(dvSide);
+    
         return this;
     }
     

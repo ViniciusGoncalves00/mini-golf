@@ -12,7 +12,7 @@ export class Tile extends Monobehavior {
         this.rigidBody = new RigidBody(mesh);
 
         this.coordinates = coordinates;
-        this.rigidBody.friction = friction;
+        this.rigidBody.dragCoeficient = friction;
         this.rigidBody.absorption = absorption;
     }
 

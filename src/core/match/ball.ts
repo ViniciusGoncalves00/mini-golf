@@ -39,7 +39,7 @@ export class Ball extends Monobehavior {
 
         this.collider = new THREE.Sphere(mesh.position, radius);
         this.rigidBody = new RigidBody(mesh, BodyType.DYNAMIC);
-        this.rigidBody.friction = friction;
+        this.rigidBody.dragCoeficient = friction;
         this.rigidBody.absorption = absorption;
         this.rigidBody.size = radius;
 

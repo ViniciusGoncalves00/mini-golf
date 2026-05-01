@@ -116,7 +116,8 @@ export class World {
 
             const collisionInfo = this.groundCollisionData(body)
             this.applyGravity(stepDelta, body, collisionInfo.upon, collisionInfo.intersection);
-            this.applyDrag(stepDelta, body, collisionInfo.upon, collisionInfo.intersection);
+            this.applyDrag(stepDelta, body);
+            this.applyFriction(stepDelta, body, collisionInfo.upon, collisionInfo.intersection);
 
             body.update(stepDelta);
 
@@ -287,15 +288,27 @@ export class World {
         return { upon: upon, under: under, grounded: grounded, intersection: hit ? hit : null };
     }
 
-    private applyDrag(delta: number, body: RigidBody, isGrounded: boolean, hit: THREE.Intersection | null): void {
-        body.applyDrag(Ambient.airDrag * delta);
+    private applyDrag(delta: number, body: RigidBody): void {
+        const coeficient = body.dragCoeficient * delta;
+        body.applyDrag(coeficient, Ambient.airViscosity);
+    }
 
-        if (isGrounded && hit) {
-            const hitBody = this.staticBodies.find(body => body.mesh.uuid === hit.object.uuid);
-            if (!hitBody) return;
+    private applyFriction(delta: number, body: RigidBody, isGrounded: boolean, hit: THREE.Intersection | null): void {
+        if (!isGrounded || !hit) return;
 
-            body.applyDrag((body.friction + hitBody.friction) * delta);
-        }
+        const hitBody = this.staticBodies.find(body => body.mesh.uuid === hit.object.uuid);
+        if (!hitBody) return;
+
+        const coeficient = (body.dragCoeficient + hitBody.dragCoeficient) * delta;
+        const normal = hit.face!.normal.clone();
+        normal.transformDirection(hit.object.matrixWorld).normalize();
+
+        body.applyFriction(delta, normal, {
+            forward: body.getDirection(),
+            muForward: 0.2,
+            muSide: 1.5,
+            gravity: Ambient.gravity
+        });
     }
     
     private isSphereCollidingForward(direction: THREE.Vector3, hit: THREE.Intersection, radius: number, threshold: number = 0.0001): boolean {
