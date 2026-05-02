@@ -29,6 +29,9 @@ export enum Textures {
 export enum Color {
     LIGHT_GREEN   = 0x00cc00,
     DARK_GREEN    = 0x00aa00,
+    TEMPERATURE_WARM    = 0xffeedd,
+    TEMPERATURE_NEUTRAL = 0xffffff,
+    TEMPERATURE_COLD    = 0xddeeff,
 }
 
 export enum BodyType {

@@ -1,11 +1,13 @@
 import * as THREE from "three";
 import { Monobehavior } from "../monobehavior";
+import { Color } from "../common/enums";
 
 export class SceneWrapper extends Monobehavior {
     public scene: THREE.Scene;
     public renderer: THREE.WebGLRenderer;
     public globalLight: THREE.DirectionalLight;
     public globalLightHelper: THREE.DirectionalLightHelper;
+    public hemisphereLight: THREE.HemisphereLight;
     public ambientLight: THREE.AmbientLight;
 
     private readonly ground: THREE.Mesh;
@@ -29,7 +31,7 @@ export class SceneWrapper extends Monobehavior {
             this.resize();
         })
 
-        this.globalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        this.globalLight = new THREE.DirectionalLight(Color.TEMPERATURE_NEUTRAL, 1.0);
 
         this.globalLight.position.set(120, 75, 100);
         this.globalLight.castShadow = true;
@@ -53,11 +55,14 @@ export class SceneWrapper extends Monobehavior {
 
         this.scene.add(this.globalLight);
 
+        this.hemisphereLight = new THREE.HemisphereLight(Color.TEMPERATURE_WARM, Color.TEMPERATURE_COLD, 0.05);
+        this.scene.add(this.hemisphereLight);
+
         this.globalLightHelper = new THREE.DirectionalLightHelper(this.globalLight, 10, 0xff0000);
         this.globalLightHelper.visible = false;
         this.scene.add(this.globalLightHelper)
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        this.ambientLight = new THREE.AmbientLight(Color.TEMPERATURE_WARM, 0.05);
         this.scene.add(this.ambientLight);
 
         this.grid = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 100, 100), new THREE.MeshBasicMaterial({ color: 0xeeeeee, wireframe: true }));

@@ -7,10 +7,9 @@ import { Geometries, GeometriesGLB, Textures } from "./common/enums";
 
 export class Builder {
     public static tile(coordinates: THREE.Vector3Like, geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation = 0x00f000, friction: number = 0.35, absorption: number = 0.55): Tile {
-        const material = new THREE.MeshPhysicalMaterial({ color: color, normalMap: StorageLoader.instance().textures.get(Textures.GRASS_NORMAL) });
+        const material = new THREE.MeshPhysicalMaterial({ color: color, normalMap: StorageLoader.instance().textures.get(Textures.GRASS_NORMAL), roughness: 0.35, reflectivity: 0.1, specularIntensity: 0.1 });
         const mesh = new THREE.Mesh(geometry, material);
         material.normalMap!.repeat = new THREE.Vector2(5, 5);
-        material.iridescence = 0.5;
         mesh.name = "Tile";
         mesh.receiveShadow = true;
         mesh.castShadow = true;
