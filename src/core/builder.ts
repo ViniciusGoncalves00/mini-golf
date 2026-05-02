@@ -3,7 +3,7 @@ import { Tile } from "./course/tile";
 import { Ball } from "./match/ball";
 import { Club } from "./match/club";
 import { StorageLoader } from "./storageLoader";
-import { Textures } from "./common/enums";
+import { Geometries, GeometriesGLB, Textures } from "./common/enums";
 
 export class Builder {
     public static tile(coordinates: THREE.Vector3Like, geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation = 0x00f000, friction: number = 0.35, absorption: number = 0.55): Tile {
@@ -19,9 +19,10 @@ export class Builder {
     }
 
     public static ball(id: string, color: THREE.ColorRepresentation = 0xfefefe, radius: number = 0.021335, friction: number = 0.35, absorption: number = 0.25): Ball {
-        const geometry = new THREE.SphereGeometry(radius);
-        const material = new THREE.MeshPhongMaterial({ color: color });
+        const geometry = StorageLoader.instance().geometries.get(GeometriesGLB.BALL);
+        const material = new THREE.MeshPhysicalMaterial({ color: color, flatShading: false, roughness: 0.35, reflectivity: 1.0 });
         const mesh = new THREE.Mesh(geometry, material);
+        mesh.scale.set(0.001, 0.001, 0.001);
         mesh.name = id;
         mesh.receiveShadow = true;
         mesh.castShadow = true;

@@ -12,6 +12,11 @@ export class Main {
     public static async init(): Promise<void> {
         if (this.initialized) return;
         this.initialized = true;
+
+        const storage = StorageLoader.instance();
+        storage.loadGLTF();
+        storage.loadSTL();
+        storage.loadTextures();
         
         document.addEventListener('alpine:init', () => {
             const session = new Session();

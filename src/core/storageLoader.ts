@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-import { StorageKey, Tiles, Textures } from "./common/enums";
+import { StorageKey, Geometries, Textures, GeometriesGLB } from "./common/enums";
+import { BufferGeometryUtils, GLTFLoader } from "three/examples/jsm/Addons.js";
 const base = import.meta.env.BASE_URL;
 
 export class StorageLoader {
@@ -18,9 +19,35 @@ export class StorageLoader {
         return this._instance;
     }
 
+    public async loadGLTF(): Promise<void> {
+        const loader = new GLTFLoader();
+        const fileNames = Object.values(GeometriesGLB);
+
+        for (const fileName of fileNames) {
+            const url = `${base}geometry/${fileName}.glb`;
+            const gltf = await loader.loadAsync(
+                url,
+                function (xhr) {
+                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                },
+            );
+            const geometries: THREE.BufferGeometry[] = [];
+
+            gltf.scene.traverse((child) => {
+                if ((child as THREE.Mesh).isMesh) {
+                    geometries.push((child as THREE.Mesh).geometry);
+                }
+            });
+            
+            const merged = BufferGeometryUtils.mergeGeometries(geometries);
+            this.geometries.set(fileName, merged);
+        }
+        return;
+    }
+
     public async loadSTL(): Promise<void> {
         const loader = new STLLoader();
-        const fileNames = Object.values(Tiles);
+        const fileNames = Object.values(Geometries);
         
         for (const fileName of fileNames) {
             const url = `${base}geometry/${fileName}.stl`;
