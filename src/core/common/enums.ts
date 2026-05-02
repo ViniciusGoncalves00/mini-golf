@@ -3,7 +3,7 @@ export enum StorageKey {
     USER = "user",
 }
 
-export enum Tiles {
+export enum Geometries {
     CORNER   = "plane_corner",
     HOLE     = "plane_hole",
     PARALLEL = "plane_parallel",
@@ -16,6 +16,10 @@ export enum Tiles {
     RAMP_15_WALL_LEFT   = "ramp_15_wall_left",
     RAMP_15_WALL_RIGHT  = "ramp_15_wall_right",
     RAMP_15_TWO_WALLS   = "ramp_15_two_walls",
+}
+
+export enum GeometriesGLB {
+    BALL     = "ball",
 }
 
 export enum Textures {

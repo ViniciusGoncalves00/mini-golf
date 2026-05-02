@@ -5,23 +5,23 @@ import { StorageLoader } from "../storageLoader";
 import { Tile } from "./tile";
 import { GeometryBuilder } from "../geometry/geometryBuilder";
 import * as THREE from "three";
-import { Color, Tiles } from "../common/enums";
+import { Color, Geometries } from "../common/enums";
 
 const storage = StorageLoader.instance();
 await storage.loadSTL();
 await storage.loadTextures();
-const plane45 = storage.geometries.get(Tiles.PLANE_45)!;
-const plane = storage.geometries.get(Tiles.PLANE)!;
-const loop = storage.geometries.get(Tiles.LOOP)!;
-const planeCorner = storage.geometries.get(Tiles.CORNER)!;
-const planeHole = storage.geometries.get(Tiles.HOLE)!;
-const planeParallel = storage.geometries.get(Tiles.PARALLEL)!;
-const planeU = storage.geometries.get(Tiles.U)!;
-const planeWall = storage.geometries.get(Tiles.WALL)!;
-const ramp15NoWalls = storage.geometries.get(Tiles.RAMP_15_NO_WALLS)!.rotateY(Math.PI);
-const ramp15WallLeft = storage.geometries.get(Tiles.RAMP_15_WALL_LEFT)!.rotateY(Math.PI);
-const ramp15WallRight = storage.geometries.get(Tiles.RAMP_15_WALL_RIGHT)!.rotateY(Math.PI);
-const ramp15TwoWalls = storage.geometries.get(Tiles.RAMP_15_TWO_WALLS)!.rotateY(Math.PI);
+const plane45 = storage.geometries.get(Geometries.PLANE_45)!;
+const plane = storage.geometries.get(Geometries.PLANE)!;
+const loop = storage.geometries.get(Geometries.LOOP)!;
+const planeCorner = storage.geometries.get(Geometries.CORNER)!;
+const planeHole = storage.geometries.get(Geometries.HOLE)!;
+const planeParallel = storage.geometries.get(Geometries.PARALLEL)!;
+const planeU = storage.geometries.get(Geometries.U)!;
+const planeWall = storage.geometries.get(Geometries.WALL)!;
+const ramp15NoWalls = storage.geometries.get(Geometries.RAMP_15_NO_WALLS)!.rotateY(Math.PI);
+const ramp15WallLeft = storage.geometries.get(Geometries.RAMP_15_WALL_LEFT)!.rotateY(Math.PI);
+const ramp15WallRight = storage.geometries.get(Geometries.RAMP_15_WALL_RIGHT)!.rotateY(Math.PI);
+const ramp15TwoWalls = storage.geometries.get(Geometries.RAMP_15_TWO_WALLS)!.rotateY(Math.PI);
 
 export const level1 = () => {
     const tiles: Tile[] = []

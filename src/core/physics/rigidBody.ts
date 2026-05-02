@@ -25,6 +25,18 @@ export class RigidBody extends Monobehavior {
 
     public update(delta: number): void {
         this.mesh.position.addScaledVector(this.velocity, delta);
+
+        const speed = this.velocity.length();
+        if (speed === 0) return;
+
+        const radius = this.size;
+
+        const axis = new THREE.Vector3().crossVectors(this.velocity, new THREE.Vector3(0, 1, 0)).normalize();
+
+        const angularSpeed = speed / radius;
+        const angle = angularSpeed * delta;
+
+        this.mesh.rotateOnWorldAxis(axis, -angle);
     }
 
     public applyForce(force: THREE.Vector3): RigidBody {

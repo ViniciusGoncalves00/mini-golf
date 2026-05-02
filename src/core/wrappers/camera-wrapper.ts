@@ -17,7 +17,7 @@ export class CameraWrapper extends Monobehavior {
     public constructor(canvas: HTMLElement) {
         super();
         
-        this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 1000);
         this.camera.position.set(1, 1, -2);
         
         this.cameraLight = new THREE.DirectionalLight(0xffffff, 0.1);
