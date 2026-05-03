@@ -9,6 +9,7 @@ import { Global } from "./global";
 import { Course } from "../course/course";
 import { AudioAPI, AudioKey } from "@/audio/audio-API";
 import { BodyType } from "../common/enums";
+import { RigidBody } from "../physics/rigidBody";
 
 export abstract class Match {
     public readonly courses: Course[] = [];
@@ -36,23 +37,7 @@ export abstract class Match {
         this.users = users;
 
         this.monobehaviors.push(this.club);
-        this.world.onCollision.push((bodyA, bodyB, intensity) => {
-            if (bodyA.type === BodyType.DYNAMIC && bodyB.type === BodyType.DYNAMIC) {
-                window.dispatchEvent(new CustomEvent(AudioAPI.AUDIO_PLAY, {
-                    detail: {
-                        audio: AudioKey.SHOT,
-                        volume: intensity,
-                    },
-                }))
-            } else {
-                window.dispatchEvent(new CustomEvent(AudioAPI.AUDIO_PLAY, {
-                    detail: {
-                        audio: AudioKey.GRASS,
-                        volume: intensity,
-                    },
-                }))
-            }
-        })
+        this.world.onCollision.push((bodyA, bodyB, dot) => this.emmitSound(bodyA, bodyB, dot));
         
         this.nextCourse();
     }
@@ -135,6 +120,29 @@ export abstract class Match {
             this.world.update(this.hertz);
 
             this.accumulator -= this.hertz;
+        }
+    }
+
+    private emmitSound(bodyA: RigidBody, bodyB: RigidBody, dot: number): void {
+        const intensity = bodyA.getSpeed() * Math.abs(dot);
+        const distance = bodyA.mesh.position.distanceTo(this.world.cameraWrapper.camera.position);
+        const normalizedDistance = 1 / distance;
+        const volume = THREE.MathUtils.clamp(normalizedDistance * intensity, 0.01, 1);
+
+        if (bodyA.type === BodyType.DYNAMIC && bodyB.type === BodyType.DYNAMIC) {
+            window.dispatchEvent(new CustomEvent(AudioAPI.AUDIO_PLAY, {
+                detail: {
+                    audio: AudioKey.SHOT,
+                    volume: volume,
+                },
+            }))
+        } else {
+            window.dispatchEvent(new CustomEvent(AudioAPI.AUDIO_PLAY, {
+                detail: {
+                    audio: AudioKey.GRASS,
+                    volume: volume,
+                },
+            }))
         }
     }
 }
