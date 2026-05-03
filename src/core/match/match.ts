@@ -37,8 +37,16 @@ export abstract class Match {
         this.users = users;
 
         this.monobehaviors.push(this.club);
-        this.world.onCollision.push((bodyA, bodyB, dot) => this.emmitSound(bodyA, bodyB, dot));
-        
+        this.world.onCollision.push((bodyA, bodyB, dot) => this.emitSound(bodyA, bodyB, dot));
+
+        document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        this.onTabHidden();
+    } else {
+        this.onTabVisible();
+    }
+});
+    
         this.nextCourse();
     }
 
@@ -123,7 +131,7 @@ export abstract class Match {
         }
     }
 
-    private emmitSound(bodyA: RigidBody, bodyB: RigidBody, dot: number): void {
+    private emitSound(bodyA: RigidBody, bodyB: RigidBody, dot: number): void {
         const intensity = bodyA.getSpeed() * Math.abs(dot);
         const distance = bodyA.mesh.position.distanceTo(this.world.cameraWrapper.camera.position);
         const normalizedDistance = 1 / distance;
@@ -144,5 +152,14 @@ export abstract class Match {
                 },
             }))
         }
+    }
+
+    private onTabHidden(): void {
+        cancelAnimationFrame(this.frame);
+    }
+    
+    private onTabVisible(): void {
+        this.timer.reset();
+        this.animate();
     }
 }
