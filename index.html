@@ -95,7 +95,10 @@
         </main>
         <main x-show="$store.pageManager.page == 'settings'" class="bg-grid h-full w-full flex flex-col gap-4 items-center relative">
             <section class="h-1/3 flex flex-col items-center justify-end text-white"></section>
-            <section class="h-1/3 flex-none flex flex-col space-y-2"></section>
+            <section class="h-1/3 flex-none flex flex-col space-y-2">
+                <label>Shadow Map Size</label>
+                <input type="range" min="0" max="5" x-data="{ shadowSize: 0 }" x-model="shadowSize" @input="$store.settings.setShadowMapSize(Number(shadowSize))">
+            </section>
             <section class="w-full h-1/3 p-4 text-white flex items-end justify-between">
                 <div></div>
                 <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('main')">back</button>
@@ -174,13 +177,10 @@ function holdButton(callback) {
         timeout: null,
 
         start() {
-            // evita múltiplos starts
             if (this.timeout) return;
 
-            // dispara animação
             this.progress = 100;
 
-            // agenda conclusão
             this.timeout = setTimeout(() => {
                 this.complete();
                 this.reset();
@@ -195,7 +195,6 @@ function holdButton(callback) {
             clearTimeout(this.timeout);
             this.timeout = null;
 
-            // zera instantaneamente (sem animação)
             this.progress = 0;
         },
 

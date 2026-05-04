@@ -5,6 +5,7 @@ import { AudioSystem } from "./audio/audio-system";
 import { sounds } from "./audio/audio-list";
 import { StorageLoader } from "./core/storageLoader";
 import { PageManager } from "./ui/page";
+import { Settings } from "./settings";
 
 export class Main {
     private static initialized: boolean = false;
@@ -28,6 +29,7 @@ export class Main {
 
             Alpine.store("storageLoader", StorageLoader.instance());
             Alpine.store("pageManager", PageManager.instance());
+            Alpine.store("settings", Settings.instance(session));
         });
 
         (window as any).Alpine = Alpine;

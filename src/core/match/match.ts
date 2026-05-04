@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import Alpine from 'alpinejs';
 import { Builder } from "../builder";
 import { Monobehavior } from "../monobehavior";
 import { User } from "../user";
@@ -10,6 +11,7 @@ import { Course } from "../course/course";
 import { AudioAPI, AudioKey } from "@/audio/audio-API";
 import { BodyType } from "../common/enums";
 import { RigidBody } from "../physics/rigidBody";
+import { Page, PageManager } from "@/ui/page";
 
 export abstract class Match {
     public readonly courses: Course[] = [];
@@ -40,12 +42,24 @@ export abstract class Match {
         this.world.onCollision.push((bodyA, bodyB, dot) => this.emitSound(bodyA, bodyB, dot));
 
         document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-        this.onTabHidden();
-    } else {
-        this.onTabVisible();
-    }
-});
+            if (document.hidden) {
+                this.onTabHidden();
+            } else {
+                this.onTabVisible();
+            }
+        });
+
+        document.addEventListener("keypress", (e) => {
+            const key = e.key.toLowerCase();
+            if (key === "p") {
+                const pagesManager = (Alpine.store("pageManager") as PageManager);
+                if (pagesManager.page === Page.GAME) {
+                    pagesManager.setPage(Page.SETTINGS);
+                } else {
+                    pagesManager.setPage(Page.GAME);
+                }
+            }
+        })
     
         this.nextCourse();
     }
