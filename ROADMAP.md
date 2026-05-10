@@ -41,7 +41,7 @@ Add basic behaviors that allow for an understanding of what is happening.
 
 Add most of the game's elements, such as user interface, sounds, improves the experience, etc.
 
-* [ ] Add more physics.
+* [✔] Add more physics. [30/04/2026]
     * [✔] The ball loses speed based on the terrain. [24/03/2026]
     * [✔] The ball loses speed based on the collision. [24/03/2026]
     * [✔] Apply a continuous physics detection. [03/04/2026]
@@ -50,8 +50,8 @@ Add most of the game's elements, such as user interface, sounds, improves the ex
     * [✔] Allow use volume cast to dynamic bodies movement (sphere cast, box cast, capsule cast). [30/04/2026]
 * [ ] UI elements.
     * [✔] Main Menu. [18/04/2026]
-    * [ ] Multiplayer Menu.
-    * [ ] Settings Menu.
+    * [✔] Multiplayer Menu. [18/04/2026]
+    * [✔] Settings Menu. [03/05/2026]
     * [ ] Credits Menu.
     * [ ] Game Menu.
         * [ ] Show the minimum shots.
@@ -66,6 +66,13 @@ Add most of the game's elements, such as user interface, sounds, improves the ex
         * [ ] On shot. [23/04/2026]
         * [ ] Ambient.
     * [ ] Music
+* [ ] Multi-Platform
+    * [✔] Desktop - Browser [default]
+    * [✔] Desktop - Windows [09/05/2026]
+    * [ ] Desktop - Linux
+* [ ] Cross-Play
+    * [✔] Desktop <-> Browser [09/05/2026]
+    * [ ] Desktop <-> Mobile [09/05/2026]
 
 # Phase 4 — Continuous 
     * Mechanics.
@@ -75,6 +82,6 @@ Add most of the game's elements, such as user interface, sounds, improves the ex
 
 # Ideas
 
-* Add support to cross-platform (tauri)
+* Add support to cross-platform (tauri) (moved to)
 * Map Editor
 * Ranking
