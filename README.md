@@ -9,3 +9,4 @@ So I thought: why not try to create something with a similar feel to what existe
 Thus, this project was born.
 
 The project can be viewed at https://viniciusgoncalves00.github.io/mini-golf/
+The installer can be found in the releases tab.
