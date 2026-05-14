@@ -84,7 +84,7 @@ export class SceneWrapper extends Monobehavior {
         this.labelRenderer = new CSS2DRenderer();
         this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.labelRenderer.domElement);
-        this.labelRenderer.domElement.className = "fixed top-0 z-50 pointer-events-none";
+        this.labelRenderer.domElement.className = "fixed top-0 pointer-events-none";
     }
 
     public update(delta: number): void {

@@ -1,6 +1,4 @@
 import { User } from "./user";
-import { PeerHost } from "./network/PeerHost";
-import { PeerClient } from "./network/PeerClient";
 import { StorageLoader } from "./storageLoader";
 import { StorageKey } from "./common/enums";
 import { ID } from "./common/ID";

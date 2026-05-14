@@ -40,7 +40,7 @@ export class User {
 
     public setName(name: string): void {
         this.name.set(name);
-        StorageLoader.instance().save(StorageKey.USER, this);
+        this.save();
     }
 
     public isEquals(user: User): boolean {
