@@ -3,7 +3,6 @@ import { CameraType } from "../common/enums";
 import { Course } from "../course/course";
 import { User } from "../user";
 import { Match } from "./match";
-import { MessageHandler } from "../network/message-handler";
 
 /**
  * Class to handle only with all match logic (world/scene, players, ui).
@@ -61,15 +60,15 @@ export class MultiPlayerMatch extends Match {
     public nextPlayer(): void {
         this.turnIndex++;
         if (this.turnIndex >= this.users.length) this.turnIndex = 0;
-        const current = this.users[this.turnIndex];
+        const currentPlayer = this.users[this.turnIndex];
 
-        const loaded = this.balls.some((ball) => ball.rigidBody.mesh.name === current.getID().get());
+        const loaded = this.balls.some((ball) => ball.rigidBody.mesh.name === currentPlayer.getID().get());
         if (!loaded) {
-            const ball = this.placeBall(current);
+            const ball = this.placeBall(currentPlayer);
             ball.rigidBody.onFreeze.push(this.onNextPlayer);
         }
 
-        if (current.getID().get() === this.myUser.getID().get()) {
+        if (currentPlayer.getID().get() === this.myUser.getID().get()) {
             this.club.enable();
         }
     }

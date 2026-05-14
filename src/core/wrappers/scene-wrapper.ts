@@ -1,10 +1,12 @@
 import * as THREE from "three";
 import { Monobehavior } from "../monobehavior";
 import { Color } from "../common/enums";
+import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 export class SceneWrapper extends Monobehavior {
     public scene: THREE.Scene;
     public renderer: THREE.WebGLRenderer;
+    public labelRenderer: CSS2DRenderer;
     public globalLight: THREE.DirectionalLight;
     public globalLightHelper: THREE.DirectionalLightHelper;
     public hemisphereLight: THREE.HemisphereLight;
@@ -78,16 +80,23 @@ export class SceneWrapper extends Monobehavior {
 
         this.fog = new THREE.FogExp2(0xeeeeee, 0.1);
         this.scene.fog = this.fog;
+
+        this.labelRenderer = new CSS2DRenderer();
+        this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(this.labelRenderer.domElement);
+        this.labelRenderer.domElement.className = "fixed top-0 z-50 pointer-events-none";
     }
 
     public update(delta: number): void {
         this.globalLightHelper.update();
         this.renderer.render(this.scene, this.camera);
+        this.labelRenderer.render(this.scene, this.camera);
     }
 
     public resize(): void {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.renderer.setSize( window.innerWidth, window.innerHeight );
+        this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
         this.camera.updateProjectionMatrix();
     }
 }

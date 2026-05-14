@@ -110,9 +110,7 @@ export abstract class Match {
         this.monobehaviors.push(ball);
 
         this.world.addBody(ball.rigidBody);
-        this.world.sceneWrapper.scene.add(ball.arrow);
-        this.world.sceneWrapper.scene.add(ball.safePositionDebug);
-        this.world.sceneWrapper.scene.add(ball.colliderDebug);
+        ball.add(user, this.world.sceneWrapper.scene);
 
         ball.rigidBody.mesh.position.set(1, 0.071335, 0);
         ball.rigidBody.freeze();
@@ -127,9 +125,7 @@ export abstract class Match {
         this.monobehaviors.splice(index, 1);
 
         this.world.removeBody(ball.rigidBody);
-        this.world.sceneWrapper.scene.remove(ball.arrow);
-        this.world.sceneWrapper.scene.remove(ball.safePositionDebug);
-        this.world.sceneWrapper.scene.remove(ball.colliderDebug);
+        ball.remove(this.world.sceneWrapper.scene);
     }
 
     private animate = () => {
