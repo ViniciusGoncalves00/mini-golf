@@ -57,6 +57,7 @@ Add most of the game's elements, such as user interface, sounds, improves the ex
         * [ ] Show the minimum shots.
         * [ ] Show the total shots.
         * [ ] Show the courses table.
+        * [ ] Show a course map.
 * [ ] FX
     * [ ] On collision ("dust")
     * [ ] Ball tail

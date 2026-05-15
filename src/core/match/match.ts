@@ -92,14 +92,12 @@ export abstract class Match {
     public loadCourse(course: Course): void {
         course.tiles.values().forEach((tile) => {
             this.world.addBody(tile.rigidBody);
-            this.world.sceneWrapper.scene.add(tile.rigidBody.mesh);
         })
     }
 
     public unloadCourse(course: Course): void {
         course.tiles.values().forEach((tile) => {
             this.world.removeBody(tile.rigidBody);
-            this.world.sceneWrapper.scene.remove(tile.rigidBody.mesh);
         })
     }
 
@@ -110,10 +108,11 @@ export abstract class Match {
         this.monobehaviors.push(ball);
 
         this.world.addBody(ball.rigidBody);
-        ball.add(user, this.world.sceneWrapper.scene);
+        ball.add(user, this.world.sceneWrapper.scene, this.world.mapWrapper.scene);
 
         ball.rigidBody.mesh.position.set(1, 0.071335, 0);
         ball.rigidBody.freeze();
+
         return ball;
     }
 
@@ -125,7 +124,7 @@ export abstract class Match {
         this.monobehaviors.splice(index, 1);
 
         this.world.removeBody(ball.rigidBody);
-        ball.remove(this.world.sceneWrapper.scene);
+        ball.remove(this.world.sceneWrapper.scene, this.world.mapWrapper.scene);
     }
 
     private animate = () => {

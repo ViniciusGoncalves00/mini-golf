@@ -4,23 +4,28 @@ import { Color } from "../common/enums";
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 export class SceneWrapper extends Monobehavior {
-    public scene: THREE.Scene;
-    public renderer: THREE.WebGLRenderer;
-    public labelRenderer: CSS2DRenderer;
-    public globalLight: THREE.DirectionalLight;
-    public globalLightHelper: THREE.DirectionalLightHelper;
-    public hemisphereLight: THREE.HemisphereLight;
-    public ambientLight: THREE.AmbientLight;
+    public readonly scene: THREE.Scene;
 
+    public readonly renderer: THREE.WebGLRenderer;
+    public readonly labelRenderer: CSS2DRenderer;
+
+    public readonly globalLight: THREE.DirectionalLight;
+    public readonly hemisphereLight: THREE.HemisphereLight;
+    public readonly ambientLight: THREE.AmbientLight;
+
+    public readonly globalLightHelper: THREE.DirectionalLightHelper;
+
+    public readonly fog: THREE.FogExp2;
+    private readonly camera: THREE.PerspectiveCamera;
     private readonly ground: THREE.Mesh;
     private readonly grid: THREE.Mesh;
-    private readonly camera: THREE.PerspectiveCamera;
-    private readonly fog: THREE.FogExp2;
 
     public constructor(canvas: HTMLElement, camera: THREE.PerspectiveCamera) {
         super();
 
         this.camera = camera;
+        this.camera.layers.enable(0);
+        this.camera.layers.disable(2);
 
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0xeeeeee);

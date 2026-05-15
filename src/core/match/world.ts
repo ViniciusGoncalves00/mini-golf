@@ -6,6 +6,7 @@ import { RigidBody } from "../physics/rigidBody";
 import { VectorUtils } from "../utils";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { BodyType } from "../common/enums";
+import { MapWrapper } from "../wrappers/map-wrapper";
 
 /**
  * Class to handle only with objects in a scene.
@@ -22,6 +23,7 @@ export class World {
     
     public readonly sceneWrapper: SceneWrapper;
     public readonly cameraWrapper: CameraWrapper;
+    public readonly mapWrapper: MapWrapper;
 
     public onCollision: ((bodyA: RigidBody, bodyB: RigidBody, cossine: number) => void)[] = [];
         
@@ -29,6 +31,9 @@ export class World {
         this.cameraWrapper = new CameraWrapper(canvas);
         this.sceneWrapper = new SceneWrapper(canvas, this.cameraWrapper.camera);
         this.sceneWrapper.scene.add(this.cameraWrapper.cameraLight);
+
+        this.mapWrapper = new MapWrapper(this.sceneWrapper.scene,document.getElementById("map")!);
+        this.sceneWrapper.scene.add(this.mapWrapper.camera);
 
         let amount = 0;
         let total = 0;
@@ -55,7 +60,12 @@ export class World {
 
     public update(delta: number) {
         this.cameraWrapper.update(delta);
+
+        this.sceneWrapper.scene.fog = this.sceneWrapper.fog;
         this.sceneWrapper.update(delta);
+
+        this.sceneWrapper.scene.fog = null;
+        this.mapWrapper.update(delta);
 
         for (const dynamicBody of this.dynamicBodies) {
             if (dynamicBody.freezed()) continue;
@@ -76,6 +86,8 @@ export class World {
         
         this.rigidBodies.push(body);
         this.sceneWrapper.scene.add(body.mesh);
+
+        this.mapWrapper.centralize(this.rigidBodies.map(rb => rb.mesh));
     }
 
     public removeBody(body: RigidBody): void {

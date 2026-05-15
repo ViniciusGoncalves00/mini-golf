@@ -47,6 +47,22 @@ export class Ball extends Monobehavior {
         this.rigidBody.size = radius;
 
         this.safePositionDebug.visible = false;
+
+        const mapMarker = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+                color: 0xffffff,
+                depthTest: false,
+                depthWrite: false,
+            })
+        );
+
+        mapMarker.scale.set(100, 100, 1);
+        mapMarker.position.y = 5;
+
+        this.rigidBody.mesh.layers.set(0);
+        mapMarker.layers.set(2);
+
+        this.rigidBody.mesh.add(mapMarker);
     }
 
     public update(delta: number): void {
@@ -62,17 +78,19 @@ export class Ball extends Monobehavior {
         this.label.position.y += 0.05;
     }
 
-    public add(player: User, scene: THREE.Scene): void {
+    public add(player: User, scene: THREE.Scene, minimap: THREE.Scene): void {
         this.label.element.textContent = player.getName().get();
         this.label.element.style.color = 'white';
 
+        minimap.add(this.label);
         scene.add(this.label);
         scene.add(this.arrow);
         scene.add(this.safePositionDebug);
         scene.add(this.colliderDebug);
     }
 
-    public remove(scene: THREE.Scene): void {
+    public remove(scene: THREE.Scene, minimap: THREE.Scene): void {
+        minimap.remove(this.label);
         scene.remove(this.label);
         scene.remove(this.arrow);
         scene.remove(this.safePositionDebug);
