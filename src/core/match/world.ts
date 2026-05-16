@@ -72,8 +72,6 @@ export class World {
             if (dynamicBody.freezed()) continue;
             this.simulateDynamicBody(delta, dynamicBody);
         };
-
-        this.mapWrapper.setPosition(this.dynamicBodies[0].mesh);
     }
 
     public addBody(body: RigidBody): void {

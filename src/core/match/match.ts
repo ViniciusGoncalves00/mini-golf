@@ -12,11 +12,13 @@ import { AudioAPI, AudioKey } from "@/audio/audio-API";
 import { BodyType } from "../common/enums";
 import { RigidBody } from "../physics/rigidBody";
 import { Page, PageManager } from "@/ui/page";
+import { use } from "react";
 
 export abstract class Match {
     public readonly courses: Course[] = [];
     public readonly world: World;
     public readonly users: User[] = [];
+    public myUser: User;
     public readonly club: Club = new Club();
     
     protected currentCourse: Course | null = null;
@@ -30,13 +32,14 @@ export abstract class Match {
     private accumulator: number = 0;
     private frame: number = 0;
     
-    public constructor(canvas: HTMLElement, courses: Course[], users: User[]) {
+    public constructor(canvas: HTMLElement, courses: Course[], users: User[], myUser: User) {
         this.world = new World(canvas);
         this.world.sceneWrapper.scene.add(this.club.arrow);
         this.club.disable();
 
         this.courses = courses;
         this.users = users;
+        this.myUser = myUser;
 
         this.monobehaviors.push(this.club);
         this.world.onCollision.push((bodyA, bodyB, dot) => this.emitSound(bodyA, bodyB, dot));
@@ -138,6 +141,11 @@ export abstract class Match {
 
             this.accumulator -= this.hertz;
         }
+
+        const rigidBody = this.world.dynamicBodies.find((rb) => rb.mesh.name === this.myUser.getID().get());
+        if (!rigidBody) return;
+
+        this.world.mapWrapper.setPosition(rigidBody.mesh);
     }
 
     private emitSound(bodyA: RigidBody, bodyB: RigidBody, dot: number): void {

@@ -41,7 +41,7 @@ export class Session {
 
         setTimeout(() => {
             const canvas = document.getElementById("game")!;
-            this.match = new SinglePlayerMatch(canvas, courses, [this.user]);
+            this.match = new SinglePlayerMatch(canvas, courses, [this.user], this.user);
             this.match.start();
         }, (100));
     }

@@ -8,13 +8,10 @@ import { Match } from "./match";
  * Class to handle only with all match logic (world/scene, players, ui).
  */
 export class MultiPlayerMatch extends Match {
-    public myUser: User;
     public turnIndex: number = -1;
     
     public constructor(canvas: HTMLElement, courses: Course[], users: User[], myUser: User) {
-        super(canvas, courses, users);
-
-        this.myUser = myUser;
+        super(canvas, courses, users, myUser);
 
         canvas.addEventListener("mousemove", (e) => {
             const rigidBody = this.world.rigidBodies.find((rb) => rb.mesh.name === this.myUser.getID().get());

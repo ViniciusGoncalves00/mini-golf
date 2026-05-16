@@ -4,8 +4,8 @@ import { User } from "../user";
 import { Course } from "../course/course";
 
 export class SinglePlayerMatch extends Match {
-    public constructor(canvas: HTMLElement, courses: Course[], players: User[]) {
-        super(canvas, courses, players);
+    public constructor(canvas: HTMLElement, courses: Course[], players: User[], myUser: User) {
+        super(canvas, courses, players, myUser);
 
         const user = this.users[0];
         const ball = this.placeBall(user);
