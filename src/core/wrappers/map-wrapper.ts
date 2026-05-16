@@ -27,13 +27,35 @@ export class MapWrapper extends Monobehavior {
         );
         this.camera.layers.enable(0);
         this.camera.layers.enable(2);
+
         
         this.renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
-        this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        this.renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
     }
 
     public update(delta: number): void {
         this.renderer.render(this.scene, this.camera);
+    }
+
+    public resize(): void {
+        const canvas = this.renderer.domElement;
+
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+
+        if (width <= 0 || height <= 0) return;
+
+        const aspect = width / height;
+        const frustum = 100;
+
+        this.camera.left = -frustum * aspect;
+        this.camera.right = frustum * aspect;
+        this.camera.top = frustum;
+        this.camera.bottom = -frustum;
+
+        this.camera.updateProjectionMatrix();
+
+        this.renderer.setSize(width, height, false);
     }
 
     public centralize(objects: THREE.Object3D[]): void {
@@ -54,9 +76,6 @@ export class MapWrapper extends Monobehavior {
         box.getSize(size);
 
         const offset = 1.2;
-
-        const width = window.innerWidth;
-        const height = window.innerHeight;
 
         const object_width = size.x;
         const object_height = size.y;

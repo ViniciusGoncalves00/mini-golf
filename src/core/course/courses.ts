@@ -25,7 +25,7 @@ const ramp15TwoWalls = storage.geometries.get(Geometries.RAMP_15_TWO_WALLS)!.rot
 
 export const level1 = () => {
     const tiles: Tile[] = []
-    const rows = 13;
+    const rows = 11;
     const columns = 3;
 
     for (let column = 0; column < columns; column++) {

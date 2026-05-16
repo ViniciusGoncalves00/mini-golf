@@ -32,7 +32,7 @@ export class World {
         this.sceneWrapper = new SceneWrapper(canvas, this.cameraWrapper.camera);
         this.sceneWrapper.scene.add(this.cameraWrapper.cameraLight);
 
-        this.mapWrapper = new MapWrapper(this.sceneWrapper.scene,document.getElementById("map")!);
+        this.mapWrapper = new MapWrapper(this.sceneWrapper.scene, document.getElementById("map")!);
         this.sceneWrapper.scene.add(this.mapWrapper.camera);
 
         let amount = 0;
@@ -66,6 +66,8 @@ export class World {
 
         this.sceneWrapper.scene.fog = null;
         this.mapWrapper.update(delta);
+        this.mapWrapper.resize();
+        this.mapWrapper.centralize(this.staticBodies.map(rb => rb.mesh));
 
         for (const dynamicBody of this.dynamicBodies) {
             if (dynamicBody.freezed()) continue;
@@ -87,7 +89,7 @@ export class World {
         this.rigidBodies.push(body);
         this.sceneWrapper.scene.add(body.mesh);
 
-        this.mapWrapper.centralize(this.rigidBodies.map(rb => rb.mesh));
+        this.mapWrapper.centralize(this.staticBodies.map(rb => rb.mesh));
     }
 
     public removeBody(body: RigidBody): void {
