@@ -67,12 +67,13 @@ export class World {
         this.sceneWrapper.scene.fog = null;
         this.mapWrapper.update(delta);
         this.mapWrapper.resize();
-        this.mapWrapper.centralize(this.staticBodies.map(rb => rb.mesh));
 
         for (const dynamicBody of this.dynamicBodies) {
             if (dynamicBody.freezed()) continue;
             this.simulateDynamicBody(delta, dynamicBody);
         };
+
+        this.mapWrapper.setPosition(this.dynamicBodies[0].mesh);
     }
 
     public addBody(body: RigidBody): void {
@@ -88,8 +89,6 @@ export class World {
         
         this.rigidBodies.push(body);
         this.sceneWrapper.scene.add(body.mesh);
-
-        this.mapWrapper.centralize(this.staticBodies.map(rb => rb.mesh));
     }
 
     public removeBody(body: RigidBody): void {

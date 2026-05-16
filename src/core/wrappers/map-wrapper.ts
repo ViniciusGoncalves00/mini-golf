@@ -1,10 +1,13 @@
 import * as THREE from "three";
 import { Monobehavior } from "../monobehavior";
+import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { clamp } from "three/src/math/MathUtils.js";
 
 export class MapWrapper extends Monobehavior {
     public readonly scene: THREE.Scene;
     public readonly renderer: THREE.WebGLRenderer;
     public readonly camera: THREE.OrthographicCamera;
+    public readonly orbitControls: OrbitControls;
 
     public constructor(scene: THREE.Scene, canvas: HTMLElement) {
         super();
@@ -25,9 +28,16 @@ export class MapWrapper extends Monobehavior {
              0.1,
              10000
         );
+        this.camera.up.set(0, 0, -1);
+        this.camera.position.set(0, 100, 0);
+        this.camera.lookAt(0, -1, 0);
         this.camera.layers.enable(0);
         this.camera.layers.enable(2);
+        this.camera.zoom = 80;
 
+        this.orbitControls = new OrbitControls(this.camera, canvas);
+        this.orbitControls.enableRotate = false;
+        this.orbitControls.enablePan = false;
         
         this.renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
         this.renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
@@ -56,6 +66,16 @@ export class MapWrapper extends Monobehavior {
         this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(width, height, false);
+    }
+
+    public setPosition(object: THREE.Object3D): void {
+        this.camera.zoom = clamp(this.camera.zoom, 50, 240);
+        
+        this.camera.position.set(object.position.x, this.camera.position.y, object.position.z);
+        this.camera.lookAt(object.position);
+
+        this.orbitControls.update();
+        this.orbitControls.target.copy(object.position);
     }
 
     public centralize(objects: THREE.Object3D[]): void {

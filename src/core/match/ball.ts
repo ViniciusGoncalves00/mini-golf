@@ -56,8 +56,7 @@ export class Ball extends Monobehavior {
             })
         );
 
-        mapMarker.scale.set(100, 100, 1);
-        mapMarker.position.y = 5;
+        mapMarker.scale.set(50, 50, 1);
 
         this.rigidBody.mesh.layers.set(0);
         mapMarker.layers.set(2);
