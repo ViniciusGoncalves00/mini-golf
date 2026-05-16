@@ -4,9 +4,11 @@ import { Ball } from "../match/ball";
 import { Monobehavior } from "../monobehavior";
 import { RigidBody } from "../physics/rigidBody";
 import { CameraType } from "../common/enums";
+import { clamp } from "three/src/math/MathUtils.js";
 
 export class CameraWrapper extends Monobehavior {
-    public distance: number = 2;
+    public readonly minDistance: number = 0.2;
+    public readonly maxDistance: number = 2;
     public camera: THREE.PerspectiveCamera;
     public cameraLight: THREE.DirectionalLight;
     public orbitControls: OrbitControls;
@@ -22,6 +24,9 @@ export class CameraWrapper extends Monobehavior {
         
         this.cameraLight = new THREE.DirectionalLight(0xffffff, 0.1);
         this.orbitControls = new OrbitControls(this.camera, canvas);
+
+        this.orbitControls.enablePan = false;
+        this.orbitControls.minDistance = this.minDistance;
     }
 
     public update(delta: number): void {
@@ -31,7 +36,8 @@ export class CameraWrapper extends Monobehavior {
             const target = this.target;
 
             const direction = new THREE.Vector3().subVectors(camera.position, target.mesh.position).normalize();
-            const position = new THREE.Vector3().copy(direction).multiplyScalar(this.distance).add(target.mesh.position);
+            const distance = clamp(this.orbitControls.getDistance(), this.minDistance, this.maxDistance);
+            const position = new THREE.Vector3().copy(direction).multiplyScalar(distance).add(target.mesh.position);
 
             camera.position.copy(position);
             this.orbitControls.target.copy(target.mesh.position);
@@ -47,13 +53,13 @@ export class CameraWrapper extends Monobehavior {
         this.cameraMode = CameraType.TARGET;
         this.target = body;
 
-        this.orbitControls.enablePan = false;
+        this.orbitControls.maxDistance = this.maxDistance;
     }
 
     public setFreeMode(): void {
         this.cameraMode = CameraType.FREE;
         this.target = null;
 
-        this.orbitControls.enablePan = true;
+        this.orbitControls.maxDistance = Infinity;
     }
 }

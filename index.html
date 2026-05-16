@@ -18,9 +18,9 @@
                 </p>
             </section>
             <section class="h-full flex flex-col space-y-2">
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('singleplayer')">singleplayer</button>
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('multiplayer')">multiplayer</button>
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('settings')">settings</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('singleplayer')">singleplayer</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('multiplayer')">multiplayer</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('settings')">settings</button>
                 <!-- <button class="btn btn-disabled uppercase font-bold" disabled>credits</button>
                 <button class="btn btn-disabled uppercase font-bold" disabled>quit</button> -->
             </section>
@@ -55,24 +55,24 @@
         <main x-show="$store.pageManager.page == 'singleplayer'" class="bg-grid h-full w-full flex flex-col justify-between items-center overflow-hidden gap-4 relative z-50">
             <section class="h-64 flex-none flex flex-col items-center justify-end text-white"></section>
             <section class="h-full flex flex-col space-y-2">
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('game'); $store.session.startSinglePlayerMatch()">start</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('game'); $store.session.startSinglePlayerMatch()">start</button>
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('main')">back</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('main')">back</button>
                 <div></div>
             </section>
         </main>
         <main x-show="$store.pageManager.page == 'multiplayer'" class="bg-grid h-full w-full flex flex-col justify-between items-center overflow-hidden gap-4 relative z-50">
             <section class="h-64 flex-none flex flex-col items-center justify-end text-white"></section>
             <section class="h-1/3 flex-none flex flex-col space-y-2" x-data="{roomID: ''}">
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('room'), $store.session.createRoom()">create room</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('room'), $store.session.createRoom()">create room</button>
                 <input type="text" placeholder="Room ID" class="input input-bordered w-full max-w-xs bg-transparent text-white" x-model="roomID">
-                <button class="btn uppercase font-bold" @click="$store.session.connectTo(roomID)">enter room</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.session.connectTo(roomID)">enter room</button>
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('main')">back</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('main')">back</button>
                 <div></div>
             </section>
         </main>
@@ -87,11 +87,11 @@
                         <div x-show="user.getID().get() == $store.room.host.getID().get()">(host)</div>
                     </div>
                 </template>
-                <button x-show="$store.room.host?.getID().get() == $store.session.user.getID().get()" class="btn uppercase font-bold" @click="$store.pageManager.setPage('game'); $store.session.startMultiPlayerMatch()">start</button>
+                <button x-show="$store.room.host?.getID().get() == $store.session.user.getID().get()" class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('game'); $store.session.startMultiPlayerMatch()">start</button>
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('multiplayer')">leave</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('multiplayer')">leave</button>
                 <div></div>
             </section>
         </main>
@@ -103,31 +103,12 @@
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('main')">back</button>
+                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('main')">back</button>
                 <div></div>
             </section>
         </main>
         <main x-show="$store.pageManager.page == 'game'" class="relative h-full w-full flex flex-col gap-4 items-center">
             <div class="absolute w-full h-full flex flex-col pointer-events-none">
-              <!-- {showHelp && (
-                <div className="absolute w-full h-full bg-zinc-200/80 flex items-center justify-center">
-                  <div className="bg-zinc-200 border rounded-lg border-amber-500 p-4 flex flex-col pointer-events-auto">
-
-                    <div
-                      className="w-full h-4 flex items-end cursor-pointer"
-                      onClick={() => setShowHelp(false)}
-                    >
-                      <div className="h-full aspect-square">X</div>
-                    </div>
-                
-                    <div className="w-full h-4">How to play</div>
-                    <div className="w-full h-4">Mouse Left: Orbit Camera</div>
-                    <div className="w-full h-4">Mouse Right: Shot the ball</div>
-                    <div className="w-full h-4">T: Toggle free camera</div>
-                  </div>
-                </div>
-              )} -->
-            
                 <div class="w-full flex px-8 py-4 space-x-4">
                     <template x-for="user in $store.room.users">
                         <div :key=user.getID().get() class="flex skew-x-[-15deg] border-2 border-amber-500">
@@ -165,9 +146,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="w-full"></div>
-                <div class="fixed top-[calc(100%-256px-16px)] left-4 h-64 w-64 border border-white rounded-sm flex-none pointer-events-auto">
-                    <canvas id="map" class="h-full w-full rounded-sm"></canvas>
+                <div class="relative h-64 w-64 m-4 p-1 border-2 border-white rounded-full flex-none pointer-events-auto">
+                    <canvas id="map" class="h-full w-full rounded-full"></canvas>
+                </div>
+                <div class="bg-dots p-2 w-full flex-none flex items-center space-x-2 border-t-2 border-white pointer-events-auto text-black">
+                    <div id="mouse0" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3645/3645819.png" alt="Left Click Icon" class="w-5 aspect-square">
+                        <div class="flex items-center justify-center align-center text-center">Orbit</div>
+                    </div>
+                    <div id="mouse2" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3646/3646205.png" alt="Left Click Icon" class="w-5 aspect-square">
+                        <div class="flex items-center justify-center align-center text-center">Zoom</div>
+                    </div>
+                    <div id="mouse1" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3645/3645851.png" alt="Left Click Icon" class="w-5 aspect-square">
+                        <div class="flex items-center justify-center align-center text-center">Shoot</div>
+                    </div>
+                    <div class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                        <i class="px-1.5 border border-black/20 rounded-lg text-sm">T</i>
+                        <div class="flex items-center justify-center align-center text-center">Toggle Free Camera</div>
+                    </div>
                 </div>
             </div>
             <canvas id="game" class="h-full w-full"></canvas>

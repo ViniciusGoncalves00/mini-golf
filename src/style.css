@@ -17,6 +17,15 @@
   background-size: var(--size) var(--size);
 }
 
+.bg-dots {
+    background-color: #fff;
+
+    background-image:
+        radial-gradient(circle, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
+
+    background-size: 8px 8px;
+}
+
 @utility btn {
   @apply bg-green-600 hover:bg-green-700 text-white border border-white rounded-full;
 }
@@ -31,4 +40,8 @@
 
 @utility btn-progress {
   @apply bg-black/20 ease-linear pointer-events-none;
+}
+
+@utility base-field {
+    @apply bg-green-600 hover:bg-green-700 text-white border border-white rounded-full;
 }
