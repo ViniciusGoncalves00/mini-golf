@@ -18,14 +18,13 @@
                 </p>
             </section>
             <section class="h-full flex flex-col space-y-2">
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('singleplayer')">singleplayer</button>
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('multiplayer')">multiplayer</button>
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('settings')">settings</button>
-                <!-- <button class="btn btn-disabled uppercase font-bold" disabled>credits</button>
-                <button class="btn btn-disabled uppercase font-bold" disabled>quit</button> -->
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('singleplayer')">singleplayer</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('multiplayer')">multiplayer</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('settings')">settings</button>
             </section>
             <section class="flex-none flex flex-col items-center justify-end text-white">
-                <p class="flex flex-col items-center space-x-2">
+                <p class="flex flex-col items-center s
+                pace-x-2">
                     <span>Logged in as</span>
                     <input class="text-center font-semibold" :value="$store.session.user.getName().get()" @input.leave="$store.session.user.setName($event.target.value)">
                 </p>
@@ -55,24 +54,24 @@
         <main x-show="$store.pageManager.page == 'singleplayer'" class="bg-grid h-full w-full flex flex-col justify-between items-center overflow-hidden gap-4 relative z-50">
             <section class="h-64 flex-none flex flex-col items-center justify-end text-white"></section>
             <section class="h-full flex flex-col space-y-2">
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('game'); $store.session.startSinglePlayerMatch()">start</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('game'); $store.session.startSinglePlayerMatch()">start</button>
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('main')">back</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('main')">back</button>
                 <div></div>
             </section>
         </main>
         <main x-show="$store.pageManager.page == 'multiplayer'" class="bg-grid h-full w-full flex flex-col justify-between items-center overflow-hidden gap-4 relative z-50">
             <section class="h-64 flex-none flex flex-col items-center justify-end text-white"></section>
             <section class="h-1/3 flex-none flex flex-col space-y-2" x-data="{roomID: ''}">
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('room'), $store.session.createRoom()">create room</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('room'), $store.session.createRoom()">create room</button>
                 <input type="text" placeholder="Room ID" class="input input-bordered w-full max-w-xs bg-transparent text-white" x-model="roomID">
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.session.connectTo(roomID)">enter room</button>
+                <button class="btn uppercase font-bold" @click="$store.session.connectTo(roomID)">enter room</button>
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('main')">back</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('main')">back</button>
                 <div></div>
             </section>
         </main>
@@ -87,11 +86,11 @@
                         <div x-show="user.getID().get() == $store.room.host.getID().get()">(host)</div>
                     </div>
                 </template>
-                <button x-show="$store.room.host?.getID().get() == $store.session.user.getID().get()" class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('game'); $store.session.startMultiPlayerMatch()">start</button>
+                <button x-show="$store.room.host?.getID().get() == $store.session.user.getID().get()" class="btn uppercase font-bold" @click="$store.pageManager.setPage('game'); $store.session.startMultiPlayerMatch()">start</button>
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('multiplayer')">leave</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('multiplayer')">leave</button>
                 <div></div>
             </section>
         </main>
@@ -103,72 +102,70 @@
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold rounded-lg" @click="$store.pageManager.setPage('main')">back</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('main')">back</button>
                 <div></div>
             </section>
         </main>
-        <main x-show="$store.pageManager.page == 'game'" class="relative h-full w-full flex flex-col gap-4 items-center">
-            <div class="absolute w-full h-full flex flex-col pointer-events-none">
-                <div class="w-full flex px-8 py-4 space-x-4">
-                    <template x-for="user in $store.room.users">
-                        <div :key=user.getID().get() class="flex skew-x-[-15deg] border-2 border-amber-500">
-                            <div class="h-16 aspect-square flex items-center justify-center bg-zinc-200/80">
-                                <i class="text-5xl text-amber-500/80 bi bi-person-fill"></i>
-                            </div>
-                          
-                            <div class="w-64 flex flex-col text-white">
-                                <div class="h-1/2 w-full bg-amber-600/80 flex items-center justify-between px-2">
-                                    <div class="flex space-x-1">
-                                        <div class="" x-text="`${user.getName().get()}`"></div>
+        <main x-show="$store.pageManager.page == 'game'" class="h-full w-full flex flex-col items-center overflow-hidden">
+            <div class="relative w-full h-[calc(100%-52px)]">
+                <div class="absolute w-full h-full flex pointer-events-none">
+                    <div class="flex flex-col justify-between">
+                        <div class="w-full flex px-8 py-4 space-x-4">
+                            <template x-for="user in $store.room.users">
+                                <div :key=user.getID().get() class="w-64 inline-flex items-center space-x-4 p-1 bg-white rounded-full border border-black/20 text-black">
+                                    <i class="w-8 aspect-square bi bi-person-fill flex-none flex items-center justify-center rounded-full border border-black/20"></i>
+                                    <div class="w-full flex items-center justify-start align-center text-center space-x-1">
+                                        <div class="truncate" x-text="`${user.getName().get()}`"></div>
                                         <div x-show="user.getID().get() == $store.session.user.getID().get()">(you)</div>
                                     </div>
-                                    <div x-text="user.getID().get()"></div>
+                                    <div class="flex-none flex items-center justify-start align-center text-center space-x-1 mr-2">
+                                        <div>ID:</div>
+                                        <div class="truncate" x-text="user.getID().get()"></div>
+                                    </div>
                                 </div>
-                            
-                                <div class="h-1/2 w-full bg-amber-500/80 flex items-center px-2">Stroke 1</div>
+                            </template>
+                        </div>
+                        <div class="h-64 w-64 m-4 p-1 border-2 border-white rounded-full flex-none pointer-events-auto">
+                            <canvas id="map" class="h-full w-full rounded-full"></canvas>
+                        </div>
+                    </div>
+                    <div class="w-full h-full flex items-center justify-end p-4 text-black">
+                        <div class="h-full w-4 border border-black rounded-lg bg-white/10 relative">
+                            <template x-for="percent in [10, 20, 30, 40, 50, 60, 70, 80, 90]">
+                                <div
+                                    :key="percent"
+                                    class="absolute w-full h-px bg-black text-xs text-center opacity-80 z-10"
+                                    :style="`top: ${100 - percent}%`"
+                                    x-text="percent"
+                                    ></div>
+                            </template>
+                            <div class="w-full h-full rotate-180">
+                                <div id="power-bar" class="w-full rounded-lg opacity-80"></div>
                             </div>
                         </div>
-                    </template>
-                </div>
-          
-                <div class="w-full h-full flex items-center justify-end p-4 text-black">
-                    <div class="h-128 w-4 border border-black rounded-lg bg-white/10 relative">
-                        <template x-for="percent in [10, 20, 30, 40, 50, 60, 70, 80, 90]">
-                            <div
-                                :key="percent"
-                                class="absolute w-full h-px bg-black text-xs text-center opacity-80 z-10"
-                                :style="`top: ${100 - percent}%`"
-                                x-text="percent"
-                                ></div>
-                        </template>
-                        <div class="w-full h-full rotate-180">
-                            <div id="power-bar" class="w-full rounded-lg opacity-80"></div>
-                        </div>
                     </div>
                 </div>
-                <div class="relative h-64 w-64 m-4 p-1 border-2 border-white rounded-full flex-none pointer-events-auto">
-                    <canvas id="map" class="h-full w-full rounded-full"></canvas>
+                <div class="absolute top-[calc(100%-6px)] bg-white w-full h-0.5"></div>
+                <canvas id="game" class="w-full h-full"></canvas>
+            </div>
+            <div class="bg-dots p-2 w-full h-13 flex-none flex items-center space-x-2 border-t-2 border-white pointer-events-auto text-black">
+                <div id="mouse0" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3645/3645819.png" alt="Left Click Icon" class="w-5 aspect-square">
+                    <div class="flex items-center justify-center align-center text-center">Orbit</div>
                 </div>
-                <div class="bg-dots p-2 w-full flex-none flex items-center space-x-2 border-t-2 border-white pointer-events-auto text-black">
-                    <div id="mouse0" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3645/3645819.png" alt="Left Click Icon" class="w-5 aspect-square">
-                        <div class="flex items-center justify-center align-center text-center">Orbit</div>
-                    </div>
-                    <div id="mouse2" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3646/3646205.png" alt="Left Click Icon" class="w-5 aspect-square">
-                        <div class="flex items-center justify-center align-center text-center">Zoom</div>
-                    </div>
-                    <div id="mouse1" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3645/3645851.png" alt="Left Click Icon" class="w-5 aspect-square">
-                        <div class="flex items-center justify-center align-center text-center">Shoot</div>
-                    </div>
-                    <div class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
-                        <i class="px-1.5 border border-black/20 rounded-lg text-sm">T</i>
-                        <div class="flex items-center justify-center align-center text-center">Toggle Free Camera</div>
-                    </div>
+                <div id="mouse2" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3646/3646205.png" alt="Left Click Icon" class="w-5 aspect-square">
+                    <div class="flex items-center justify-center align-center text-center">Zoom</div>
+                </div>
+                <div id="mouse1" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3645/3645851.png" alt="Left Click Icon" class="w-5 aspect-square">
+                    <div class="flex items-center justify-center align-center text-center">Shoot</div>
+                </div>
+                <div class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                    <i class="px-1.5 border border-black/20 rounded-lg text-sm">T</i>
+                    <div class="flex items-center justify-center align-center text-center">Toggle Free Camera</div>
                 </div>
             </div>
-            <canvas id="game" class="h-full w-full"></canvas>
         </main>
     </body>
 </html>

@@ -63,6 +63,7 @@ export class World {
 
         this.sceneWrapper.scene.fog = this.sceneWrapper.fog;
         this.sceneWrapper.update(delta);
+        this.sceneWrapper.resize();
 
         this.sceneWrapper.scene.fog = null;
         this.mapWrapper.update(delta);

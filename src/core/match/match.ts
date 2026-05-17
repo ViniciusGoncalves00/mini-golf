@@ -12,7 +12,6 @@ import { AudioAPI, AudioKey } from "@/audio/audio-API";
 import { BodyType } from "../common/enums";
 import { RigidBody } from "../physics/rigidBody";
 import { Page, PageManager } from "@/ui/page";
-import { use } from "react";
 
 export abstract class Match {
     public readonly courses: Course[] = [];

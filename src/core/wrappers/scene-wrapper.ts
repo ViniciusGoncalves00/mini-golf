@@ -6,6 +6,7 @@ import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 export class SceneWrapper extends Monobehavior {
     public readonly scene: THREE.Scene;
 
+    public readonly canvas: HTMLElement;
     public readonly renderer: THREE.WebGLRenderer;
     public readonly labelRenderer: CSS2DRenderer;
 
@@ -23,6 +24,7 @@ export class SceneWrapper extends Monobehavior {
     public constructor(canvas: HTMLElement, camera: THREE.PerspectiveCamera) {
         super();
 
+        this.canvas = canvas;
         this.camera = camera;
         this.camera.layers.enable(0);
         this.camera.layers.disable(2);
@@ -31,7 +33,7 @@ export class SceneWrapper extends Monobehavior {
         this.scene.background = new THREE.Color(0xeeeeee);
 
         this.renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFShadowMap;
         window.addEventListener("resize", (e) => {
@@ -87,7 +89,7 @@ export class SceneWrapper extends Monobehavior {
         this.scene.fog = this.fog;
 
         this.labelRenderer = new CSS2DRenderer();
-        this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        this.labelRenderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
         document.body.appendChild(this.labelRenderer.domElement);
         this.labelRenderer.domElement.className = "fixed top-0 pointer-events-none";
     }
@@ -99,9 +101,9 @@ export class SceneWrapper extends Monobehavior {
     }
 
     public resize(): void {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.renderer.setSize( window.innerWidth, window.innerHeight );
-        this.labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        this.camera.aspect = this.canvas.clientWidth / this.canvas.clientHeight;
+        this.renderer.setSize( this.canvas.clientWidth, this.canvas.clientHeight, false);
+        this.labelRenderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
         this.camera.updateProjectionMatrix();
     }
 }
