@@ -27,6 +27,11 @@ export class CameraWrapper extends Monobehavior {
 
         this.orbitControls.enablePan = false;
         this.orbitControls.minDistance = this.minDistance;
+        this.orbitControls.mouseButtons = {
+            LEFT: THREE.MOUSE.ROTATE,
+            MIDDLE: THREE.MOUSE.PAN,
+            RIGHT: null,
+        };
     }
 
     public update(delta: number): void {
@@ -54,6 +59,7 @@ export class CameraWrapper extends Monobehavior {
         this.target = body;
 
         this.orbitControls.maxDistance = this.maxDistance;
+        this.orbitControls.enablePan = false;
     }
 
     public setFreeMode(): void {
@@ -61,5 +67,6 @@ export class CameraWrapper extends Monobehavior {
         this.target = null;
 
         this.orbitControls.maxDistance = Infinity;
+        this.orbitControls.enablePan = true;
     }
 }
