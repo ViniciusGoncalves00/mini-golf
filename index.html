@@ -102,7 +102,7 @@
             </section>
             <section class="w-full p-4 text-white flex-none flex items-end justify-between">
                 <div></div>
-                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('main')">back</button>
+                <button class="btn uppercase font-bold" @click="$store.pageManager.setPage('game')">back</button>
                 <div></div>
             </section>
         </main>
@@ -110,7 +110,7 @@
             <div class="relative w-full h-[calc(100%-52px)]">
                 <div class="absolute w-full h-full flex pointer-events-none">
                     <div class="flex flex-col justify-between">
-                        <div class="w-full flex px-8 py-4 space-x-4">
+                        <div class="w-full flex px-4 py-4 space-x-4">
                             <template x-for="user in $store.room.users">
                                 <div :key=user.getID().get() class="w-64 inline-flex items-center space-x-4 p-1 bg-white rounded-full border border-black/20 text-black">
                                     <i class="w-8 aspect-square bi bi-person-fill flex-none flex items-center justify-center rounded-full border border-black/20"></i>
@@ -125,22 +125,26 @@
                                 </div>
                             </template>
                         </div>
-                        <div class="h-64 w-64 m-4 p-1 border-2 border-white rounded-full flex-none pointer-events-auto">
-                            <canvas id="map" class="h-full w-full rounded-full"></canvas>
+                        <div class="h-64 w-64 mx-4 my-6 p-1 border-2 border-white rounded-full flex-none pointer-events-auto">
+                            <canvas id="map" class="h-full w-full drop-shadow-sm drop-shadow-white rounded-full"></canvas>
                         </div>
                     </div>
-                    <div class="w-full h-full flex items-center justify-end p-4 text-black">
-                        <div class="h-full w-4 border border-black rounded-lg bg-white/10 relative">
-                            <template x-for="percent in [10, 20, 30, 40, 50, 60, 70, 80, 90]">
-                                <div
-                                    :key="percent"
-                                    class="absolute w-full h-px bg-black text-xs text-center opacity-80 z-10"
-                                    :style="`top: ${100 - percent}%`"
-                                    x-text="percent"
-                                    ></div>
-                            </template>
-                            <div class="w-full h-full rotate-180">
-                                <div id="power-bar" class="w-full rounded-lg opacity-80"></div>
+                    <div class="w-full h-full flex items-center justify-end px-4 pt-4 pb-6 text-black">
+                        <div class="h-full rounded-full border-2 border-black/20">
+                            <div class="h-full rounded-full border-2 border-white">
+                                <div class="h-full w-4 rounded-full border border-black/20 bg-white/20 relative">
+                                    <template x-for="percent in [10, 20, 30, 40, 50, 60, 70, 80, 90]">
+                                        <div
+                                            :key="percent"
+                                            class="absolute w-full h-0.5 bg-white border-t-2 border-black/20 text-white font-medium text-xs text-center z-10"
+                                            :style="`top: ${100 - percent}%`"
+                                            x-text="percent"
+                                        ></div>
+                                    </template>
+                                    <div class="w-full h-full rotate-180">
+                                        <div id="power-bar" class="w-full rounded-full"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -149,21 +153,29 @@
                 <canvas id="game" class="w-full h-full"></canvas>
             </div>
             <div class="bg-dots p-2 w-full h-13 flex-none flex items-center space-x-2 border-t-2 border-white pointer-events-auto text-black">
-                <div id="mouse0" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 bg-white rounded-full border border-black/20">
                     <img src="https://cdn-icons-png.flaticon.com/512/3645/3645819.png" alt="Left Click Icon" class="w-5 aspect-square">
                     <div class="flex items-center justify-center align-center text-center">Orbit</div>
                 </div>
-                <div id="mouse2" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 bg-white rounded-full border border-black/20">
                     <img src="https://cdn-icons-png.flaticon.com/512/3646/3646205.png" alt="Left Click Icon" class="w-5 aspect-square">
                     <div class="flex items-center justify-center align-center text-center">Zoom</div>
                 </div>
-                <div id="mouse1" class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 bg-white rounded-full border border-black/20">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3646/3646205.png" alt="Left Click Icon" class="w-5 aspect-square">
+                    <div class="flex items-center justify-center align-center text-center">Pan (free camera)</div>
+                </div>
+                <div class="inline-flex items-center space-x-2 px-3 py-1 bg-white rounded-full border border-black/20">
                     <img src="https://cdn-icons-png.flaticon.com/512/3645/3645851.png" alt="Left Click Icon" class="w-5 aspect-square">
                     <div class="flex items-center justify-center align-center text-center">Shoot</div>
                 </div>
-                <div class="inline-flex items-center space-x-2 px-2 py-1 bg-white rounded-full border border-black/20">
-                    <i class="px-1.5 border border-black/20 rounded-lg text-sm">T</i>
+                <div class="inline-flex items-center space-x-2 px-3 py-1 bg-white rounded-full border border-black/20">
+                    <p class="px-1.5 border border-black/20 rounded-sm text-sm">T</p>
                     <div class="flex items-center justify-center align-center text-center">Toggle Free Camera</div>
+                </div>
+                <div class="inline-flex items-center space-x-2 px-3 py-1 bg-white rounded-full border border-black/20">
+                    <p class="px-1.5 border border-black/20 rounded-sm text-sm">P</p>
+                    <div class="flex items-center justify-center align-center text-center">Settings</div>
                 </div>
             </div>
         </main>
